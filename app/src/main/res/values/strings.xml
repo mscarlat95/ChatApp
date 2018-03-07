@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">ChatoS</string>
+    <string name="user_register">Don\'t have an account, yet? Please, sign up!</string>
+    <string name="email_hint">Email</string>
+    <string name="username_hint">Username</string>
+    <string name="password_hint">Password</string>
+    <string name="logout_button">Log Out</string>
+</resources>

@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "534743571431",
+    "firebase_url": "https://fir-chatapplication-5a636.firebaseio.com",
+    "project_id": "fir-chatapplication-5a636",
+    "storage_bucket": "fir-chatapplication-5a636.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:534743571431:android:6a48f1ba5a6d40bc",
+        "android_client_info": {
+          "package_name": "com.scarlat.marius.chatapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "534743571431-i8p8h9fndon4g34p4l24s4r7gq5rve74.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.scarlat.marius.chatapp",
+            "certificate_hash": "b1ef612cc27c1413404d12c039bd372cd60e1a27"
+          }
+        },
+        {
+          "client_id": "534743571431-n96upmdia45v605gp4lq7b74707efs73.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDFkO7ssPFOTvosxjW8YXnOjl3NxdHE9Ag"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "534743571431-n96upmdia45v605gp4lq7b74707efs73.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
