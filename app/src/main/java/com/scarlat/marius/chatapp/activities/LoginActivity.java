@@ -1,4 +1,4 @@
-package com.scarlat.marius.chatapp;
+package com.scarlat.marius.chatapp.activities;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -17,6 +17,8 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.scarlat.marius.chatapp.R;
+import com.scarlat.marius.chatapp.util.Constants;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -25,6 +27,7 @@ public class LoginActivity extends AppCompatActivity {
 
     // Android fields
     private TextView registerTextView;
+    private TextView forgotPasswordTextView;
     private TextInputLayout emailInputLayout;
     private TextInputLayout passwordInputLayout;
     private Button loginButton;
@@ -50,7 +53,6 @@ public class LoginActivity extends AppCompatActivity {
         toolbar = (Toolbar) findViewById(R.id.loginToolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("ChatoS - Login");
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true); // for back button
 
         // Initialize Firebase authentification
         mAuth = FirebaseAuth.getInstance();
@@ -59,11 +61,24 @@ public class LoginActivity extends AppCompatActivity {
         emailInputLayout = (TextInputLayout) findViewById(R.id.emailInputLayout);
         passwordInputLayout = (TextInputLayout) findViewById(R.id.passwordInputLayout);
 
+        forgotPasswordTextView = (TextView) findViewById(R.id.forgotPasswordTextView);
+        forgotPasswordTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(Constants.USER_LOGIN_TAG, "Forgot password. Perform password reset");
+
+                // Launch Register Activity
+                Intent forgotPassIntent = new Intent(LoginActivity.this, ForgotPasswordActivity.class);
+                forgotPassIntent.putExtra("forgotPassword", true);
+                startActivity(forgotPassIntent);
+            }
+        });
+
         registerTextView = (TextView) findViewById(R.id.registerTextView);
         registerTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d(Constants.USER_STATUS_TAG, "Not existing. Must register");
+                Log.d(Constants.USER_LOGIN_TAG, "User does not exists. Perform registration");
 
                 // Launch Register Activity
                 Intent registerIntent = new Intent(LoginActivity.this, RegisterActivity.class);
@@ -74,7 +89,7 @@ public class LoginActivity extends AppCompatActivity {
 
         loginProgress = new ProgressDialog(this);
 
-        loginButton = (Button) findViewById(R.id.loginButton);
+        loginButton = (Button) findViewById(R.id.recoverButton);
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -94,8 +109,6 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
         });
-
-
     }
 
     private void loginUser(String email, String password) {
@@ -103,20 +116,23 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (task.isSuccessful()) {
-                    Log.d(Constants.USER_STATUS_TAG, "Is now loggeed in");
+                    Log.d(Constants.USER_LOGIN_TAG, "Successfull");
 
                     // Dismiss progress dialog
                     loginProgress.dismiss();
 
                     // Launch Main Activity
                     Intent mainIntent = new Intent(LoginActivity.this, MainActivity.class);
+
+                    // Clear all previous tasks
+                    mainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     mainIntent.putExtra("main", true);
                     startActivity(mainIntent);
 
                     // User cannot go back to register activity
                     finish();
                 } else {
-                    Log.d(Constants.USER_STATUS_TAG, "Login failed: " + task.getException().toString());
+                    Log.d(Constants.USER_LOGIN_TAG, "Failed: " + task.getException().toString());
 
                     // Hide progress dialog in case of any error
                     loginProgress.hide();
@@ -126,5 +142,6 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
         });
+
     }
 }

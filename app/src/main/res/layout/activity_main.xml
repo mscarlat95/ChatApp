@@ -1,20 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<android.support.constraint.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.scarlat.marius.chatapp.MainActivity">
+    tools:context="com.scarlat.marius.chatapp.activities.MainActivity">
 
-    <include layout="@layout/app_bar_layout" android:id="@+id/mainPageToolbar"/>
 
-    <TextView
-        android:layout_width="wrap_content"
+    <!-- Application bar-->
+    <android.support.design.widget.AppBarLayout
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:text="This is main page"
-        android:textSize="24sp"/>
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:id="@+id/appBarLayout">
 
-</RelativeLayout>
+        <!-- Toolbar -->
+        <include layout="@layout/app_bar_layout" android:id="@+id/mainPageToolbar"/>
+
+        <!-- Tab bar-->
+        <android.support.design.widget.TabLayout
+            android:id="@+id/mainTabLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+        </android.support.design.widget.TabLayout>
+    </android.support.design.widget.AppBarLayout>
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/mainTabsViewPager"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="-9dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/appBarLayout"></android.support.v4.view.ViewPager>
+
+</android.support.constraint.ConstraintLayout>
