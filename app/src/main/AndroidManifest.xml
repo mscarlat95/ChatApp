@@ -24,7 +24,11 @@
             android:name=".activities.RegisterActivity"
             android:parentActivityName=".activities.LoginActivity">
         </activity>
-        <activity android:name=".activities.ForgotPasswordActivity">
+        <activity
+            android:name=".activities.ForgotPasswordActivity"
+            android:parentActivityName=".activities.LoginActivity">
+        </activity>
+        <activity android:name=".activities.ProfileSettingsActivity">
         </activity>
     </application>
 

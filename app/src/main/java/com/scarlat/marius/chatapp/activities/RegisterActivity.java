@@ -101,8 +101,6 @@ public class RegisterActivity extends AppCompatActivity {
                 }
             }
         });
-
-
     }
 
     private void registerUser(String email, String username, String password) {
@@ -116,6 +114,8 @@ public class RegisterActivity extends AppCompatActivity {
 
                             // Dismiss progress dialog
                             registerProgress.dismiss();
+
+                            // TODO: send verification mail
 
                             // Launch Main Activity
                             Intent mainIntent = new Intent(RegisterActivity.this, MainActivity.class);

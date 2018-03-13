@@ -8,14 +8,14 @@ import android.util.Log;
 
 import com.scarlat.marius.chatapp.fragments.ChatsFragment;
 import com.scarlat.marius.chatapp.fragments.FriendsFragment;
-import com.scarlat.marius.chatapp.fragments.RequestsFragment;
+import com.scarlat.marius.chatapp.fragments.FriendRequestsFragment;
 
 public class MainTabsAdapter extends FragmentPagerAdapter{
 
     private int numberOfTabs = 3;
     private String[] fragmentTitles = {
-            "REQUEST",
-            "CHATS",
+            "FRIEND REQUESTS",
+            "CHAT",
             "FRIENDS"
     };
 
@@ -35,7 +35,7 @@ public class MainTabsAdapter extends FragmentPagerAdapter{
 
         switch (position) {
             case 0:
-                fragment = new RequestsFragment();
+                fragment = new FriendRequestsFragment();
                 break;
             case 1:
                 fragment = new ChatsFragment();
