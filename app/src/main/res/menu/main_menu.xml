@@ -2,9 +2,13 @@
 <menu xmlns:app="http://schemas.android.com/apk/res-auto"
       xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <item android:title="Account Settings"/>
-    <item android:title="All Users"/>
     <item
-        android:id="@+id/menuLogoutButton"
+        android:id="@+id/profileSettingsItem"
+        android:title="Profile Settings"/>
+    <item
+        android:id="@+id/userTimelineItem"
+        android:title="Timeline"/>
+    <item
+        android:id="@+id/userLogoutItem"
         android:title="@string/logout_button"/>
 </menu>

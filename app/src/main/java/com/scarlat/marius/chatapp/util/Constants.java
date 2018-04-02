@@ -16,5 +16,21 @@ public class Constants {
     public static final String CURRENT_TAB = "Current Tab";
 
 
+    // Menu options
+    public static final String MENU_SELECTED_OPTION = "Menu Selected Option";
+
+
+    // Requests Codes
+    public static final int REQUEST_CODE_GALLERY = 8;
+    public static final int REQUEST_CODE_CAMERA = 9;
+
+
+    // Shared Preferences
+    public static final String USER_PREFERENCES = "UserDetails";
+    public static final String EMAIL = "Email";
+    public static final String PASSWORD = "Password";
+    public static final String CREDENTIALS_CHECKBOX = "RememberCredentials";
+
+
 
 }

@@ -63,7 +63,7 @@ public class ForgotPasswordActivity extends AppCompatActivity {
         emailCheckBox = (CheckBox) findViewById(R.id.emailCheckBox);
         usernameCheckBox = (CheckBox) findViewById(R.id.usernameCheckBox);
         emailInputLayout = (TextInputLayout) findViewById(R.id.emailInputLayout);
-        usernameInputLayout = (TextInputLayout) findViewById(R.id.usernameInputLayout);
+        usernameInputLayout = (TextInputLayout) findViewById(R.id.fullNameInputLayout);
         resultTextView = (TextView) findViewById(R.id.resultTextView);
 
         emailInputLayout.getEditText().addTextChangedListener(new TextListener(emailCheckBox));

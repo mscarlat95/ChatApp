@@ -2,7 +2,6 @@ package com.scarlat.marius.chatapp.activities;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
@@ -21,6 +20,7 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.scarlat.marius.chatapp.R;
 import com.scarlat.marius.chatapp.util.Constants;
+import com.scarlat.marius.chatapp.util.SharedPref;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -41,9 +41,6 @@ public class LoginActivity extends AppCompatActivity {
     // Firebase Auth
     private FirebaseAuth mAuth;
 
-    // Data storage
-    SharedPreferences sharedPreferences;
-    SharedPreferences.Editor preferencesEditor;
 
 
     @Override
@@ -63,12 +60,11 @@ public class LoginActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("ChatoS - Login");
 
-        // Initialize shared preferences
-        sharedPreferences = getSharedPreferences("userdetails", MODE_PRIVATE);
-        preferencesEditor = sharedPreferences.edit();
-
         // Initialize Firebase authentification
         mAuth = FirebaseAuth.getInstance();
+
+        // Initialize SharedPreferences
+        SharedPref.setup(getApplicationContext());
 
         // Set Android view fields
         emailInputLayout = (TextInputLayout) findViewById(R.id.emailInputLayout);
@@ -102,7 +98,7 @@ public class LoginActivity extends AppCompatActivity {
 
         loginProgress = new ProgressDialog(this);
 
-        loginButton = (Button) findViewById(R.id.recoverButton);
+        loginButton = (Button) findViewById(R.id.signInButton);
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -138,14 +134,10 @@ public class LoginActivity extends AppCompatActivity {
 
                     // TODO: Update email and password when the user modify his profile settings
                     if (rememberCredentialsCheckBox.isChecked()) {
-                        preferencesEditor.putString("email", email);
-                        preferencesEditor.putString("password", password);
-                        preferencesEditor.putBoolean("rememberCredentials", true);
+                        SharedPref.saveCredentials(email, password);
                     } else {
-                        preferencesEditor.clear();
-                        preferencesEditor.putBoolean("rememberCredentials", false);
+                        SharedPref.clearCredentials();
                     }
-                    preferencesEditor.commit();
 
                     // Launch Main Activity
                     Intent mainIntent = new Intent(LoginActivity.this, MainActivity.class);
@@ -170,20 +162,20 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
+
     @Override
     protected void onStart() {
         super.onStart();
 
         // Check shared preferences and update UI
-        if (sharedPreferences.getBoolean("rememberCredentials", true)) {
+        if (SharedPref.getBoolean(Constants.CREDENTIALS_CHECKBOX)) {
             Log.d(Constants.LIFE_CYCLE_TAG, "onStart: Credentials Checkbox is checked");
 
-            emailInputLayout.getEditText().setText(sharedPreferences.getString("email", ""));
-            passwordInputLayout.getEditText().setText(sharedPreferences.getString("password", ""));
+            emailInputLayout.getEditText().setText(SharedPref.getString(Constants.EMAIL));
+            passwordInputLayout.getEditText().setText(SharedPref.getString(Constants.PASSWORD));
             rememberCredentialsCheckBox.setChecked(true);
         } else {
             Log.d(Constants.LIFE_CYCLE_TAG, "onStart: Credentials Checkbox is NOT checked");
         }
-
     }
 }

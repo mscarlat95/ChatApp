@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
         // Link viewPager with tab layout
         mainTabLayout = (TabLayout) findViewById(R.id.mainTabLayout);
         mainTabLayout.setupWithViewPager(viewPager);
-        mainTabLayout.setTabTextColors(Color.WHITE /*normal color*/, Color.YELLOW /*selected color*/);
+        mainTabLayout.setTabTextColors(Color.WHITE /*normal color*/, Color.rgb(204, 51, 0) /*selected color*/);
         
     }
 
@@ -62,21 +62,27 @@ public class MainActivity extends AppCompatActivity {
 
         if (currentUser == null) { // User is not logged in
             Log.d(Constants.USER_LOGIN_TAG, "User is not signed in");
-            launchLoginActivity();
+//            launchLoginActivity();
+            launchActivity(LoginActivity.class, "login", true);
+
         } else { // User is logged in
             Log.d(Constants.USER_LOGIN_TAG, "User is signed in. Current user: " + currentUser.getEmail());
         }
     }
 
-    private void launchLoginActivity() {
-        // Launch Login Activity
-        Intent loginIntent = new Intent(MainActivity.this, LoginActivity.class);
-        loginIntent.putExtra("login", true);
-        startActivity(loginIntent);
+    private void launchActivity (Class destination, String extraMessage, Boolean finish) {
+        Intent intent = new Intent(MainActivity.this, destination);
 
-        // User cannot go back to main activity
-        finish();
+        // Put extra message before lauching the new activity
+        intent.putExtra(extraMessage, true);
+        startActivity(intent);
+
+        if (finish) {
+            // Finish current activity
+            finish();
+        }
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -91,14 +97,30 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         super.onOptionsItemSelected(item);
 
-        if (item.getItemId() == R.id.menuLogoutButton) {
-            FirebaseAuth.getInstance().signOut();
-            Log.d(Constants.USER_LOGOUT_TAG, "Successful");
+        switch (item.getItemId()) {
+            case R.id.userLogoutItem:
+                Log.d(Constants.MENU_SELECTED_OPTION, "Logout");
 
-            launchLoginActivity();
+                // Perform logout
+                FirebaseAuth.getInstance().signOut();
+                Log.d(Constants.USER_LOGOUT_TAG, "Successful");
+                launchActivity(LoginActivity.class, "login", true);
+                return true;
+
+            case R.id.profileSettingsItem:
+                Log.d(Constants.MENU_SELECTED_OPTION, "Profile Settings");
+
+                launchActivity(ProfileSettingsActivity.class, "profileSettings", false);
+                return true;
+
+            case R.id.userTimelineItem:
+                Log.d(Constants.MENU_SELECTED_OPTION, "User Timeline");
+
+                return true;
+
+            default:
+                return false;
         }
-
-        return true;
     }
 
 

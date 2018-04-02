@@ -18,6 +18,23 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 
+    <TextView
+        android:id="@+id/titleTextView"
+        android:layout_width="240dp"
+        android:layout_height="37dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="36dp"
+        android:text="Create a New Account"
+        android:textColor="@android:color/black"
+        android:textSize="20sp"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/registerToolbar"/>
+
     <android.support.design.widget.TextInputLayout
         android:id="@+id/emailInputLayout"
         android:layout_width="368dp"
@@ -36,13 +53,14 @@
             android:id="@+id/emailEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:drawableStart="@drawable/ic_action_email"
             android:hint="@string/email_hint"
-            android:drawableStart="@drawable/ic_action_email"/>
+            android:inputType="textEmailAddress"/>
 
     </android.support.design.widget.TextInputLayout>
 
     <android.support.design.widget.TextInputLayout
-        android:id="@+id/usernameInputLayout"
+        android:id="@+id/fullNameInputLayout"
         android:layout_width="368dp"
         android:layout_height="wrap_content"
         android:layout_marginRight="8dp"
@@ -55,11 +73,12 @@
         app:layout_constraintTop_toBottomOf="@+id/emailInputLayout">
 
         <EditText
-            android:id="@+id/usernameEditText"
+            android:id="@+id/fullNameEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/username_hint"
-            android:drawableStart="@drawable/ic_action_username"/>
+            android:drawableStart="@drawable/ic_action_username"
+            android:hint="Full Name"
+            android:inputType="textPersonName"/>
     </android.support.design.widget.TextInputLayout>
 
     <android.support.design.widget.TextInputLayout
@@ -69,7 +88,7 @@
         android:layout_marginLeft="8dp"
         android:layout_marginTop="8dp"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/usernameInputLayout"
+        app:layout_constraintTop_toBottomOf="@+id/fullNameInputLayout"
         app:passwordToggleEnabled="true"
         android:layout_marginRight="8dp"
         app:layout_constraintRight_toRightOf="parent"
@@ -86,7 +105,7 @@
     </android.support.design.widget.TextInputLayout>
 
     <Button
-        android:id="@+id/recoverButton"
+        android:id="@+id/signUpButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_weight="1"
@@ -102,34 +121,36 @@
         app:layout_constraintTop_toBottomOf="@+id/passwordInputLayout"
         />
 
-    <TextView
-        android:id="@+id/titleTextView"
-        android:layout_width="240dp"
-        android:layout_height="37dp"
-        android:layout_marginLeft="16dp"
-        android:text="Create a New Account"
-        android:textColor="@android:color/black"
-        android:textSize="20sp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        android:layout_marginTop="36dp"
-        app:layout_constraintTop_toBottomOf="@+id/registerToolbar"
+    <CheckBox
+        android:id="@+id/rememberCredentialsCheckBox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
+        android:layout_marginTop="26dp"
+        android:checked="false"
+        android:text="Remember me "
+        android:textColor="#545454"
+        app:layout_constraintHorizontal_bias="0.029"
+        app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="8dp"/>
+        app:layout_constraintTop_toBottomOf="@+id/signUpButton"
+        app:layout_constraintBottom_toTopOf="@+id/loginTextView"
+        app:layout_constraintVertical_bias="0.0"/>
 
     <TextView
         android:id="@+id/loginTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginTop="119dp"
+        android:layout_marginBottom="16dp"
         android:text="Already have an account? Please, sign in!"
         android:textColor="@android:color/holo_blue_dark"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/recoverButton"/>
+        app:layout_constraintHorizontal_bias="0.496"
+        />
+
 
 </android.support.constraint.ConstraintLayout>
