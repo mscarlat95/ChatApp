@@ -41,8 +41,6 @@ public class LoginActivity extends AppCompatActivity {
     // Firebase Auth
     private FirebaseAuth mAuth;
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,7 +74,7 @@ public class LoginActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Log.d(Constants.USER_LOGIN_TAG, "Forgot password. Perform password reset");
 
-                // Launch Register Activity
+                // Launch ForgotPassword Activity
                 Intent forgotPassIntent = new Intent(LoginActivity.this, ForgotPasswordActivity.class);
                 forgotPassIntent.putExtra("forgotPassword", true);
                 startActivity(forgotPassIntent);
