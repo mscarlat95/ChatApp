@@ -4,7 +4,6 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
@@ -13,6 +12,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,8 +27,8 @@ public class ForgotPasswordActivity extends AppCompatActivity {
     private static final String TAG = "ForgotPasswordActivity";
     
     // Android fields
-    private TextInputLayout emailInputLayout;
-    private TextInputLayout usernameInputLayout;
+    private EditText emailEditText;
+    private EditText usernameEditText;
     private Button recoverPasswordButton;
     private CheckBox emailCheckBox, usernameCheckBox;
     private TextView resultTextView;
@@ -37,6 +37,26 @@ public class ForgotPasswordActivity extends AppCompatActivity {
 
     // Firebase Auth
     private FirebaseAuth mAuth;
+
+    private View.OnClickListener passwordRecoverListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            final String username = usernameEditText.getText().toString();
+            final String email = emailEditText.getText().toString();
+
+            if (username.equals("") && email.equals("")) {
+                Toast.makeText(ForgotPasswordActivity.this, "Please, complete at least one field!", Toast.LENGTH_SHORT).show();
+            } else {
+
+                resetProgress.setTitle("Password Reset");
+                resetProgress.setMessage("Please wait until an email is sent to you");
+                resetProgress.setCanceledOnTouchOutside(false); // Don't stop it when screen is touched
+                resetProgress.show();
+
+                resetPassword(username, email);
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,35 +82,17 @@ public class ForgotPasswordActivity extends AppCompatActivity {
         // Set Android field views
         emailCheckBox = (CheckBox) findViewById(R.id.emailCheckBox);
         usernameCheckBox = (CheckBox) findViewById(R.id.usernameCheckBox);
-        emailInputLayout = (TextInputLayout) findViewById(R.id.emailInputLayout);
-        usernameInputLayout = (TextInputLayout) findViewById(R.id.fullNameInputLayout);
+        emailEditText = (EditText) findViewById(R.id.emailEditText);
+        usernameEditText = (EditText) findViewById(R.id.usernameEditText);
         resultTextView = (TextView) findViewById(R.id.resultTextView);
 
-        emailInputLayout.getEditText().addTextChangedListener(new TextListener(emailCheckBox));
-        usernameInputLayout.getEditText().addTextChangedListener(new TextListener(usernameCheckBox));
+        emailEditText.addTextChangedListener(new TextListener(emailCheckBox));
+        usernameEditText.addTextChangedListener(new TextListener(usernameCheckBox));
 
         resetProgress = new ProgressDialog(this);
 
         recoverPasswordButton = (Button) findViewById(R.id.recoverButton);
-        recoverPasswordButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final String username = usernameInputLayout.getEditText().getText().toString();
-                final String email = emailInputLayout.getEditText().getText().toString();
-
-                if (username.equals("") && email.equals("")) {
-                    Toast.makeText(ForgotPasswordActivity.this, "Please, complete at least one field!", Toast.LENGTH_SHORT).show();
-                } else {
-
-                    resetProgress.setTitle("Password Reset");
-                    resetProgress.setMessage("Please wait until an email is sent to you");
-                    resetProgress.setCanceledOnTouchOutside(false); // Don't stop it when screen is touched
-                    resetProgress.show();
-
-                    resetPassword(username, email);
-                }
-            }
-        });
+        recoverPasswordButton.setOnClickListener(passwordRecoverListener);
     }
 
     private void resetPassword(final String username, final String email) {
@@ -112,7 +114,7 @@ public class ForgotPasswordActivity extends AppCompatActivity {
                         // Hide progress dialog in case of any error
                         resetProgress.hide();
 
-                        resultTextView.setText("An error ocurred. Please, try again!");
+                        resultTextView.setText("An error ocurred. Please, try again later");
                         Toast.makeText(ForgotPasswordActivity.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 }
@@ -120,10 +122,9 @@ public class ForgotPasswordActivity extends AppCompatActivity {
         }
 
         // TODO: also for username
-
     }
 
-    class TextListener implements TextWatcher {
+    private class TextListener implements TextWatcher {
         private CheckBox checkbox;
 
         TextListener (CheckBox checkBox) {

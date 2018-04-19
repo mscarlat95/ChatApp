@@ -4,8 +4,8 @@
                                    android:id="@+id/mainAppToolbar"
                                    android:layout_width="match_parent"
                                    android:layout_height="wrap_content"
-                                   app:titleTextColor="#fff"
                                    android:background="@color/colorAccent"
-                                   android:theme="@android:style/ThemeOverlay.Material.Dark.ActionBar">
+                                   android:theme="@android:style/ThemeOverlay.Material.Dark.ActionBar"
+                                   app:titleTextColor="#fff">
 
 </android.support.v7.widget.Toolbar>

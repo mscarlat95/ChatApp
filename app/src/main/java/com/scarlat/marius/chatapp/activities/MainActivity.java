@@ -28,63 +28,6 @@ public class MainActivity extends AppCompatActivity {
     private TabLayout mainTabLayout;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-        // Initialize Firebase authentification
-        mAuth = FirebaseAuth.getInstance();
-
-        // Set Toolbar
-        toolbar = (Toolbar) findViewById(R.id.mainPageToolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("ChatoS");
-
-        // Set up tabs
-        viewPager = (ViewPager) findViewById(R.id.mainTabsViewPager);
-
-        // Link each tab to a fragment (Requests, Chat, Friends)
-        pagerAdapter = new MainTabsAdapter(getSupportFragmentManager());
-        viewPager.setAdapter(pagerAdapter);
-
-        // Link viewPager with tab layout
-        mainTabLayout = (TabLayout) findViewById(R.id.mainTabLayout);
-        mainTabLayout.setupWithViewPager(viewPager);
-        mainTabLayout.setTabTextColors(Color.WHITE /*normal color*/, Color.rgb(204, 51, 0) /*selected color*/);
-        
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-
-        if (currentUser == null) { // User is not logged in
-            Log.d(Constants.USER_LOGIN_TAG, "User is not signed in");
-//            launchLoginActivity();
-            launchActivity(LoginActivity.class, "login", true);
-
-        } else { // User is logged in
-            Log.d(Constants.USER_LOGIN_TAG, "User is signed in. Current user: " + currentUser.getEmail());
-        }
-    }
-
-    private void launchActivity (Class destination, String extraMessage, Boolean finish) {
-        Intent intent = new Intent(MainActivity.this, destination);
-
-        // Put extra message before lauching the new activity
-        intent.putExtra(extraMessage, true);
-        startActivity(intent);
-
-        if (finish) {
-            // Finish current activity
-            finish();
-        }
-    }
-
-
-    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
 
@@ -109,13 +52,11 @@ public class MainActivity extends AppCompatActivity {
 
             case R.id.profileSettingsItem:
                 Log.d(Constants.MENU_SELECTED_OPTION, "Profile Settings");
-
                 launchActivity(ProfileSettingsActivity.class, "profileSettings", false);
                 return true;
 
             case R.id.userTimelineItem:
                 Log.d(Constants.MENU_SELECTED_OPTION, "User Timeline");
-
                 return true;
 
             default:
@@ -123,5 +64,59 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        // Initialize Firebase authentification
+        mAuth = FirebaseAuth.getInstance();
+
+        // Set Toolbar
+        toolbar = (Toolbar) findViewById(R.id.mainPageToolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setTitle("ChatoS");
+
+        // Set up tabs
+        viewPager = (ViewPager) findViewById(R.id.mainTabsViewPager);
+
+        // Link each tab to a fragment (Requests, Chat, Friends)
+        pagerAdapter = new MainTabsAdapter(getSupportFragmentManager());
+        viewPager.setAdapter(pagerAdapter);
+
+        // Link viewPager with tab layout
+        mainTabLayout = (TabLayout) findViewById(R.id.mainTabLayout);
+        mainTabLayout.setupWithViewPager(viewPager);
+        mainTabLayout.setTabTextColors( Color.parseColor("#4d4d4d") /*normal color*/,
+                                        Color.parseColor("#00bfff") /*selected color*/);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+
+        if (currentUser == null) { // User is not logged in
+            Log.d(Constants.USER_LOGIN_TAG, "User is not signed in");
+            launchActivity(LoginActivity.class, "login", true);
+
+        } else { // User is logged in
+            Log.d(Constants.USER_LOGIN_TAG, "User is signed in. Current user: " + currentUser.getEmail());
+        }
+    }
+
+    private void launchActivity (Class destination, String extraMessage, Boolean finish) {
+        Intent intent = new Intent(MainActivity.this, destination);
+
+        // Put extra message before lauching the new activity
+        intent.putExtra(extraMessage, true);
+        startActivity(intent);
+
+        if (finish) {
+            // Finish current activity
+            finish();
+        }
+    }
 
 }

@@ -41,6 +41,52 @@ public class LoginActivity extends AppCompatActivity {
     // Firebase Auth
     private FirebaseAuth mAuth;
 
+    // Setup Listeners
+    private View.OnClickListener forgotPasswordListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            Log.d(Constants.USER_LOGIN_TAG, "Forgot password. Perform password reset");
+
+            // Launch ForgotPassword Activity
+            Intent forgotPassIntent = new Intent(LoginActivity.this, ForgotPasswordActivity.class);
+            forgotPassIntent.putExtra("forgotPassword", true);
+            startActivity(forgotPassIntent);
+        }
+    };
+
+    private View.OnClickListener userRegisterListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            Log.d(Constants.USER_LOGIN_TAG, "User does not exists. Perform registration");
+
+            // Launch Register Activity
+            Intent registerIntent = new Intent(LoginActivity.this, RegisterActivity.class);
+            registerIntent.putExtra("register", true);
+            startActivity(registerIntent);
+        }
+    };
+
+    private View.OnClickListener userLoginListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            final String email = emailInputLayout.getEditText().getText().toString();
+            final String password = passwordInputLayout.getEditText().getText().toString();
+
+            if (email.equals("") || password.equals("")) {
+                Toast.makeText(LoginActivity.this, "You cannot leave any field empty!", Toast.LENGTH_SHORT).show();
+            } else {
+
+                loginProgress.setTitle("Logging In");
+                loginProgress.setMessage("Please wait while your creditentials are checked");
+                loginProgress.setCanceledOnTouchOutside(false); // Don't stop it when screen is touched
+                loginProgress.show();
+
+                loginUser (email, password);
+            }
+        }
+    };
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,56 +115,18 @@ public class LoginActivity extends AppCompatActivity {
         passwordInputLayout = (TextInputLayout) findViewById(R.id.passwordInputLayout);
 
         forgotPasswordTextView = (TextView) findViewById(R.id.forgotPasswordTextView);
-        forgotPasswordTextView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d(Constants.USER_LOGIN_TAG, "Forgot password. Perform password reset");
-
-                // Launch ForgotPassword Activity
-                Intent forgotPassIntent = new Intent(LoginActivity.this, ForgotPasswordActivity.class);
-                forgotPassIntent.putExtra("forgotPassword", true);
-                startActivity(forgotPassIntent);
-            }
-        });
+        forgotPasswordTextView.setOnClickListener(forgotPasswordListener);
 
         registerTextView = (TextView) findViewById(R.id.registerTextView);
-        registerTextView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d(Constants.USER_LOGIN_TAG, "User does not exists. Perform registration");
-
-                // Launch Register Activity
-                Intent registerIntent = new Intent(LoginActivity.this, RegisterActivity.class);
-                registerIntent.putExtra("register", true);
-                startActivity(registerIntent);
-            }
-        });
-
+        registerTextView.setOnClickListener(userRegisterListener);
         loginProgress = new ProgressDialog(this);
 
         loginButton = (Button) findViewById(R.id.signInButton);
-        loginButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final String email = emailInputLayout.getEditText().getText().toString();
-                final String password = passwordInputLayout.getEditText().getText().toString();
-
-                if (email.equals("") || password.equals("")) {
-                    Toast.makeText(LoginActivity.this, "You cannot leave any field empty!", Toast.LENGTH_SHORT).show();
-                } else {
-
-                    loginProgress.setTitle("Logging In");
-                    loginProgress.setMessage("Please wait while your creditentials are checked");
-                    loginProgress.setCanceledOnTouchOutside(false); // Don't stop it when screen is touched
-                    loginProgress.show();
-
-                    loginUser (email, password);
-                }
-            }
-        });
+        loginButton.setOnClickListener(userLoginListener);
 
         rememberCredentialsCheckBox = (CheckBox) findViewById(R.id.rememberCredentialsCheckBox);
     }
+
 
     private void loginUser(final String email, final String password) {
         mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
@@ -140,12 +148,9 @@ public class LoginActivity extends AppCompatActivity {
                     // Launch Main Activity
                     Intent mainIntent = new Intent(LoginActivity.this, MainActivity.class);
 
-                    // Clear all previous tasks
                     mainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     mainIntent.putExtra("main", true);
                     startActivity(mainIntent);
-
-                    // User cannot go back to register activity
                     finish();
                 } else {
                     Log.d(Constants.USER_LOGIN_TAG, "Failed: " + task.getException().toString());

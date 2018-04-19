@@ -3,10 +3,9 @@
           package="com.scarlat.marius.chatapp">
 
     <uses-permission android:name="android.permission.INTERNET"/>
-
-
     <uses-permission android:name="android.permission.CAMERA"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -34,6 +33,11 @@
         </activity>
         <activity android:name=".activities.ProfileSettingsActivity">
         </activity>
+
+        <service android:name=".services.UserLocationService"
+            android:exported="false"
+            android:enabled="true"/>
+
     </application>
 
 </manifest>

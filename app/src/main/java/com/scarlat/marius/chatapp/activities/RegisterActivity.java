@@ -10,7 +10,8 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.CheckBox;
+import android.widget.EditText;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,9 +37,12 @@ public class RegisterActivity extends AppCompatActivity {
     private TextInputLayout emailInputLayout;
     private TextInputLayout fullNameInputLayout;
     private TextInputLayout passwordInputLayout;
+
+    private EditText birthDayEditText, birthMonthEditText, birthYearEditText;
+    private RadioGroup genderRadioGroup;
+
     private TextView loginTextView;
     private Button registerButton;
-    private CheckBox rememberCredentialsCheckBox;
 
     private Toolbar toolbar;
     private ProgressDialog registerProgress;
@@ -48,6 +52,65 @@ public class RegisterActivity extends AppCompatActivity {
 
     // Firebase Realtime databse
     private DatabaseReference refDatabase;
+
+    private View.OnClickListener userLoginListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            Log.d(Constants.USER_REGISTER_TAG, "User already exists. Perform login.");
+
+            // Launch Register Activity
+            Intent loginIntent = new Intent(RegisterActivity.this, LoginActivity.class);
+            loginIntent.putExtra("login", true);
+            startActivity(loginIntent);
+        }
+    };
+
+    private View.OnClickListener userRegisterListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            final String email = emailInputLayout.getEditText().getText().toString();
+            final String fullName = fullNameInputLayout.getEditText().getText().toString();
+            final String password = passwordInputLayout.getEditText().getText().toString();
+
+            final String birthDay = birthDayEditText.getText().toString();
+            final String birthMonth = birthMonthEditText.getText().toString();
+            final String birthYear = birthYearEditText.getText().toString();
+
+            if (email.equals("") || fullName.equals("") || password.equals("") ||
+                    birthDay.equals("") || birthMonth.equals("") || birthYear.equals("")) {
+
+                Toast.makeText(RegisterActivity.this, "You cannot leave any field empty!",
+                        Toast.LENGTH_SHORT).show();
+
+            } else {
+
+                /* Setup progress dialog */
+                registerProgress.setTitle("Registering User");
+                registerProgress.setMessage("Please wait until the account is created !");
+                registerProgress.setCanceledOnTouchOutside(false); // Don't stop it when screen is touched
+                registerProgress.show();
+
+                /* Concatenate birthday items */
+                final String birthday = birthDay + "/" + birthMonth + "/" + birthYear;
+
+                /* Check genre */
+                String gender = "Custom";
+
+                switch (genderRadioGroup.getCheckedRadioButtonId()) {
+                    case R.id.maleRadioButton:
+                        gender = "Male";
+                        break;
+
+                    case R.id.femaleRadioButton:
+                        gender = "Female";
+                        break;
+                }
+
+                registerUser (email, fullName, password, birthday, gender);
+            }
+        }
+    };
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,49 +144,23 @@ public class RegisterActivity extends AppCompatActivity {
         fullNameInputLayout = (TextInputLayout) findViewById(R.id.fullNameInputLayout);
         passwordInputLayout = (TextInputLayout) findViewById(R.id.passwordInputLayout);
 
+        birthDayEditText = (EditText) findViewById(R.id.dayEditText);
+        birthMonthEditText = (EditText) findViewById(R.id.monthEditText);
+        birthYearEditText = (EditText) findViewById(R.id.yearEditText);
+
+        genderRadioGroup = (RadioGroup) findViewById(R.id.genderRadioGroup);
+
         loginTextView = (TextView) findViewById(R.id.loginTextView);
-        loginTextView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                Log.d(Constants.USER_REGISTER_TAG, "User already exists. Perform login.");
-
-                // Launch Register Activity
-                Intent loginIntent = new Intent(RegisterActivity.this, LoginActivity.class);
-                loginIntent.putExtra("login", true);
-                startActivity(loginIntent);
-            }
-        });
+        loginTextView.setOnClickListener(userLoginListener);
 
         registerProgress = new ProgressDialog(this);
-
         registerButton = (Button) findViewById(R.id.signUpButton);
-        registerButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        registerButton.setOnClickListener(userRegisterListener);
 
-                final String email = emailInputLayout.getEditText().getText().toString();
-                final String fullName = fullNameInputLayout.getEditText().getText().toString();
-                final String password = passwordInputLayout.getEditText().getText().toString();
-
-                if (email.equals("") || fullName.equals("") || password.equals("")) {
-                    Toast.makeText(RegisterActivity.this, "You cannot leave any field empty!", Toast.LENGTH_SHORT).show();
-                } else {
-
-                    registerProgress.setTitle("Registering User");
-                    registerProgress.setMessage("Please wait until the account is created !");
-                    registerProgress.setCanceledOnTouchOutside(false); // Don't stop it when screen is touched
-                    registerProgress.show();
-
-                    registerUser (email, fullName, password);
-                }
-            }
-        });
-
-        rememberCredentialsCheckBox = (CheckBox) findViewById(R.id.rememberCredentialsCheckBox);
     }
 
-    private void registerUser(final String email, final String fullName, final String password) {
+    private void registerUser(final String email, final String fullName, final String password,
+                              final String birthday, final String gender) {
 
         mAuth   .createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
@@ -135,18 +172,18 @@ public class RegisterActivity extends AppCompatActivity {
                             // Obtain user and database information
                             FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
                             String userID = currentUser.getUid();
-                            String dbID = refDatabase.push().getKey();
-
                             Log.d(Constants.USER_REGISTER_TAG, "User ID = " + userID);
-                            Log.d(Constants.USER_REGISTER_TAG, "Database ID = " + dbID);
 
                             HashMap<String, String> userInfo = new HashMap<String, String>();
+                            userInfo.put(Constants.FULLNAME, fullName);
+                            userInfo.put(Constants.EMAIL, email);
+                            userInfo.put(Constants.BIRTHDAY, birthday);
+                            userInfo.put(Constants.GENDER, gender);
+                            userInfo.put(Constants.STATUS, "Available");
+                            userInfo.put(Constants.PROFILE_IMAGE, "default");
+                            userInfo.put(Constants.THUMBNAIL_PROFILE_IMAGE, "default");
 
-                            userInfo.put("name", fullName);
-                            userInfo.put("email", email);
-                            userInfo.put("profileImage", "None");
-
-                            refDatabase.child(dbID).child("Users").child(userID)
+                            refDatabase.child("Users").child(userID)
                                     .setValue(userInfo)
                                     .addOnCompleteListener(new OnCompleteListener<Void>() {
 
@@ -155,9 +192,6 @@ public class RegisterActivity extends AppCompatActivity {
                                     if (task.isSuccessful()) {
                                         // Dismiss progress dialog
                                         registerProgress.dismiss();
-
-                                        // Save credentials for login if checkbox is checked
-                                        saveCredentials(email, password);
 
                                         // launch Main Activity
                                         launchMainActivity();
@@ -178,14 +212,6 @@ public class RegisterActivity extends AppCompatActivity {
                         }
                     }
                 });
-    }
-
-    private void saveCredentials(final String email, final String password) {
-        if (rememberCredentialsCheckBox.isChecked()) {
-            SharedPref.saveCredentials(email, password);
-        } else {
-            SharedPref.clearCredentials();
-        }
     }
 
     private void launchMainActivity() {
