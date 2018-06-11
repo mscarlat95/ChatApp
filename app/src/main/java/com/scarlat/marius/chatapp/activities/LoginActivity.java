@@ -19,15 +19,14 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.scarlat.marius.chatapp.R;
-import com.scarlat.marius.chatapp.util.Constants;
-import com.scarlat.marius.chatapp.util.SharedPref;
+import com.scarlat.marius.chatapp.general.Constants;
+import com.scarlat.marius.chatapp.general.SharedPref;
 
 public class LoginActivity extends AppCompatActivity {
 
-    // Login Activity Tag
     private static final String TAG = "LoginActivity";
 
-    // Android fields
+    /* Android fields */
     private TextView registerTextView;
     private TextView forgotPasswordTextView;
     private TextInputLayout emailInputLayout;
@@ -38,35 +37,33 @@ public class LoginActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private ProgressDialog loginProgress;
 
-    // Firebase Auth
+    /* Firebase Auth */
     private FirebaseAuth mAuth;
 
-    // Setup Listeners
+    /* Setup Listeners */
     private View.OnClickListener forgotPasswordListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            Log.d(Constants.USER_LOGIN_TAG, "Forgot password. Perform password reset");
+            Log.d(TAG, "Register: Forgot password. Perform password reset");
 
-            // Launch ForgotPassword Activity
+            /* Launch ForgotPassword Activity */
             Intent forgotPassIntent = new Intent(LoginActivity.this, ForgotPasswordActivity.class);
             forgotPassIntent.putExtra("forgotPassword", true);
             startActivity(forgotPassIntent);
         }
     };
-
     private View.OnClickListener userRegisterListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            Log.d(Constants.USER_LOGIN_TAG, "User does not exists. Perform registration");
+            Log.d(TAG, "Register: User does not exists. Perform registration");
 
-            // Launch Register Activity
+            /* Launch Register Activity */
             Intent registerIntent = new Intent(LoginActivity.this, RegisterActivity.class);
             registerIntent.putExtra("register", true);
             startActivity(registerIntent);
         }
     };
-
-    private View.OnClickListener userLoginListener = new View.OnClickListener() {
+    private View.OnClickListener emailAndPassLoginListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             final String email = emailInputLayout.getEditText().getText().toString();
@@ -74,111 +71,107 @@ public class LoginActivity extends AppCompatActivity {
 
             if (email.equals("") || password.equals("")) {
                 Toast.makeText(LoginActivity.this, "You cannot leave any field empty!", Toast.LENGTH_SHORT).show();
-            } else {
-
-                loginProgress.setTitle("Logging In");
-                loginProgress.setMessage("Please wait while your creditentials are checked");
-                loginProgress.setCanceledOnTouchOutside(false); // Don't stop it when screen is touched
-                loginProgress.show();
-
-                loginUser (email, password);
+                return;
             }
+            displayProgressDialog();
+            emailAndPassLogin(email, password);
         }
     };
 
+    private void displayProgressDialog() {
+        loginProgress.setTitle("Logging In");
+        loginProgress.setMessage("Please wait while your credentials are checked");
+        loginProgress.setCanceledOnTouchOutside(false); // Don't stop it when screen is touched
+        loginProgress.show();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        // Check intent extra values
+        /* Check intent extra values */
         final Intent intent = getIntent();
         if (!intent.getBooleanExtra("login", true)) {
             Log.d(TAG, "onCreate: LoginActivity was accessed incorrectly");
             finish();
         }
 
-        // Set up toolbar
+        /* Set up toolbar */
         toolbar = (Toolbar) findViewById(R.id.loginToolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("ChatoS - Login");
 
-        // Initialize Firebase authentification
+        /* Initialize Firebase authentification */
         mAuth = FirebaseAuth.getInstance();
 
-        // Initialize SharedPreferences
+        /* Initialize SharedPreferences */
         SharedPref.setup(getApplicationContext());
 
-        // Set Android view fields
+        /* Set Android view fields */
         emailInputLayout = (TextInputLayout) findViewById(R.id.emailInputLayout);
         passwordInputLayout = (TextInputLayout) findViewById(R.id.passwordInputLayout);
-
         forgotPasswordTextView = (TextView) findViewById(R.id.forgotPasswordTextView);
         forgotPasswordTextView.setOnClickListener(forgotPasswordListener);
-
         registerTextView = (TextView) findViewById(R.id.registerTextView);
         registerTextView.setOnClickListener(userRegisterListener);
         loginProgress = new ProgressDialog(this);
-
         loginButton = (Button) findViewById(R.id.signInButton);
-        loginButton.setOnClickListener(userLoginListener);
-
+        loginButton.setOnClickListener(emailAndPassLoginListener);
         rememberCredentialsCheckBox = (CheckBox) findViewById(R.id.rememberCredentialsCheckBox);
     }
-
-
-    private void loginUser(final String email, final String password) {
-        mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-            @Override
-            public void onComplete(@NonNull Task<AuthResult> task) {
-                if (task.isSuccessful()) {
-                    Log.d(Constants.USER_LOGIN_TAG, "Successfull");
-
-                    // Dismiss progress dialog
-                    loginProgress.dismiss();
-
-                    // TODO: Update email and password when the user modify his profile settings
-                    if (rememberCredentialsCheckBox.isChecked()) {
-                        SharedPref.saveCredentials(email, password);
-                    } else {
-                        SharedPref.clearCredentials();
-                    }
-
-                    // Launch Main Activity
-                    Intent mainIntent = new Intent(LoginActivity.this, MainActivity.class);
-
-                    mainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    mainIntent.putExtra("main", true);
-                    startActivity(mainIntent);
-                    finish();
-                } else {
-                    Log.d(Constants.USER_LOGIN_TAG, "Failed: " + task.getException().toString());
-
-                    // Hide progress dialog in case of any error
-                    loginProgress.hide();
-
-                    // Display error in UI
-                    Toast.makeText(LoginActivity.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-    }
-
 
     @Override
     protected void onStart() {
         super.onStart();
 
-        // Check shared preferences and update UI
+        /* Check shared preferences and update UI */
         if (SharedPref.getBoolean(Constants.CREDENTIALS_CHECKBOX)) {
-            Log.d(Constants.LIFE_CYCLE_TAG, "onStart: Credentials Checkbox is checked");
+            Log.d(TAG, "onStart: Credentials Checkbox is checked");
 
             emailInputLayout.getEditText().setText(SharedPref.getString(Constants.EMAIL));
             passwordInputLayout.getEditText().setText(SharedPref.getString(Constants.PASSWORD));
             rememberCredentialsCheckBox.setChecked(true);
         } else {
-            Log.d(Constants.LIFE_CYCLE_TAG, "onStart: Credentials Checkbox is NOT checked");
+            Log.d(TAG, "onStart: Credentials Checkbox is NOT checked");
         }
     }
+
+
+    private void launchMainActivity() {
+        Intent mainIntent = new Intent(LoginActivity.this, MainActivity.class);
+
+        /* Clear all previous tasks */
+        mainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        mainIntent.putExtra("main", true);
+        startActivity(mainIntent);
+        finish();
+    }
+
+    private void emailAndPassLogin(final String email, final String password) {
+        mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                if (task.isSuccessful()) {
+                    Log.d(TAG, "Login Successful");
+                    loginProgress.dismiss();
+
+                    /* Remember username and password if checkbox is checked */
+                    if (rememberCredentialsCheckBox.isChecked()) {
+                        SharedPref.saveCredentials(email, password);
+                    } else {
+                        SharedPref.clearCredentials();
+                    }
+                    launchMainActivity();
+                } else {
+                    Log.d(TAG, "Login Failed: " + task.getException().toString());
+
+                    /* Display errors */
+                    loginProgress.hide();
+                    Toast.makeText(LoginActivity.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
 }
+

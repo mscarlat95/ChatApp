@@ -1,12 +1,12 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 25
+    compileSdkVersion 27
     buildToolsVersion "27.0.1"
     defaultConfig {
         applicationId "com.scarlat.marius.chatapp"
         minSdkVersion 21
-        targetSdkVersion 25
+        targetSdkVersion 27
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -25,27 +25,42 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
 
-    compile 'com.android.support:appcompat-v7:25.3.1'
-    compile 'com.android.support:design:25.3.1'
+    /* App Design */
+    compile 'com.android.support:appcompat-v7:27.0.1'
+    compile 'com.android.support:design:27.0.1'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
-    compile 'com.google.firebase:firebase-auth:10.0.1'
-    compile 'com.android.support:support-v4:25.3.1'
+
+    compile 'com.android.support:support-v4:27.0.1'
+
+    /* Circle Image View */
     compile 'de.hdodenhof:circleimageview:2.2.0'
+
+    /* URI image processing */
+    compile 'com.github.bumptech.glide:glide:4.7.1'
+    compile 'com.theartofdev.edmodo:android-image-cropper:2.7.+'
+//    compile 'com.squareup.picasso:picasso:2.5.2'
+
+
+    /* Firebase Database */
     compile 'com.google.firebase:firebase-database:10.0.1'
-    compile 'com.google.firebase:firebase-core:10.0.1'
+
+    /* Firebase Core */
+    compile 'com.google.firebase:firebase-core:16.0.0'
+
+
+    /* Firebase Auth ; also Google auth */
+    compile 'com.google.firebase:firebase-auth:16.0.1'
+    compile 'com.google.android.gms:play-services-auth:15.0.1'
+    compile 'com.firebaseui:firebase-ui-auth:4.0.1'
+    compile 'com.firebaseui:firebase-ui-database:4.0.1'
+
+    /* Facebook Auth */
+    compile 'com.facebook.android:facebook-android-sdk:[4,5)'
+
+    /* Unit testing */
     testCompile 'junit:junit:4.12'
 
-    compile 'me.spark:submitbutton:1.0.1'
 }
-
-
-
-
-
-
-
-
-
 
 
 apply plugin: 'com.google.gms.google-services'

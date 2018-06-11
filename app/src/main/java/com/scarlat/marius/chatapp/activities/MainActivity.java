@@ -1,8 +1,13 @@
 package com.scarlat.marius.chatapp.activities;
 
+import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -10,12 +15,16 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
+import com.firebase.ui.auth.AuthUI;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.scarlat.marius.chatapp.R;
-import com.scarlat.marius.chatapp.util.Constants;
-import com.scarlat.marius.chatapp.util.MainTabsAdapter;
+import com.scarlat.marius.chatapp.general.Constants;
+import com.scarlat.marius.chatapp.general.MainTabsAdapter;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -31,7 +40,6 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
 
-        // Inflate main_menu
         getMenuInflater().inflate(R.menu.main_menu, menu);
         return true;
     }
@@ -42,81 +50,123 @@ public class MainActivity extends AppCompatActivity {
 
         switch (item.getItemId()) {
             case R.id.userLogoutItem:
-                Log.d(Constants.MENU_SELECTED_OPTION, "Logout");
-
-                // Perform logout
-                FirebaseAuth.getInstance().signOut();
-                Log.d(Constants.USER_LOGOUT_TAG, "Successful");
-                launchActivity(LoginActivity.class, "login", true);
+                Log.d(TAG, "onOptionsItemSelected: Logout");
+                AuthUI.getInstance().signOut(MainActivity.this).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            Log.d(TAG, "onComplete: Logout Successful");
+                            launchActivity (MainActivity.this, LoginActivity.class, "login");
+                            finish();
+                        } else {
+                            Toast.makeText(MainActivity.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
                 return true;
 
             case R.id.profileSettingsItem:
-                Log.d(Constants.MENU_SELECTED_OPTION, "Profile Settings");
-                launchActivity(ProfileSettingsActivity.class, "profileSettings", false);
+                Log.d(TAG, "onOptionsItemSelected: Profile Settings");
+                launchActivity(MainActivity.this, ProfileSettingsActivity.class, "profileSettings");
                 return true;
 
             case R.id.userTimelineItem:
-                Log.d(Constants.MENU_SELECTED_OPTION, "User Timeline");
+                Log.d(TAG, "onOptionsItemSelected: User Timeline");
                 return true;
-
-            default:
-                return false;
         }
+
+        return false;
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d(TAG, "onCreate: Method was invoked!");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Initialize Firebase authentification
+        /* Initialize Firebase authentification */
         mAuth = FirebaseAuth.getInstance();
 
-        // Set Toolbar
+        /*  Set Toolbar */
         toolbar = (Toolbar) findViewById(R.id.mainPageToolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("ChatoS");
 
-        // Set up tabs
+        /* Setup Tabs */
         viewPager = (ViewPager) findViewById(R.id.mainTabsViewPager);
-
-        // Link each tab to a fragment (Requests, Chat, Friends)
         pagerAdapter = new MainTabsAdapter(getSupportFragmentManager());
         viewPager.setAdapter(pagerAdapter);
 
-        // Link viewPager with tab layout
         mainTabLayout = (TabLayout) findViewById(R.id.mainTabLayout);
         mainTabLayout.setupWithViewPager(viewPager);
-        mainTabLayout.setTabTextColors( Color.parseColor("#4d4d4d") /*normal color*/,
-                                        Color.parseColor("#00bfff") /*selected color*/);
+        mainTabLayout.setTabTextColors( Color.parseColor(Constants.COLOR_INACTIVE_TAB),
+                                        Color.parseColor(Constants.COLOR_ACTIVE_TAB));
+
+        /* Request permissions */
+        enablePermissions();
+    }
+
+    private void enablePermissions() {
+        Log.d(TAG, "requestPermissions: Method was invoked!");
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M /*Marshmallow*/) {
+            if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, Constants.REQUEST_CODE_READ_EXT);
+            }
+            if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{Manifest.permission.CAMERA}, Constants.REQUEST_CODE_CAMERA);
+            }
+            if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, Constants.REQUEST_CODE_WRITE_EXT);
+            }
+        }
     }
 
     @Override
     protected void onStart() {
+        Log.d(TAG, "onStart: Method was invoked!");
         super.onStart();
 
+        /* Perform sign in if user is not logged in */
         FirebaseUser currentUser = mAuth.getCurrentUser();
-
-        if (currentUser == null) { // User is not logged in
-            Log.d(Constants.USER_LOGIN_TAG, "User is not signed in");
-            launchActivity(LoginActivity.class, "login", true);
-
-        } else { // User is logged in
-            Log.d(Constants.USER_LOGIN_TAG, "User is signed in. Current user: " + currentUser.getEmail());
-        }
-    }
-
-    private void launchActivity (Class destination, String extraMessage, Boolean finish) {
-        Intent intent = new Intent(MainActivity.this, destination);
-
-        // Put extra message before lauching the new activity
-        intent.putExtra(extraMessage, true);
-        startActivity(intent);
-
-        if (finish) {
-            // Finish current activity
+        if (currentUser == null) {
+            launchActivity (MainActivity.this, LoginActivity.class, "login");
             finish();
         }
     }
 
+    private void launchActivity (Context srcContext, Class destClass, String extraMsg) {
+        Log.d(TAG, "launchActivity: Method was invoked!");
+
+        Intent intent = new Intent(srcContext, destClass);
+        intent.putExtra(extraMsg, true);
+        startActivity(intent);
+    }
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        Log.d(TAG, "onRequestPermissionsResult: Method was invoked!");
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        switch (requestCode) {
+            case Constants.REQUEST_CODE_READ_EXT:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Log.d(TAG, "onRequestPermissionsResult: Read External permissions GRANTED");
+                }
+                break;
+
+            case Constants.REQUEST_CODE_CAMERA:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Log.d(TAG, "onRequestPermissionsResult: Camera permissions GRANTED");
+                }
+                break;
+
+            case Constants.REQUEST_CODE_WRITE_EXT:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Log.d(TAG, "onRequestPermissionsResult: Write External permissions GRANTED");
+                }
+                break;
+        }
+    }
 }

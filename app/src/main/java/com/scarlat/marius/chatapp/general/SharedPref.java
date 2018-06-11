@@ -1,5 +1,4 @@
-package com.scarlat.marius.chatapp.util;
-
+package com.scarlat.marius.chatapp.general;
 
 import android.content.Context;
 import android.content.SharedPreferences;

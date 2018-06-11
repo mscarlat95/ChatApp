@@ -6,12 +6,9 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -20,7 +17,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.scarlat.marius.chatapp.R;
-import com.scarlat.marius.chatapp.util.Constants;
+import com.scarlat.marius.chatapp.general.Constants;
 
 public class ForgotPasswordActivity extends AppCompatActivity {
 
@@ -28,9 +25,7 @@ public class ForgotPasswordActivity extends AppCompatActivity {
     
     // Android fields
     private EditText emailEditText;
-    private EditText usernameEditText;
     private Button recoverPasswordButton;
-    private CheckBox emailCheckBox, usernameCheckBox;
     private TextView resultTextView;
     private Toolbar toolbar;
     private ProgressDialog resetProgress;
@@ -41,11 +36,10 @@ public class ForgotPasswordActivity extends AppCompatActivity {
     private View.OnClickListener passwordRecoverListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            final String username = usernameEditText.getText().toString();
             final String email = emailEditText.getText().toString();
 
-            if (username.equals("") && email.equals("")) {
-                Toast.makeText(ForgotPasswordActivity.this, "Please, complete at least one field!", Toast.LENGTH_SHORT).show();
+            if (email.equals("")) {
+                Toast.makeText(ForgotPasswordActivity.this, "Please, complete email field!", Toast.LENGTH_SHORT).show();
             } else {
 
                 resetProgress.setTitle("Password Reset");
@@ -53,7 +47,7 @@ public class ForgotPasswordActivity extends AppCompatActivity {
                 resetProgress.setCanceledOnTouchOutside(false); // Don't stop it when screen is touched
                 resetProgress.show();
 
-                resetPassword(username, email);
+                resetPassword(email);
             }
         }
     };
@@ -80,71 +74,37 @@ public class ForgotPasswordActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
 
         // Set Android field views
-        emailCheckBox = (CheckBox) findViewById(R.id.emailCheckBox);
-        usernameCheckBox = (CheckBox) findViewById(R.id.usernameCheckBox);
         emailEditText = (EditText) findViewById(R.id.emailEditText);
-        usernameEditText = (EditText) findViewById(R.id.usernameEditText);
         resultTextView = (TextView) findViewById(R.id.resultTextView);
-
-        emailEditText.addTextChangedListener(new TextListener(emailCheckBox));
-        usernameEditText.addTextChangedListener(new TextListener(usernameCheckBox));
-
         resetProgress = new ProgressDialog(this);
-
         recoverPasswordButton = (Button) findViewById(R.id.recoverButton);
         recoverPasswordButton.setOnClickListener(passwordRecoverListener);
     }
 
-    private void resetPassword(final String username, final String email) {
+    private void resetPassword(final String email) {
 
         if (!email.equals("")) {
             mAuth.sendPasswordResetEmail(email).addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
                     if (task.isSuccessful()) {
-                        Log.d(Constants.PASSWORD_RECOVER, "Successfull!");
+                        Log.d(TAG, "resetPassword: Successfull!");
 
                         // Dismiss progress dialog
                         resetProgress.dismiss();
 
                         resultTextView.setText("An email was sent to " + email);
                     } else {
-                        Log.d(Constants.PASSWORD_RECOVER, "Failed: " + task.getException().toString());
+                        Log.d(TAG, "resetPassword: Failed: " + task.getException().toString());
 
                         // Hide progress dialog in case of any error
                         resetProgress.hide();
 
-                        resultTextView.setText("An error ocurred. Please, try again later");
+                        resultTextView.setText("An error ocurred. Please, try again later!");
                         Toast.makeText(ForgotPasswordActivity.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 }
             });
         }
-
-        // TODO: also for username
     }
-
-    private class TextListener implements TextWatcher {
-        private CheckBox checkbox;
-
-        TextListener (CheckBox checkBox) {
-            this.checkbox = checkBox;
-        }
-
-        @Override
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
-        @Override
-        public void onTextChanged(CharSequence s, int start, int before, int count) {
-            if (s.toString().equals("")) {
-                checkbox.setChecked(false);
-            } else {
-                checkbox.setChecked(true);
-            }
-        }
-
-        @Override
-        public void afterTextChanged(Editable s) {}
-    }
-
 }

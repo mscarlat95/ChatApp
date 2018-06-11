@@ -23,15 +23,17 @@
         android:id="@+id/titleTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="Create an Account"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/create_an_account"
         android:textColor="@color/colorAccent"
         android:textSize="30sp"
         android:textStyle="bold"
+        app:layout_constraintHorizontal_bias="0.49"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/registerToolbar"
-        app:layout_constraintHorizontal_bias="0.503"/>
+        app:layout_constraintTop_toBottomOf="@+id/registerToolbar"/>
 
     <LinearLayout
         android:id="@+id/credentials_layout"
@@ -52,9 +54,8 @@
             android:id="@+id/emailInputLayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_marginBottom="8dp"
             android:layout_marginEnd="8dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="10dp"
             app:passwordToggleEnabled="true">
@@ -66,18 +67,16 @@
                 android:drawableStart="@drawable/ic_action_email"
                 android:hint="@string/email_hint"
                 android:inputType="textEmailAddress"
-                />
+                android:textSize="16sp"/>
         </android.support.design.widget.TextInputLayout>
 
         <android.support.design.widget.TextInputLayout
             android:id="@+id/fullNameInputLayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_marginBottom="8dp"
             android:layout_marginEnd="8dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
             app:passwordToggleEnabled="true">
 
             <EditText
@@ -87,7 +86,7 @@
                 android:drawableStart="@drawable/ic_action_email"
                 android:hint="@string/full_name_hint"
                 android:inputType="textEmailAddress"
-                />
+                android:textSize="16sp"/>
         </android.support.design.widget.TextInputLayout>
 
         <android.support.design.widget.TextInputLayout
@@ -95,10 +94,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginEnd="8dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
             app:passwordToggleEnabled="true">
 
             <android.support.design.widget.TextInputEditText
@@ -107,65 +103,9 @@
                 android:layout_height="wrap_content"
                 android:drawableStart="@drawable/ic_action_password"
                 android:hint="@string/password_hint"
-                android:inputType="textPassword"/>
+                android:inputType="textPassword"
+                android:textSize="16sp"/>
         </android.support.design.widget.TextInputLayout>
-
-        <LinearLayout
-            android:id="@+id/birthday_layout"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
-            android:layout_marginTop="30dp"
-            android:orientation="horizontal">
-
-            <EditText
-                android:id="@+id/birthdayEditText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:ems="10"
-                android:enabled="false"
-                android:inputType="textPersonName"
-                android:text="Birthday"
-                android:textAlignment="center"
-                android:textColor="#555"
-                android:textSize="18sp"
-                android:textStyle="bold"/>
-
-            <EditText
-                android:id="@+id/dayEditText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:maxLength="2"
-                android:ems="10"
-                android:hint="Day"
-                android:inputType="number"
-                android:textAlignment="center"/>
-
-            <EditText
-                android:id="@+id/monthEditText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:maxLength="2"
-                android:ems="10"
-                android:hint="Month"
-                android:inputType="number"
-                android:textAlignment="center"/>
-
-            <EditText
-                android:id="@+id/yearEditText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:maxLength="4"
-                android:ems="10"
-                android:hint="Year"
-                android:inputType="number"
-                android:textAlignment="center"/>
-        </LinearLayout>
 
     </LinearLayout>
 
@@ -173,68 +113,78 @@
         android:id="@+id/signUpButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="45dp"
+        android:layout_marginTop="24dp"
         android:background="@drawable/button_shape"
-        android:text="Sign up"
+        android:text="@string/sign_up"
         android:textColor="@android:color/white"
-        android:textSize="20sp"
+        android:textSize="16sp"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/genderRadioGroup"/>
+        app:layout_constraintTop_toBottomOf="@+id/credentials_layout"
+        app:layout_constraintBottom_toTopOf="@+id/alternatives_login_layout"
+        app:layout_constraintVertical_bias="0.0"/>
 
-    <TextView
-        android:id="@+id/loginTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="0dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        android:lines="2"
-        android:text="@string/user_login_message"
-        android:textColor="@color/colorAccent"
-        android:textSize="16sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintHorizontal_bias="0.494"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/signUpButton"
-        app:layout_constraintVertical_bias="0.981"/>
 
-    <RadioGroup
-        android:id="@+id/genderRadioGroup"
+    <LinearLayout
+        android:id="@+id/alternatives_login_layout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/credentials_layout"
-        android:layout_marginTop="20dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp">
+        app:layout_constraintRight_toRightOf="parent">
 
-        <RadioButton
-            android:id="@+id/maleRadioButton"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_gravity="center"
-            android:paddingRight="20dp"
-            android:text="Male"
-            android:textColor="#555"
-            android:textSize="18sp"/>
+        <TextView
+            android:id="@+id/alternativesLoginTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/alternatives_login"
+            android:textAlignment="center"
+            android:textStyle="bold"/>
 
-        <RadioButton
-            android:id="@+id/femaleRadioButton"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_gravity="center"
-            android:text="Female"
-            android:textColor="#555"
-            android:textSize="18sp"/>
-    </RadioGroup>
+            android:orientation="horizontal"
+            android:padding="10dp">
+
+            <ImageButton
+                android:id="@+id/googleImageButton"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_gravity="start"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:scaleType="fitCenter"
+                app:srcCompat="@drawable/google_logo"
+                android:contentDescription="@string/google_image_button"/>
+
+            <ImageButton
+                android:id="@+id/facebookImageButton"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_gravity="end"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:scaleType="fitCenter"
+                app:srcCompat="@drawable/facebook_logo"
+                android:contentDescription="@string/facebook_image_button"/>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/loginTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:text="@string/user_login_message"
+            android:textColor="@color/colorAccent"/>
+    </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>

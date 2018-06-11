@@ -21,10 +21,10 @@
         android:id="@+id/welcomeTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="29dp"
-        android:text="Sign In"
+        android:layout_marginTop="8dp"
+        android:text="@string/sign_in"
         android:textColor="@color/colorAccent"
-        android:textSize="40sp"
+        android:textSize="30sp"
         android:textStyle="bold"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
@@ -38,22 +38,21 @@
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="32dp"
         android:orientation="vertical"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/welcomeTextView">
+        app:layout_constraintTop_toBottomOf="@+id/welcomeTextView"
+        >
 
         <android.support.design.widget.TextInputLayout
             android:id="@+id/emailInputLayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginEnd="8dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="8dp"
             app:passwordToggleEnabled="true">
 
             <EditText
@@ -71,8 +70,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginEnd="8dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             app:passwordToggleEnabled="true">
@@ -86,81 +83,71 @@
                 android:inputType="textPassword"/>
         </android.support.design.widget.TextInputLayout>
 
+        <CheckBox
+            android:id="@+id/rememberCredentialsCheckBox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="12dp"
+            android:checked="false"
+            android:text="@string/remember_me"
+            android:textColor="#545454"
+            android:textSize="16sp"/>
     </LinearLayout>
-
-    <CheckBox
-        android:id="@+id/rememberCredentialsCheckBox"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="33dp"
-        android:checked="false"
-        android:text="Remember me "
-        android:textColor="#545454"
-        android:textSize="16sp"
-        app:layout_constraintHorizontal_bias="0.029"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/credentials_layout"/>
 
 
     <TextView
         android:id="@+id/registerTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        android:inputType="textPersonName"
-        android:lines="2"
-        android:text="@string/user_register_message"
-        android:textColor="@color/colorAccent"
-        android:textSize="16sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/signin_layout"
-        app:layout_constraintVertical_bias="0.99"/>
-
-    <LinearLayout
-        android:id="@+id/signin_layout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="76dp"
-
-        android:orientation="horizontal"
+        android:layout_marginBottom="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="8dp"
+        android:gravity="center"
+        android:padding="5dp"
+        android:text="@string/user_register_message"
+        android:textColor="@color/colorAccent"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/rememberCredentialsCheckBox">
+        app:layout_constraintTop_toBottomOf="@+id/signin_layout"
+        app:layout_constraintVertical_bias="1.0"/>
+
+    <LinearLayout
+        android:id="@+id/signin_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="32dp"
+        android:orientation="horizontal"
+        app:layout_constraintHorizontal_bias="0.496"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/credentials_layout">
 
         <Button
             android:id="@+id/signInButton"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="20dp"
             android:layout_weight="1"
             android:background="@drawable/button_shape"
-            android:text="Login"
+            android:text="@string/login"
             android:textColor="@android:color/white"
-            android:textSize="20sp"
+            android:textSize="16sp"
             />
 
         <TextView
             android:id="@+id/forgotPasswordTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
-            android:text="Forgot password ?"
+            android:layout_marginStart="50dp"
+            android:text="@string/forgot_password"
             android:textAlignment="center"
-            android:textSize="16sp"
             />
 
     </LinearLayout>

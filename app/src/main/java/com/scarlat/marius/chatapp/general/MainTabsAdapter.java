@@ -1,4 +1,4 @@
-package com.scarlat.marius.chatapp.util;
+package com.scarlat.marius.chatapp.general;
 
 
 import android.support.v4.app.Fragment;
@@ -12,7 +12,8 @@ import com.scarlat.marius.chatapp.fragments.FriendRequestsFragment;
 
 public class MainTabsAdapter extends FragmentPagerAdapter{
 
-    private int numberOfTabs = 3;
+    private static final String TAG = "MainTabsAdapter";
+
     private String[] fragmentTitles = {
             "FRIEND REQUESTS",
             "CHAT",
@@ -26,12 +27,9 @@ public class MainTabsAdapter extends FragmentPagerAdapter{
     // Assign one fragment for each tab
     @Override
     public Fragment getItem(int position) {
-        if (position < 0 || position > 2)
-            Log.d(Constants.CURRENT_TAB, "NULL. Invalid position = " + Integer.toString(position));
-        else
-            Log.d(Constants.CURRENT_TAB, fragmentTitles[position]);
+        Log.d(TAG, "getItem: Method was invoked!");
 
-        Fragment fragment;
+        Fragment fragment = null;
 
         switch (position) {
             case 0:
@@ -43,9 +41,6 @@ public class MainTabsAdapter extends FragmentPagerAdapter{
             case 2:
                 fragment = new FriendsFragment();
                 break;
-            default:
-                fragment = null;
-                break;
         }
 
         return fragment;
@@ -53,16 +48,12 @@ public class MainTabsAdapter extends FragmentPagerAdapter{
 
     @Override
     public int getCount() {
-        return numberOfTabs;
+        return fragmentTitles.length;
     }
 
     @Override
     public CharSequence getPageTitle(int position) {
-
-        if (position < 0 || position > 2) {
-            Log.d(Constants.CURRENT_TAB, "getPageTitle: Invalid position = " + Integer.toString(position));
-            return null;
-        }
+        Log.d(TAG, "getPageTitle: Method was invoked");
 
         return fragmentTitles[position];
     }
