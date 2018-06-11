@@ -8,6 +8,7 @@ import android.util.Log;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -15,6 +16,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.scarlat.marius.chatapp.activities.ProfileSettingsActivity;
 import com.scarlat.marius.chatapp.general.Constants;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -85,12 +87,13 @@ public class GetUserInfoTask extends AsyncTask<Void, Void, Void> {
                     final String thumbImage = dataSnapshot.child(Constants.THUMBNAIL_PROFILE_IMAGE).getValue().toString();
                     final String status = dataSnapshot.child(Constants.STATUS).getValue().toString();
 
-                    statusEditText.setText(status);
-                    fullNameEditText.setText(fullname);
-                    emailEditText.setText(email);
-
-                    /* TODO: Update photo image */
-
+                    // TODO: Check Glide Exception: You cannot start a load for a destroyed activity glide
+                    if (! ((ProfileSettingsActivity) context).isFinishing()) {
+                        statusEditText.setText(status);
+                        fullNameEditText.setText(fullname);
+                        emailEditText.setText(email);
+                        Glide.with(context).load(profileImage).into(avatarCircleImageView);
+                    }
                 } else {
                     Log.d(TAG, "onDataChange: Cannot find snapshot of " + mAuth.getUid());
                     Toast.makeText(context, "User ID " + mAuth.getUid() + " doesn't exists", Toast.LENGTH_SHORT).show();
@@ -110,7 +113,4 @@ public class GetUserInfoTask extends AsyncTask<Void, Void, Void> {
 
         return null;
     }
-
-
-
 }

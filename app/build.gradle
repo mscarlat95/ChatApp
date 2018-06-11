@@ -38,8 +38,6 @@ dependencies {
     /* URI image processing */
     compile 'com.github.bumptech.glide:glide:4.7.1'
     compile 'com.theartofdev.edmodo:android-image-cropper:2.7.+'
-//    compile 'com.squareup.picasso:picasso:2.5.2'
-
 
     /* Firebase Database */
     compile 'com.google.firebase:firebase-database:10.0.1'
@@ -47,6 +45,8 @@ dependencies {
     /* Firebase Core */
     compile 'com.google.firebase:firebase-core:16.0.0'
 
+    /* Firebase Storage */
+    compile "com.google.firebase:firebase-storage:16.0.1"
 
     /* Firebase Auth ; also Google auth */
     compile 'com.google.firebase:firebase-auth:16.0.1'
@@ -59,7 +59,6 @@ dependencies {
 
     /* Unit testing */
     testCompile 'junit:junit:4.12'
-
 }
 
 

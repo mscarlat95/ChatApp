@@ -16,13 +16,14 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
 import com.scarlat.marius.chatapp.R;
 import com.scarlat.marius.chatapp.general.Constants;
 import com.scarlat.marius.chatapp.threads.ChangeStatusTask;
 import com.scarlat.marius.chatapp.threads.GetUserInfoTask;
+import com.scarlat.marius.chatapp.threads.UploadProfilePhotoTask;
 import com.theartofdev.edmodo.cropper.CropImage;
+import com.theartofdev.edmodo.cropper.CropImageView;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -154,8 +155,6 @@ public class ProfileSettingsActivity extends AppCompatActivity {
         startActivityForResult(Intent.createChooser(galleryIntent, "Select profile image"), Constants.REQUEST_CODE_READ_EXT);
     }
 
-
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -188,21 +187,21 @@ public class ProfileSettingsActivity extends AppCompatActivity {
     private void extractImagefromCamera(Intent data) {
         Log.d(TAG, "extractImagefromCamera: Method was invoked!");
         
-        /* Save full size photo */
         Uri imageUri = Uri.parse(data.getStringExtra(Constants.PROFILE_IMAGE));
-
-        CropImage.activity(imageUri)
-                .setAspectRatio(1 /*X ratio*/, 1 /*Y ratio*/)
-                .start(this);
+        cropImage(imageUri);
     }
 
     private void extractImageFromGallery(Intent data) {
         Log.d(TAG, "extractImageFromGallery: Method was invoked!");
 
         Uri imageUri = data.getData();
+        cropImage(imageUri);
+    }
 
+    private void cropImage(Uri imageUri) {
         CropImage.activity(imageUri)
                 .setAspectRatio(1 /*X ratio*/, 1 /*Y ratio*/)
+                .setRequestedSize(Constants.MAX_WIDTH, Constants.MAX_HEIGHT, CropImageView.RequestSizeOptions.RESIZE_EXACT)
                 .start(this);
     }
 
@@ -210,12 +209,7 @@ public class ProfileSettingsActivity extends AppCompatActivity {
         CropImage.ActivityResult result = CropImage.getActivityResult(data);
         Uri imageUri = result.getUri();
 
-
-        Glide.with(this)
-                .load(imageUri)
-                .into(avatarCircleImageView);
-
-
-
+        /* Upload it to the server */
+        new UploadProfilePhotoTask(this).execute(imageUri);
     }
 }

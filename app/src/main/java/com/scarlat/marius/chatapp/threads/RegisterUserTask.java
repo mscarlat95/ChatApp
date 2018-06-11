@@ -86,7 +86,7 @@ public class RegisterUserTask extends AsyncTask<String, Void, Void> {
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
                             Log.d(TAG, "Add info in database success");
-                            Toast.makeText(context, "Register Succedded!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(context, "Register succeeded !", Toast.LENGTH_SHORT).show();
                         } else {
                             Log.d(TAG, "Add info in database failed. " + task.getException().toString());
                             Toast.makeText(context, task.getException().getMessage(), Toast.LENGTH_SHORT).show();

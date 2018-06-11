@@ -68,7 +68,7 @@ public class ChangeStatusTask extends AsyncTask<String, Void, Void> {
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
                             Log.d(TAG, "Changing Status: Success");
-                            Toast.makeText(context, "Status was updated successfully!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(context, "Status Updating successful!", Toast.LENGTH_SHORT).show();
                         } else {
                             Log.d(TAG, "Changing Status Failed: " + task.getException().getMessage());
                             Toast.makeText(context, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
