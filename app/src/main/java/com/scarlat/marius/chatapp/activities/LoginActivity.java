@@ -87,6 +87,8 @@ public class LoginActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d(TAG, "onCreate: Method was invoked!");
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
@@ -149,6 +151,8 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void emailAndPassLogin(final String email, final String password) {
+        Log.d(TAG, "emailAndPassLogin: Method was invoked!");
+
         mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {

@@ -51,18 +51,7 @@ public class MainActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.userLogoutItem:
                 Log.d(TAG, "onOptionsItemSelected: Logout");
-                AuthUI.getInstance().signOut(MainActivity.this).addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()) {
-                            Log.d(TAG, "onComplete: Logout Successful");
-                            launchActivity (MainActivity.this, LoginActivity.class, "login");
-                            finish();
-                        } else {
-                            Toast.makeText(MainActivity.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
+                logout();
                 return true;
 
             case R.id.profileSettingsItem:
@@ -70,8 +59,9 @@ public class MainActivity extends AppCompatActivity {
                 launchActivity(MainActivity.this, ProfileSettingsActivity.class, "profileSettings");
                 return true;
 
-            case R.id.userTimelineItem:
-                Log.d(TAG, "onOptionsItemSelected: User Timeline");
+            case R.id.allUsersItem:
+                Log.d(TAG, "onOptionsItemSelected: All Users");
+                launchActivity(MainActivity.this, UserListActivity.class, "all_users");
                 return true;
         }
 
@@ -106,6 +96,42 @@ public class MainActivity extends AppCompatActivity {
         enablePermissions();
     }
 
+    @Override
+    protected void onStart() {
+        Log.d(TAG, "onStart: Method was invoked!");
+        super.onStart();
+
+        /* Perform sign in if user is not logged in */
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (currentUser == null) {
+            launchActivity (MainActivity.this, LoginActivity.class, "login");
+            finish();
+        }
+    }
+
+    private void logout() {
+        AuthUI.getInstance().signOut(MainActivity.this).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful()) {
+                    Log.d(TAG, "onComplete: Logout Successful");
+                    launchActivity (MainActivity.this, LoginActivity.class, "login");
+                    finish();
+                } else {
+                    Toast.makeText(MainActivity.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
+    private void launchActivity (Context srcContext, Class destClass, String extraMsg) {
+        Log.d(TAG, "launchActivity: Method was invoked!");
+
+        Intent intent = new Intent(srcContext, destClass);
+        intent.putExtra(extraMsg, true);
+        startActivity(intent);
+    }
+
     private void enablePermissions() {
         Log.d(TAG, "requestPermissions: Method was invoked!");
 
@@ -121,28 +147,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-
-    @Override
-    protected void onStart() {
-        Log.d(TAG, "onStart: Method was invoked!");
-        super.onStart();
-
-        /* Perform sign in if user is not logged in */
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        if (currentUser == null) {
-            launchActivity (MainActivity.this, LoginActivity.class, "login");
-            finish();
-        }
-    }
-
-    private void launchActivity (Context srcContext, Class destClass, String extraMsg) {
-        Log.d(TAG, "launchActivity: Method was invoked!");
-
-        Intent intent = new Intent(srcContext, destClass);
-        intent.putExtra(extraMsg, true);
-        startActivity(intent);
-    }
-
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {

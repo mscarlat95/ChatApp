@@ -6,8 +6,8 @@
         android:id="@+id/profileSettingsItem"
         android:title="Profile Settings"/>
     <item
-        android:id="@+id/userTimelineItem"
-        android:title="Timeline"/>
+        android:id="@+id/allUsersItem"
+        android:title="All Users"/>
     <item
         android:id="@+id/userLogoutItem"
         android:title="@string/logout_button"/>

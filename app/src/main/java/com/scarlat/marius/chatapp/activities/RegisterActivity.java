@@ -153,7 +153,7 @@ public class RegisterActivity extends AppCompatActivity {
                             Log.d(TAG, "Adding new records about user into the database");
 
                             new RegisterUserTask(RegisterActivity.this, mAuth)
-                                    .execute(email, fullName, Constants.DEFAULT_PROFILE_IMAGE_VAL);
+                                    .execute(email, fullName, Constants.UNSET);
 
                             launchMainActivity();
 
@@ -314,7 +314,7 @@ public class RegisterActivity extends AppCompatActivity {
                     Log.d(TAG, "User doesn't exists in database. Adding new records about him...");
                     
                     FirebaseUser user = mAuth.getCurrentUser();
-                    String photoUrl = Constants.DEFAULT_PROFILE_IMAGE_VAL;
+                    String photoUrl = Constants.UNSET;
                     if (user.getPhotoUrl() != null) {
                         photoUrl = String.valueOf(user.getPhotoUrl());
                     }

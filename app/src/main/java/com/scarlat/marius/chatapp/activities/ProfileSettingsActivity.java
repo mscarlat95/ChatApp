@@ -1,9 +1,11 @@
 package com.scarlat.marius.chatapp.activities;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -11,10 +13,12 @@ import android.provider.MediaStore;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.scarlat.marius.chatapp.R;
@@ -38,9 +42,8 @@ public class ProfileSettingsActivity extends AppCompatActivity {
 
     /* Android Fields */
     private CircleImageView avatarCircleImageView;
-    private EditText fullNameEditText, emailEditText, statusEditText;
-    private Button changeStatusButton, changePhotoButton;
-
+    private EditText fullNameEditText, emailEditText, statusEditText, friendsNumberEditText;
+    private Button changeStatusButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,35 +57,70 @@ public class ProfileSettingsActivity extends AppCompatActivity {
         fullNameEditText = (EditText) findViewById(R.id.fullNameEditText);
         emailEditText = (EditText) findViewById(R.id.emailEditText);
         statusEditText = (EditText) findViewById(R.id.statusEditText);
+        friendsNumberEditText = (EditText) findViewById(R.id.friendsNumberEditText);
         changeStatusButton = (Button) findViewById(R.id.changeStatusButton);
 
+        statusEditText.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
+                    changeUserStatus(v);
+                }
+
+                return false;
+            }
+        });
+
         /* Retrieve User Data */
-        new GetUserInfoTask(this, avatarCircleImageView, fullNameEditText, emailEditText, statusEditText).execute();
+        new GetUserInfoTask(this, avatarCircleImageView, fullNameEditText, emailEditText,
+                            statusEditText, friendsNumberEditText).execute();
+
 
     }
 
     /* Change Status Listener */
     public void changeUserStatus(View view) {
+        Log.d(TAG, "changeUserStatus: Method was invoked!");
+
         if (statusEditText.isEnabled()) {
             new ChangeStatusTask(ProfileSettingsActivity.this, FirebaseAuth.getInstance())
                     .execute(statusEditText.getText().toString());
             statusEditText.setEnabled(false);
-            changeStatusButton.setText("Change Status");
+            statusEditText.setTextColor(emailEditText.getTextColors());
+            changeStatusButton.setText(R.string.change_status_btn);
         } else {
-                    /* Request focus and activate the keyboard */
+
+            /* Request focus and activate the keyboard */
             statusEditText.setEnabled(true);
             statusEditText.requestFocus();
             statusEditText.setSelection(statusEditText.length());
 
+            statusEditText.setTextColor(Color.BLACK);
+
             InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
             inputMethodManager.showSoftInput(statusEditText, InputMethodManager.SHOW_IMPLICIT);
 
-            changeStatusButton.setText("Publish Status");
+            changeStatusButton.setText(R.string.publish_status_btn);
+        }
+    }
+
+
+    /* Display Photo Listener */
+    public void displayUserPhoto(View view) {
+        if (view.getId() == R.id.avatarCircleImageView) {
+            final Dialog dialog = new Dialog(this);
+            dialog.setContentView(R.layout.user_image_layout);
+
+            ImageView profileImage = (ImageView) dialog.findViewById(R.id.profileImageView);
+            profileImage.setImageDrawable(avatarCircleImageView.getDrawable());
+            dialog.show();
         }
     }
 
     /* Change Photo Listener */
     public void changePictureOptions(View view) {
+        Log.d(TAG, "changePictureOptions: Method was invoked!");
+
         final String[] availableOptions = {
                 "Take a photo",
                 "Choose from gallery",
@@ -212,4 +250,5 @@ public class ProfileSettingsActivity extends AppCompatActivity {
         /* Upload it to the server */
         new UploadProfilePhotoTask(this).execute(imageUri);
     }
+
 }

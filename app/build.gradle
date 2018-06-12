@@ -41,6 +41,7 @@ dependencies {
 
     /* Firebase Database */
     compile 'com.google.firebase:firebase-database:10.0.1'
+    compile 'com.firebaseui:firebase-ui-database:4.0.1'
 
     /* Firebase Core */
     compile 'com.google.firebase:firebase-core:16.0.0'
@@ -52,7 +53,6 @@ dependencies {
     compile 'com.google.firebase:firebase-auth:16.0.1'
     compile 'com.google.android.gms:play-services-auth:15.0.1'
     compile 'com.firebaseui:firebase-ui-auth:4.0.1'
-    compile 'com.firebaseui:firebase-ui-database:4.0.1'
 
     /* Facebook Auth */
     compile 'com.facebook.android:facebook-android-sdk:[4,5)'

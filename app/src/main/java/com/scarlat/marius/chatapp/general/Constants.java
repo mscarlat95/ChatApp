@@ -2,7 +2,9 @@ package com.scarlat.marius.chatapp.general;
 
 public class Constants {
 
+    /* Default Element values */
     public static final String UNSET = "Unset";
+    public static final String DEFAULT_STATUS_VAL = "Available";
     public static final String RESULT_OK = "SUCCESS";
     public static final String RESULT_ERROR = "ERROR";
 
@@ -20,11 +22,11 @@ public class Constants {
     public static final String EMAIL = "email";
     public static final String FULLNAME = "fullname";
     public static final String STATUS = "status";
-    public static final String DEFAULT_STATUS_VAL = "Available";
-    public static final String DEFAULT_PROFILE_IMAGE_VAL = "Unset";
-    public static final String PROFILE_IMAGE = "profile_image";
-    public static final String THUMBNAIL_PROFILE_IMAGE = "thumbnail_profile_image";
+    public static final String NUMBER_OF_FRIENDS = "numberOfFriends";
 
+    public static final String PROFILE_IMAGE = "profileImage";
+
+    /* Profile picture resize */
     public static final int MAX_WIDTH = 600;
     public static final int MAX_HEIGHT = 600;
 

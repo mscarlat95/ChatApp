@@ -68,13 +68,13 @@ public class RegisterUserTask extends AsyncTask<String, Void, Void> {
         final String fullName = params[1];
         final String photoUrl = params[2];
         final String userID = mAuth.getUid();
-        Map<String, String> userInfo = new HashMap<>();
+        Map<String, Object> userInfo = new HashMap<>();
 
         userInfo.put(Constants.FULLNAME, fullName);
         userInfo.put(Constants.EMAIL, email);
         userInfo.put(Constants.STATUS, Constants.DEFAULT_STATUS_VAL);
         userInfo.put(Constants.PROFILE_IMAGE, photoUrl);
-        userInfo.put(Constants.THUMBNAIL_PROFILE_IMAGE, photoUrl);
+        userInfo.put(Constants.NUMBER_OF_FRIENDS, 0);
 
         Log.d(TAG, "User ID Token = " + userID);
         Log.d(TAG, "User Information = " + userInfo.toString());
