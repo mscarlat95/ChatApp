@@ -35,10 +35,13 @@ public class Constants {
     public static final String REQUEST_TYPE_SENT = "sent";
     public static final String REQUEST_TYPE_RECEIVED = "received";
 
+    public static final String STATE_FRIENDS = "friends";
+
     public static final String[] REQUEST_STATES = {
-            UNSET,                  /* 0:   User can perform Send request */
-            REQUEST_TYPE_SENT,      /* 1:   User can perform Cancel request */
-            REQUEST_TYPE_RECEIVED   /* 2:   User can accept or decline the request */
+            UNSET,                      /* 0:   User can perform Send request */
+            REQUEST_TYPE_SENT,          /* 1:   User can perform Cancel request */
+            REQUEST_TYPE_RECEIVED,      /* 2:   User can accept or decline the request */
+            STATE_FRIENDS               /* 3:   Users are friends */
     };
 
     /* Storage */

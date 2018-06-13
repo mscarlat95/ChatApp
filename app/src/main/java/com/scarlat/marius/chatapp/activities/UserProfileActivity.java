@@ -18,6 +18,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.scarlat.marius.chatapp.R;
 import com.scarlat.marius.chatapp.general.Constants;
+import com.scarlat.marius.chatapp.threads.AcceptFriendRequestTask;
 import com.scarlat.marius.chatapp.threads.GetFriendInfoTask;
 import com.scarlat.marius.chatapp.threads.RemoveFriendRequestTask;
 import com.scarlat.marius.chatapp.threads.SendFriendRequestTask;
@@ -27,7 +28,7 @@ public class UserProfileActivity extends AppCompatActivity {
 
     private ImageView profileImageView;
     private TextView fullNameTextView, statusTextView, friendsNumberTextView;
-    private Button sendFriendRequestButton;
+    private Button sendFriendRequestButton, declineFriendRequestButton;
 
     private int requestState = 0;   /* Unset */
     private String friendID = Constants.UNSET;
@@ -49,24 +50,27 @@ public class UserProfileActivity extends AppCompatActivity {
         fullNameTextView = (TextView) findViewById(R.id.fullNameTextView);
         statusTextView = (TextView) findViewById(R.id.statusTextView);
         friendsNumberTextView = (TextView) findViewById(R.id.friendsNumberTextView);
-        sendFriendRequestButton = (Button) findViewById(R.id.sendFriendRequestButton);
 
-        /* Add button listener */
+        sendFriendRequestButton = (Button) findViewById(R.id.sendFriendRequestButton);
         sendFriendRequestButton.setOnClickListener(new FriendRequestsListener());
+
+        declineFriendRequestButton = (Button) findViewById(R.id.declineFriendRequestButton);
+        declineFriendRequestButton.setOnClickListener(new DeclineRequestListener());
 
         /* Check Request States */
         checkRequests();
 
-       /* Extract user information */
-        new GetFriendInfoTask(  this, friendID, profileImageView, fullNameTextView,
-                statusTextView, friendsNumberTextView).execute();
+        /* Extract user information */
+        new GetFriendInfoTask(this, friendID, profileImageView, fullNameTextView,
+            statusTextView, friendsNumberTextView).execute();
     }
 
     private void checkRequests() {
         Log.d(TAG, "checkRequests: Method was invoked!");
-        String userID = FirebaseAuth.getInstance().getUid();
 
-        sendFriendRequestButton.setEnabled(false);
+        sendFriendRequestButton.setVisibility(View.INVISIBLE);
+
+        String userID = FirebaseAuth.getInstance().getUid();
         if (userID == null) {
             Log.d(TAG, "checkRequests: USER_ID is null");
 
@@ -95,13 +99,15 @@ public class UserProfileActivity extends AppCompatActivity {
                             }
                         }
 
-                        sendFriendRequestButton.setEnabled(true);
+                        sendFriendRequestButton.setVisibility(View.VISIBLE);
                     }
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError databaseError) {
                         Log.d(TAG, "onCancelled: " + databaseError.getMessage());
                         Toast.makeText(UserProfileActivity.this, databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+
+                        sendFriendRequestButton.setVisibility(View.VISIBLE);
                     }
                 });
     }
@@ -111,24 +117,38 @@ public class UserProfileActivity extends AppCompatActivity {
         public void onClick(View v) {
             sendFriendRequestButton.setEnabled(false);
 
+            // TODO: set requestState from Aync Tasks using execute().get() and a getter
+
             switch (Constants.REQUEST_STATES[requestState]) {
-                case Constants.UNSET:
+                case Constants.UNSET:                       // Send Friend Request
                     new SendFriendRequestTask(UserProfileActivity.this, friendID, sendFriendRequestButton).execute();
-                    requestState = 1; /* Request sent */
+                    requestState = 1;       // Request sent
                     break;
 
-                case Constants.REQUEST_TYPE_SENT:
+                case Constants.REQUEST_TYPE_SENT:           // Cancel Friend Request
                     new RemoveFriendRequestTask(UserProfileActivity.this, friendID, sendFriendRequestButton).execute();
-                    requestState = 0;   /* Cancel Request --> Unset State */
+                    requestState = 0;       // Unset State
                     break;
 
-                case Constants.REQUEST_TYPE_RECEIVED:
-                    // TODO: process Decline or Accept
-                    // TODO: process Friends Table
+                case Constants.REQUEST_TYPE_RECEIVED:       // Accept Friend Request
+                    new AcceptFriendRequestTask(UserProfileActivity.this, friendID, sendFriendRequestButton).execute();
+                    requestState = 3;       // Users are friends now
+                    break;
 
+                case Constants.STATE_FRIENDS:               // Unfriend
+                    // TODO: delete records from Friends table
+                    requestState = 0;
                     break;
             }
         }
     };
+
+    private class DeclineRequestListener implements View.OnClickListener {
+
+        @Override
+        public void onClick(View v) {
+
+        }
+    }
 
 }

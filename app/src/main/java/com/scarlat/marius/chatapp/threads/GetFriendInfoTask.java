@@ -59,7 +59,7 @@ public class GetFriendInfoTask extends AsyncTask<Void, Void, Void> {
     protected void onPreExecute() {
         /* Setup progress dialog */
         progressDialog = new ProgressDialog(context);
-        progressDialog.setTitle("Retreiving User Information");
+        progressDialog.setTitle("Retrieving User Information");
         progressDialog.setMessage("Please wait until the server provides the required data");
         progressDialog.setCanceledOnTouchOutside(false); // Don't stop it when screen is touched
         progressDialog.show();

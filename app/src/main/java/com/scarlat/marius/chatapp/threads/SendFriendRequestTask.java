@@ -79,10 +79,7 @@ public class SendFriendRequestTask extends AsyncTask<Void, Void, Void> {
                         public void onComplete(@NonNull Task<Void> task) {
                             if (task.isSuccessful()) {
                                 Log.d(TAG, "Set REQUEST_TYPE_RECEIVED Successful");
-
-                                sendFriendRequestButton.setEnabled(true);
                                 sendFriendRequestButton.setText(R.string.cancel_friend_request);
-
                             } else {
                                 Log.d(TAG, "Set REQUEST_TYPE_RECEIVED Failed: " + task.getException().getMessage());
                                 Toast.makeText(context, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
@@ -95,9 +92,10 @@ public class SendFriendRequestTask extends AsyncTask<Void, Void, Void> {
                 } else {
                     Log.d(TAG, "Set REQUEST_TYPE_SENT Failed: " + task.getException().getMessage());
                     Toast.makeText(context, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-
                     hideProgressDialog();
                 }
+
+                sendFriendRequestButton.setEnabled(true);
             }
         });
 

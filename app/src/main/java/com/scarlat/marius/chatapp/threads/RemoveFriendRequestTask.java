@@ -4,10 +4,13 @@ package com.scarlat.marius.chatapp.threads;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.widget.Button;
+import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
@@ -46,7 +49,7 @@ public class RemoveFriendRequestTask extends AsyncTask<Void, Void, Void> {
     protected void onPreExecute() {
         /* Setup progress dialog */
         progressDialog = new ProgressDialog(context);
-        progressDialog.setTitle("Cancelin Friend Request");
+        progressDialog.setTitle("Canceling Friend Request");
         progressDialog.setMessage("Please wait until the friend request is canceled");
         progressDialog.setCanceledOnTouchOutside(false); // Don't stop it when screen is touched
         progressDialog.show();
@@ -61,24 +64,37 @@ public class RemoveFriendRequestTask extends AsyncTask<Void, Void, Void> {
     protected Void doInBackground(Void... params) {
         Log.d(TAG, "doInBackground: Method was invoked!");
 
-        dbReference.child(friendID).child(userID).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+        dbReference.child(friendID).child(userID).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
-            public void onSuccess(Void aVoid) {
-
+            public void onComplete(@NonNull Task<Void> task) {
                 Log.d(TAG, "Removed REQUEST_TYPE_RECEIVED Successful");
 
-                dbReference.child(userID).child(friendID).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
+                if (task.isSuccessful()) {
 
-                        Log.d(TAG, "Removed REQUEST_TYPE_SENT Successful");
+                    dbReference.child(userID).child(friendID).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful()) {
+                                Log.d(TAG, "Removed REQUEST_TYPE_SENT Successful");
 
-                        sendFriendRequestButton.setEnabled(true);
-                        sendFriendRequestButton.setText(R.string.send_friend_request);
+                                if (sendFriendRequestButton != null) {
+                                    sendFriendRequestButton.setEnabled(true);
+                                    sendFriendRequestButton.setText(R.string.send_friend_request);
+                                }
 
-                        hideProgressDialog();
-                    }
-                });
+                            } else {
+                                Log.d(TAG, "Removed REQUEST_TYPE_SENT Successful Failed: " + task.getException().getMessage());
+                                Toast.makeText(context, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+
+                        }
+                    });
+                } else {
+                    Log.d(TAG, "Removed REQUEST_TYPE_RECEIVED Successful Failed: " + task.getException().getMessage());
+                    Toast.makeText(context, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                }
+
+                hideProgressDialog();
             }
         });
         return null;
