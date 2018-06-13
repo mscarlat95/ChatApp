@@ -37,4 +37,7 @@
     <string name="number_of_friends">Number of friends</string>
     <string name="change_status_btn">Change Status</string>
     <string name="publish_status_btn">Publish Status</string>
+    <string name="accept_friend_request">Accept Friend Request</string>
+    <string name="cancel_friend_request">Cancel Friend Request</string>
+    <string name="send_friend_request">Send Friend Request</string>
 </resources>

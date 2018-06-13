@@ -99,7 +99,7 @@ public class GetUserInfoTask extends AsyncTask<Void, Void, Void> {
                     statusEditText.setText(status);
                     fullNameEditText.setText(fullname);
                     emailEditText.setText(email);
-                    friendsNumberEditText.setText(numberOfFriends + " friends");
+                    friendsNumberEditText.setText(numberOfFriends + " Friends");
                     Glide.with(context)
                             .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_avatar))
                             .load(profileImage)

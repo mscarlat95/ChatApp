@@ -113,6 +113,15 @@ public class ProfileSettingsActivity extends AppCompatActivity {
 
             ImageView profileImage = (ImageView) dialog.findViewById(R.id.profileImageView);
             profileImage.setImageDrawable(avatarCircleImageView.getDrawable());
+
+            findViewById(R.id.profileSettingsRootView).setVisibility(View.INVISIBLE);
+
+            dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                @Override
+                public void onCancel(DialogInterface dialog) {
+                    findViewById(R.id.profileSettingsRootView).setVisibility(View.VISIBLE);
+                }
+            });
             dialog.show();
         }
     }

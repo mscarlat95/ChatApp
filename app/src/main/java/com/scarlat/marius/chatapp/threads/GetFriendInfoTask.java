@@ -23,7 +23,6 @@ import com.scarlat.marius.chatapp.general.Constants;
 
 public class GetFriendInfoTask extends AsyncTask<Void, Void, Void> {
     private static final String TAG = "GetFriendInfoTask";
-
     private Context context;
 
     private String userID;

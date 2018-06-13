@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -97,11 +98,13 @@ public class UserListActivity extends AppCompatActivity {
                     User user = dataSnapshot.getValue(User.class);
                     user.setUserId(dataSnapshot.getKey());
 
-                    Log.d(TAG, "onChildAdded: Profile Image" + user.getProfileImage());
-                    users.add(user);
+                    if (!FirebaseAuth.getInstance().getUid().equals(user.getUserId())) {
+                        Log.d(TAG, "onChildAdded: Profile Image" + user.getProfileImage());
+                        users.add(user);
 
-                    adapter.setFilter(users);
-                    adapter.notifyItemInserted(users.size() - 1);
+                        adapter.setFilter(users);
+                        adapter.notifyItemInserted(users.size() - 1);
+                    }
 
                     progressDialog.dismiss();
                 }
@@ -120,8 +123,6 @@ public class UserListActivity extends AppCompatActivity {
             }
         });
     }
-
-
 
 
     /* Filter users using the search bar */

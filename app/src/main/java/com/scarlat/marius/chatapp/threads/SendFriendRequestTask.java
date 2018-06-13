@@ -1,12 +1,11 @@
 package com.scarlat.marius.chatapp.threads;
 
 
+import android.app.ProgressDialog;
 import android.content.Context;
-import android.graphics.Color;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -16,34 +15,47 @@ import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.scarlat.marius.chatapp.R;
 import com.scarlat.marius.chatapp.general.Constants;
 
 public class SendFriendRequestTask extends AsyncTask<Void, Void, Void> {
     private static final String TAG = "SendFriendRequestTask";
 
     private Context context;
-
     private String userID;
     private String friendID;
 
     /* Views */
-    private Button sendFriendRequestButton, declineFriendRequestButton;
+    private ProgressDialog progressDialog;
+    private Button sendFriendRequestButton;
 
     /* Firebase */
     private DatabaseReference dbReference;
 
-    public SendFriendRequestTask(Context context, String friendID,
-                                 Button sendFriendRequestButton, Button declineFriendRequestButton) {
+    public SendFriendRequestTask(Context context, String friendID, Button sendFriendRequestButton) {
         this.context = context;
         this.friendID = friendID;
 
         /* Setup views */
         this.sendFriendRequestButton = sendFriendRequestButton;
-        this.declineFriendRequestButton = declineFriendRequestButton;
+    }
+
+
+    private void hideProgressDialog() {
+        if (progressDialog.isShowing()) {
+            progressDialog.dismiss();
+        }
     }
 
     @Override
     protected void onPreExecute() {
+        /* Setup progress dialog */
+        progressDialog = new ProgressDialog(context);
+        progressDialog.setTitle("Sending Friend Request");
+        progressDialog.setMessage("Please wait until the friend request is sent");
+        progressDialog.setCanceledOnTouchOutside(false); // Don't stop it when screen is touched
+        progressDialog.show();
+
         /* Setup Firebase */
         FirebaseApp.initializeApp(context);
         userID = FirebaseAuth.getInstance().getUid();
@@ -68,22 +80,23 @@ public class SendFriendRequestTask extends AsyncTask<Void, Void, Void> {
                             if (task.isSuccessful()) {
                                 Log.d(TAG, "Set REQUEST_TYPE_RECEIVED Successful");
 
-                                sendFriendRequestButton.setText("Friend Request Sent");
-                                sendFriendRequestButton.setBackgroundColor(Color.parseColor("#55EEEEEE"));
-
-
-                                declineFriendRequestButton.setVisibility(View.VISIBLE);
+                                sendFriendRequestButton.setEnabled(true);
+                                sendFriendRequestButton.setText(R.string.cancel_friend_request);
 
                             } else {
                                 Log.d(TAG, "Set REQUEST_TYPE_RECEIVED Failed: " + task.getException().getMessage());
                                 Toast.makeText(context, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                             }
+
+                            hideProgressDialog();
                         }
                     });
 
                 } else {
                     Log.d(TAG, "Set REQUEST_TYPE_SENT Failed: " + task.getException().getMessage());
                     Toast.makeText(context, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+
+                    hideProgressDialog();
                 }
             }
         });
