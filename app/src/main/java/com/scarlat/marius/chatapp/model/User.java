@@ -5,6 +5,8 @@ import com.scarlat.marius.chatapp.general.Constants;
 
 public class User {
 
+    private String userId = Constants.UNSET;
+
     private String fullname = Constants.UNSET;
     private String email = Constants.UNSET;
     private String status = Constants.UNSET;
@@ -32,4 +34,7 @@ public class User {
 
     public String getProfileImage() { return profileImage; }
     public void setProfileImage(String profileImage) { this.profileImage = profileImage; }
+
+    public String getUserId() { return  userId; }
+    public void setUserId(String userId) { this.userId = userId; }
 }

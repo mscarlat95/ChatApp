@@ -19,16 +19,22 @@ public class Constants {
     public static final int REQUEST_CODE_SIGN_IN = 21;
 
     /* User Info */
+    public static final String USER_ID = "userId";
     public static final String EMAIL = "email";
     public static final String FULLNAME = "fullname";
     public static final String STATUS = "status";
     public static final String NUMBER_OF_FRIENDS = "numberOfFriends";
-
     public static final String PROFILE_IMAGE = "profileImage";
 
     /* Profile picture resize */
     public static final int MAX_WIDTH = 600;
     public static final int MAX_HEIGHT = 600;
+
+    /* Friend request */
+    public static final String REQUEST_TYPE = "request_type";
+    public static final String REQUEST_TYPE_SENT = "sent";
+    public static final String REQUEST_TYPE_RECEIVED = "received";
+
 
     /* Storage */
     public static final String USER_PREFERENCES = "user_info_shared_pref";

@@ -110,13 +110,6 @@ public class RegisterActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
-        // Check intent extra values
-        final Intent intent = getIntent();
-        if (!intent.getBooleanExtra("register", true)) {
-            Log.d(TAG, "onCreate: RegisterActivity was accessed incorrectly");
-            finish();
-        }
-
         // Set Toolbar
         toolbar = (Toolbar) findViewById(R.id.registerToolbar);
         setSupportActionBar(toolbar);

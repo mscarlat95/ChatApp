@@ -17,20 +17,19 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.scarlat.marius.chatapp.R;
-import com.scarlat.marius.chatapp.general.Constants;
 
 public class ForgotPasswordActivity extends AppCompatActivity {
 
     private static final String TAG = "ForgotPasswordActivity";
     
-    // Android fields
+    /*  Android Views */
     private EditText emailEditText;
-    private Button recoverPasswordButton;
+    private Button recoverPasswordButton, openEmailButton;
     private TextView resultTextView;
     private Toolbar toolbar;
     private ProgressDialog resetProgress;
 
-    // Firebase Auth
+    /* Firebase Auth */
     private FirebaseAuth mAuth;
 
     private View.OnClickListener passwordRecoverListener = new View.OnClickListener() {
@@ -38,17 +37,28 @@ public class ForgotPasswordActivity extends AppCompatActivity {
         public void onClick(View v) {
             final String email = emailEditText.getText().toString();
 
-            if (email.equals("")) {
-                Toast.makeText(ForgotPasswordActivity.this, "Please, complete email field!", Toast.LENGTH_SHORT).show();
-            } else {
-
-                resetProgress.setTitle("Password Reset");
-                resetProgress.setMessage("Please wait until an email is sent to you");
-                resetProgress.setCanceledOnTouchOutside(false); // Don't stop it when screen is touched
-                resetProgress.show();
-
-                resetPassword(email);
+            if (email.isEmpty()) {
+                Toast.makeText(ForgotPasswordActivity.this, "Please, complete your email address!", Toast.LENGTH_SHORT).show();
+                return;
             }
+
+            resetProgress = new ProgressDialog(ForgotPasswordActivity.this);
+            resetProgress.setTitle("Password Reset");
+            resetProgress.setMessage("Please wait until an email is sent to you");
+            resetProgress.setCanceledOnTouchOutside(false); // Don't stop it when screen is touched
+            resetProgress.show();
+
+            resetPassword(email);
+        }
+    };
+
+    private View.OnClickListener openEmailListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            /* Launch Email */
+            Intent intent = new Intent(Intent.ACTION_MAIN);
+            intent.addCategory(Intent.CATEGORY_APP_EMAIL);
+            startActivity(intent);
         }
     };
 
@@ -57,52 +67,51 @@ public class ForgotPasswordActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_forgot_password);
 
-        // Check intent extra values
-        final Intent intent = getIntent();
-        if (!intent.getBooleanExtra("forgotPassword", true)) {
-            Log.d(TAG, "onCreate: ForgotPasswordActivity was accessed incorrectly");
-            finish();
-        }
-
-        // Set up toolbar
+        /* Setup toolbar */
         toolbar = (Toolbar) findViewById(R.id.forgotPassToolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("ChatoS - Password Recover");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true); // for back button
 
-        // Initialize Firebase authentification
+        /* Initialize Firebase authentication */
         mAuth = FirebaseAuth.getInstance();
 
-        // Set Android field views
+        /* Setup Android views */
         emailEditText = (EditText) findViewById(R.id.emailEditText);
         resultTextView = (TextView) findViewById(R.id.resultTextView);
-        resetProgress = new ProgressDialog(this);
         recoverPasswordButton = (Button) findViewById(R.id.recoverButton);
+        openEmailButton = (Button) findViewById(R.id.openEmailButton);
+
         recoverPasswordButton.setOnClickListener(passwordRecoverListener);
+        openEmailButton.setOnClickListener(openEmailListener);
+        resultTextView.setVisibility(View.INVISIBLE);
+        openEmailButton.setVisibility(View.INVISIBLE);
     }
 
     private void resetPassword(final String email) {
-
         if (!email.equals("")) {
             mAuth.sendPasswordResetEmail(email).addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
                     if (task.isSuccessful()) {
                         Log.d(TAG, "resetPassword: Successfull!");
+                        Toast.makeText(ForgotPasswordActivity.this, "Successful", Toast.LENGTH_SHORT).show();
 
-                        // Dismiss progress dialog
-                        resetProgress.dismiss();
+                        emailEditText.setText("");
 
                         resultTextView.setText("An email was sent to " + email);
+                        resultTextView.setVisibility(View.VISIBLE);
+
+                        openEmailButton.setVisibility(View.VISIBLE);
+
                     } else {
                         Log.d(TAG, "resetPassword: Failed: " + task.getException().toString());
-
-                        // Hide progress dialog in case of any error
-                        resetProgress.hide();
-
                         resultTextView.setText("An error ocurred. Please, try again later!");
                         Toast.makeText(ForgotPasswordActivity.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                     }
+
+                    /* Dismiss progress dialog */
+                    resetProgress.dismiss();
                 }
             });
         }

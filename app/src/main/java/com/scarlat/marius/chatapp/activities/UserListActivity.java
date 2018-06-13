@@ -1,15 +1,17 @@
 package com.scarlat.marius.chatapp.activities;
 
 import android.app.ProgressDialog;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -34,19 +36,28 @@ public class UserListActivity extends AppCompatActivity {
     private UserListAdapter adapter;
     private List<User> users;
 
+    /* Inflate the search bar */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        Log.d(TAG, "onCreateOptionsMenu: Method was invoked!");
+        getMenuInflater().inflate(R.menu.user_list_menu, menu);
+
+        MenuItem searchItem = menu.findItem(R.id.searchBarItem);
+        SearchView searchView = (SearchView) searchItem.getActionView();
+
+        searchView.setOnQueryTextListener(new SearchViewListener());
+        searchView.onActionViewExpanded();
+        searchView.setQueryHint("Search Users");
+
+        return true;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.d(TAG, "onCreate: Method was invoked!");
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_list);
-
-        /* Check intent extra values */
-        final Intent intent = getIntent();
-        if (!intent.getBooleanExtra("all_users", true)) {
-            Log.d(TAG, "onCreate: UserListActivity was accessed incorrectly");
-            finish();
-        }
 
         /* Setup toolbar */
         toolbar = (Toolbar) findViewById(R.id.userListToolbar);
@@ -82,12 +93,14 @@ public class UserListActivity extends AppCompatActivity {
         dbReference.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-//                Log.d(TAG, "onChildAdded: " + dataSnapshot.toString());
                 if (dataSnapshot.exists()) {
                     User user = dataSnapshot.getValue(User.class);
+                    user.setUserId(dataSnapshot.getKey());
 
                     Log.d(TAG, "onChildAdded: Profile Image" + user.getProfileImage());
                     users.add(user);
+
+                    adapter.setFilter(users);
                     adapter.notifyItemInserted(users.size() - 1);
 
                     progressDialog.dismiss();
@@ -104,8 +117,36 @@ public class UserListActivity extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError databaseError) {
                 Log.d(TAG, "onCancelled: " + databaseError.getMessage());
                 progressDialog.dismiss();
-//                Toast.makeText(UserListActivity.this, databaseError.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
+
+
+
+
+    /* Filter users using the search bar */
+    class SearchViewListener implements SearchView.OnQueryTextListener {
+        @Override
+        public boolean onQueryTextSubmit(String query) { return false; }
+
+        @Override
+        public boolean onQueryTextChange(String newText) {
+            /* Update list */
+            List<User> filteredUsers = new ArrayList<>();
+
+            newText = newText.toLowerCase();
+            for (User user : users) {
+                String fullName = user.getFullname().toLowerCase();
+
+                if (fullName.contains(newText)) {
+                    filteredUsers.add(user);
+                }
+            }
+
+            Log.d(TAG, "onQueryTextChange: " + filteredUsers.toString());
+
+            adapter.setFilter(filteredUsers);
+            return true;
+        }
+    };
 }

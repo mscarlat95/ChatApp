@@ -48,7 +48,6 @@ public class LoginActivity extends AppCompatActivity {
 
             /* Launch ForgotPassword Activity */
             Intent forgotPassIntent = new Intent(LoginActivity.this, ForgotPasswordActivity.class);
-            forgotPassIntent.putExtra("forgotPassword", true);
             startActivity(forgotPassIntent);
         }
     };
@@ -59,7 +58,6 @@ public class LoginActivity extends AppCompatActivity {
 
             /* Launch Register Activity */
             Intent registerIntent = new Intent(LoginActivity.this, RegisterActivity.class);
-            registerIntent.putExtra("register", true);
             startActivity(registerIntent);
         }
     };
@@ -91,13 +89,6 @@ public class LoginActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-
-        /* Check intent extra values */
-        final Intent intent = getIntent();
-        if (!intent.getBooleanExtra("login", true)) {
-            Log.d(TAG, "onCreate: LoginActivity was accessed incorrectly");
-            finish();
-        }
 
         /* Set up toolbar */
         toolbar = (Toolbar) findViewById(R.id.loginToolbar);
@@ -145,7 +136,6 @@ public class LoginActivity extends AppCompatActivity {
 
         /* Clear all previous tasks */
         mainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        mainIntent.putExtra("main", true);
         startActivity(mainIntent);
         finish();
     }

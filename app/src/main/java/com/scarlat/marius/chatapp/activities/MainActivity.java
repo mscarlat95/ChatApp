@@ -56,12 +56,12 @@ public class MainActivity extends AppCompatActivity {
 
             case R.id.profileSettingsItem:
                 Log.d(TAG, "onOptionsItemSelected: Profile Settings");
-                launchActivity(MainActivity.this, ProfileSettingsActivity.class, "profileSettings");
+                launchActivity(MainActivity.this, ProfileSettingsActivity.class);
                 return true;
 
             case R.id.allUsersItem:
                 Log.d(TAG, "onOptionsItemSelected: All Users");
-                launchActivity(MainActivity.this, UserListActivity.class, "all_users");
+                launchActivity(MainActivity.this, UserListActivity.class);
                 return true;
         }
 
@@ -104,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
         /* Perform sign in if user is not logged in */
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser == null) {
-            launchActivity (MainActivity.this, LoginActivity.class, "login");
+            launchActivity (MainActivity.this, LoginActivity.class);
             finish();
         }
     }
@@ -115,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
             public void onComplete(@NonNull Task<Void> task) {
                 if (task.isSuccessful()) {
                     Log.d(TAG, "onComplete: Logout Successful");
-                    launchActivity (MainActivity.this, LoginActivity.class, "login");
+                    launchActivity (MainActivity.this, LoginActivity.class);
                     finish();
                 } else {
                     Toast.makeText(MainActivity.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
@@ -124,11 +124,9 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void launchActivity (Context srcContext, Class destClass, String extraMsg) {
+    private void launchActivity (Context srcContext, Class destClass) {
         Log.d(TAG, "launchActivity: Method was invoked!");
-
         Intent intent = new Intent(srcContext, destClass);
-        intent.putExtra(extraMsg, true);
         startActivity(intent);
     }
 

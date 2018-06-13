@@ -3,6 +3,7 @@ package com.scarlat.marius.chatapp.general;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -14,8 +15,10 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.scarlat.marius.chatapp.R;
+import com.scarlat.marius.chatapp.activities.UserProfileActivity;
 import com.scarlat.marius.chatapp.model.User;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -43,7 +46,7 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserVi
     }
 
     @Override
-    public void onBindViewHolder(@NonNull UserViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull UserViewHolder holder, final int position) {
         Log.d(TAG, "onBindViewHolder: Method was invoked!");
 
         if (!((Activity) context).isDestroyed()) {
@@ -54,6 +57,17 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserVi
                     .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_avatar))
                     .load(users.get(position).getProfileImage())
                     .into(holder.getAvatarCircleImageView());
+
+            /* View user profile on click */
+            holder.rootView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(context, UserProfileActivity.class);
+
+                    intent.putExtra(Constants.USER_ID, users.get(position).getUserId());
+                    context.startActivity(intent);
+                }
+            });
         }
     }
 
@@ -61,6 +75,15 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserVi
     public int getItemCount() {
         Log.d(TAG, "getItemCount: " + users.size());
         return users.size();
+    }
+    
+    public void setFilter (List<User> filteredUsers) {
+        Log.d(TAG, "setFilter: Method was invoked!");
+
+        users = new ArrayList<>();
+        users.addAll(filteredUsers);
+
+        notifyDataSetChanged();
     }
 
     class UserViewHolder extends RecyclerView.ViewHolder {
@@ -72,13 +95,13 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserVi
         private TextView statusTextView;
 
         /* Setters and getters */
-        public View getRootView() { return rootView; }
-        public CircleImageView getAvatarCircleImageView() { return avatarCircleImageView; }
-        public TextView getFullNameTextView() { return fullNameTextView; }
-        public TextView getStatusTextView() { return statusTextView; }
+        View getRootView() { return rootView; }
+        CircleImageView getAvatarCircleImageView() { return avatarCircleImageView; }
+        TextView getFullNameTextView() { return fullNameTextView; }
+        TextView getStatusTextView() { return statusTextView; }
 
         /* Constructor */
-        public UserViewHolder(View itemView) {
+        UserViewHolder(View itemView) {
             super(itemView);
 
             /* Setup views */
