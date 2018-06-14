@@ -23,9 +23,9 @@ import android.widget.ImageView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.scarlat.marius.chatapp.R;
 import com.scarlat.marius.chatapp.general.Constants;
-import com.scarlat.marius.chatapp.threads.ChangeStatusTask;
-import com.scarlat.marius.chatapp.threads.GetUserInfoTask;
-import com.scarlat.marius.chatapp.threads.UploadProfilePhotoTask;
+import com.scarlat.marius.chatapp.tasks.ChangeStatusTask;
+import com.scarlat.marius.chatapp.tasks.GetUserInfoTask;
+import com.scarlat.marius.chatapp.tasks.UploadProfilePhotoTask;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 

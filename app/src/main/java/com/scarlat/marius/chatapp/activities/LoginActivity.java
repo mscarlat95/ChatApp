@@ -18,6 +18,8 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.scarlat.marius.chatapp.R;
 import com.scarlat.marius.chatapp.general.Constants;
 import com.scarlat.marius.chatapp.general.SharedPref;
@@ -150,13 +152,29 @@ public class LoginActivity extends AppCompatActivity {
                     Log.d(TAG, "Login Successful");
                     loginProgress.dismiss();
 
-                    /* Remember username and password if checkbox is checked */
-                    if (rememberCredentialsCheckBox.isChecked()) {
-                        SharedPref.saveCredentials(email, password);
-                    } else {
-                        SharedPref.clearCredentials();
-                    }
-                    launchMainActivity();
+                    /* Store the new token ID */
+                    final String tokenID = FirebaseInstanceId.getInstance().getToken();
+
+                    FirebaseDatabase.getInstance().getReference().child("Users").child(mAuth.getUid())
+                            .child(Constants.TOKEN_ID).setValue(tokenID).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful()) {
+
+                                /* Remember username and password if checkbox is checked */
+                                if (rememberCredentialsCheckBox.isChecked()) {
+                                    SharedPref.saveCredentials(email, password);
+                                } else {
+                                    SharedPref.clearCredentials();
+                                }
+                                launchMainActivity();
+
+                            } else {
+                                Log.d(TAG, "Cannot update the new token ID");
+                                Toast.makeText(LoginActivity.this, "Updating tokenID failed", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
                 } else {
                     Log.d(TAG, "Login Failed: " + task.getException().toString());
 

@@ -19,6 +19,7 @@ public class Constants {
     public static final int REQUEST_CODE_SIGN_IN = 21;
 
     /* User Info */
+    public static final String TOKEN_ID = "tokenId";
     public static final String USER_ID = "userId";
     public static final String EMAIL = "email";
     public static final String FULLNAME = "fullname";
@@ -34,6 +35,14 @@ public class Constants {
     public static final String REQUEST_TYPE = "request_type";
     public static final String REQUEST_TYPE_SENT = "sent";
     public static final String REQUEST_TYPE_RECEIVED = "received";
+
+
+    /* Notifications */
+    public static final String CHANNEL_ID = "notify_001";
+    public static final String SOURCE = "from";
+    public static final String DESTINATION = "to";
+    public static final String NOTIFICATION_TYPE = "type";
+    public static final String NOTIFICATION_FRIEND_REQUEST = "request";
 
     public static final String STATE_FRIENDS = "friends";
 

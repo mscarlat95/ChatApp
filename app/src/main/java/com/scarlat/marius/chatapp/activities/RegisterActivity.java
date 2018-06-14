@@ -41,10 +41,11 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.scarlat.marius.chatapp.R;
 import com.scarlat.marius.chatapp.general.Constants;
 import com.scarlat.marius.chatapp.general.SharedPref;
-import com.scarlat.marius.chatapp.threads.RegisterUserTask;
+import com.scarlat.marius.chatapp.tasks.RegisterUserTask;
 
 import java.util.Arrays;
 
@@ -316,6 +317,23 @@ public class RegisterActivity extends AppCompatActivity {
                             .execute(user.getEmail(), user.getDisplayName(), photoUrl);
                 } else {
                     Log.d(TAG, "User already exists in database. Perform simple logging in ...");
+
+                    /* Store the new token ID */
+                    final String tokenID = FirebaseInstanceId.getInstance().getToken();
+                    FirebaseDatabase.getInstance().getReference().child("Users").child(userID)
+                            .child(Constants.TOKEN_ID).setValue(tokenID).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful()) {
+                                /* Do something */
+
+                            } else {
+                                Log.d(TAG, "Cannot update the new token ID");
+                                Toast.makeText(RegisterActivity.this, "Updating tokenID failed", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
+
                 }
             }
 
