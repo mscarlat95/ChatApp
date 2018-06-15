@@ -30,7 +30,7 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
         Log.d(TAG, "onCreate: Method was invoked!");
         super.onCreate();
 
-        playNotificationSound();
+//        playNotificationSound();
     }
 
     @Override
@@ -108,7 +108,7 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
         }
     }
 
-
+//     TODO: check sounds in priority
     private void playNotificationSound() {
         Ringtone ringtone = RingtoneManager.getRingtone(getApplicationContext(),
                             RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION));

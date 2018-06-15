@@ -1,7 +1,9 @@
-package com.scarlat.marius.chatapp.general;
+package com.scarlat.marius.chatapp.storage;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+
+import com.scarlat.marius.chatapp.general.Constants;
 
 public class SharedPref {
 

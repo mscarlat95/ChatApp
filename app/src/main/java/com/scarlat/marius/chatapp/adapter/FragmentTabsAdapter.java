@@ -1,4 +1,4 @@
-package com.scarlat.marius.chatapp.general;
+package com.scarlat.marius.chatapp.adapter;
 
 
 import android.support.v4.app.Fragment;
@@ -10,9 +10,9 @@ import com.scarlat.marius.chatapp.fragments.ChatsFragment;
 import com.scarlat.marius.chatapp.fragments.FriendsFragment;
 import com.scarlat.marius.chatapp.fragments.FriendRequestsFragment;
 
-public class MainTabsAdapter extends FragmentPagerAdapter{
+public class FragmentTabsAdapter extends FragmentPagerAdapter{
 
-    private static final String TAG = "MainTabsAdapter";
+    private static final String TAG = "FragmentTabsAdapter";
 
     private String[] fragmentTitles = {
             "FRIEND REQUESTS",
@@ -20,7 +20,7 @@ public class MainTabsAdapter extends FragmentPagerAdapter{
             "FRIENDS"
     };
 
-    public MainTabsAdapter(FragmentManager fm) {
+    public FragmentTabsAdapter(FragmentManager fm) {
         super(fm);
     }
 

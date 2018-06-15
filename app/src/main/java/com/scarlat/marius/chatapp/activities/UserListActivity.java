@@ -21,7 +21,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.scarlat.marius.chatapp.R;
 import com.scarlat.marius.chatapp.general.Constants;
-import com.scarlat.marius.chatapp.general.UserListAdapter;
+import com.scarlat.marius.chatapp.adapter.UserListAdapter;
 import com.scarlat.marius.chatapp.model.User;
 
 import java.util.ArrayList;

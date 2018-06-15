@@ -114,15 +114,13 @@ public class UserProfileActivity extends AppCompatActivity {
                     break;
             }
         }
-    };
+    }
 
     private class DeclineRequestListener implements View.OnClickListener {
-
         @Override
         public void onClick(View v) {
             declineFriendRequest();
         }
-
     }
 
     private void checkUsersRelationship() {
@@ -245,8 +243,8 @@ public class UserProfileActivity extends AppCompatActivity {
         Map<String, Object> acceptFriendRequestMap = new HashMap<>();
         acceptFriendRequestMap.put(Constants.FRIEND_REQUESTS_TABLE + "/" + userID + "/" + friendID, null);
         acceptFriendRequestMap.put(Constants.FRIEND_REQUESTS_TABLE + "/" + friendID + "/" + userID , null);
-        acceptFriendRequestMap.put(Constants.FRIENDS_TABLE + "/" + userID + "/" + friendID, ServerValue.TIMESTAMP);
-        acceptFriendRequestMap.put(Constants.FRIENDS_TABLE + "/" + friendID + "/" + userID, ServerValue.TIMESTAMP);
+        acceptFriendRequestMap.put(Constants.FRIENDS_TABLE + "/" + userID + "/" + friendID + "/" + Constants.FRIENDS_SINCE, ServerValue.TIMESTAMP);
+        acceptFriendRequestMap.put(Constants.FRIENDS_TABLE + "/" + friendID + "/" + userID + "/" + Constants.FRIENDS_SINCE, ServerValue.TIMESTAMP);
 
         rootDatabaseRef.updateChildren(acceptFriendRequestMap, new DatabaseReference.CompletionListener() {
             @Override

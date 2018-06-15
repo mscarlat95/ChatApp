@@ -44,7 +44,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.scarlat.marius.chatapp.R;
 import com.scarlat.marius.chatapp.general.Constants;
-import com.scarlat.marius.chatapp.general.SharedPref;
+import com.scarlat.marius.chatapp.storage.SharedPref;
 import com.scarlat.marius.chatapp.tasks.RegisterUserTask;
 
 import java.util.Arrays;

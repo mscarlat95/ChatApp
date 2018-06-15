@@ -21,9 +21,10 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.FirebaseDatabase;
 import com.scarlat.marius.chatapp.R;
+import com.scarlat.marius.chatapp.adapter.FragmentTabsAdapter;
 import com.scarlat.marius.chatapp.general.Constants;
-import com.scarlat.marius.chatapp.general.MainTabsAdapter;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -32,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
     private Toolbar toolbar;
 
     private ViewPager viewPager;
-    private MainTabsAdapter pagerAdapter;
+    private FragmentTabsAdapter pagerAdapter;
     private TabLayout mainTabLayout;
 
     @Override
@@ -83,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
 
         /* Setup Tabs */
         viewPager = (ViewPager) findViewById(R.id.mainTabsViewPager);
-        pagerAdapter = new MainTabsAdapter(getSupportFragmentManager());
+        pagerAdapter = new FragmentTabsAdapter(getSupportFragmentManager());
         viewPager.setAdapter(pagerAdapter);
 
         mainTabLayout = (TabLayout) findViewById(R.id.mainTabLayout);
@@ -106,7 +107,21 @@ public class MainActivity extends AppCompatActivity {
 
         /* Request permissions */
         enablePermissions();
+
+        /* User appears ONLINE */
+        FirebaseDatabase.getInstance().getReference().child(Constants.USERS_TABLE).child(mAuth.getUid())
+                .child(Constants.ONLINE).setValue(true);
     }
+
+    @Override
+    protected void onStop() {
+        Log.d(TAG, "onStop: Method was invoked!");
+        super.onStop();
+
+        FirebaseDatabase.getInstance().getReference().child(Constants.USERS_TABLE).child(mAuth.getUid())
+                .child(Constants.ONLINE).setValue(false);
+    }
+
 
     private void logout() {
         AuthUI.getInstance().signOut(MainActivity.this).addOnCompleteListener(new OnCompleteListener<Void>() {

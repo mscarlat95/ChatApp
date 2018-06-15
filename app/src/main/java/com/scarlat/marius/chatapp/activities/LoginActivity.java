@@ -22,7 +22,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.scarlat.marius.chatapp.R;
 import com.scarlat.marius.chatapp.general.Constants;
-import com.scarlat.marius.chatapp.general.SharedPref;
+import com.scarlat.marius.chatapp.storage.SharedPref;
 
 public class LoginActivity extends AppCompatActivity {
 

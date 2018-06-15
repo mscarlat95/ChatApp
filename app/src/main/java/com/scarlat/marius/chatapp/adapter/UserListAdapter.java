@@ -1,4 +1,4 @@
-package com.scarlat.marius.chatapp.general;
+package com.scarlat.marius.chatapp.adapter;
 
 
 import android.app.Activity;
@@ -16,6 +16,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.scarlat.marius.chatapp.R;
 import com.scarlat.marius.chatapp.activities.UserProfileActivity;
+import com.scarlat.marius.chatapp.general.Constants;
 import com.scarlat.marius.chatapp.model.User;
 
 import java.util.ArrayList;

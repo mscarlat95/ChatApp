@@ -35,7 +35,19 @@
         android:layout_alignStart="@+id/fullNameTextView"
         android:layout_below="@+id/fullNameTextView"
         android:layout_marginTop="10dp"
-        android:hint="@string/status"
-        />
+        android:hint="@string/status"/>
+
+    <ImageView
+        android:id="@+id/onlineImageView"
+        android:layout_width="15dp"
+        android:layout_height="15dp"
+        android:layout_marginTop="5dp"
+        android:layout_alignTop="@+id/fullNameTextView"
+        android:layout_marginStart="10dp"
+        android:layout_toEndOf="@+id/fullNameTextView"
+        android:background="@android:color/transparent"
+        android:scaleType="fitCenter"
+        android:visibility="invisible"
+        app:srcCompat="@drawable/online_notifier"/>
 
 </RelativeLayout>

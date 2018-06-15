@@ -26,6 +26,7 @@ public class Constants {
     public static final String STATUS = "status";
     public static final String NUMBER_OF_FRIENDS = "numberOfFriends";
     public static final String PROFILE_IMAGE = "profileImage";
+    public static final String ONLINE = "online";
 
     /* Profile picture resize */
     public static final int MAX_WIDTH = 600;
@@ -35,7 +36,7 @@ public class Constants {
     public static final String REQUEST_TYPE = "request_type";
     public static final String REQUEST_TYPE_SENT = "sent";
     public static final String REQUEST_TYPE_RECEIVED = "received";
-
+    public static final String FRIENDS_SINCE = "friendshipDate";
 
     /* Database Tables */
     public static final String USERS_TABLE = "Users";
@@ -45,9 +46,8 @@ public class Constants {
 
     /* Notifications */
     public static final String CHANNEL_ID = "notify_001";
-    public static final String CHANNEL_NAME = "notification_channel";
+    public static final String CHANNEL_NAME = "ChatApp Notification Channel";
     public static final String CHANNEL_DESCRIPTION = "Notification Channel used for FirebaseMessaging";
-
 
     public static final String SOURCE = "from";
     public static final String DESTINATION = "to";
