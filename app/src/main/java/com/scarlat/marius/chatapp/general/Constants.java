@@ -27,6 +27,7 @@ public class Constants {
     public static final String NUMBER_OF_FRIENDS = "numberOfFriends";
     public static final String PROFILE_IMAGE = "profileImage";
     public static final String ONLINE = "online";
+    public static final String LAST_SEEN = "lastSeen";
 
     /* Profile picture resize */
     public static final int MAX_WIDTH = 600;

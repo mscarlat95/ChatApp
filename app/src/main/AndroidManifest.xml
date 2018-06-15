@@ -6,8 +6,7 @@
     <uses-permission android:name="android.permission.CAMERA"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
-
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE"/>
 
     <application
         android:name=".app.ChatApp"
@@ -19,15 +18,12 @@
         android:theme="@style/AppTheme">
 
         <!-- Firebase Messaging Service -->
-        <service
-            android:name=".services.FirebaseMessagingService">
+        <service android:name=".services.FirebaseMessagingService">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT"/>
             </intent-filter>
         </service>
-
-        <service
-            android:name=".services.FirebaseInstanceIdService">
+        <service android:name=".services.FirebaseInstanceIdService">
             <intent-filter>
                 <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
             </intent-filter>
@@ -117,31 +113,35 @@
         <!-- User Profile Activity -->
         <activity android:name=".activities.UserProfileActivity">
             <intent-filter>
-                <action android:name="com.scarlat.marius.chatapp_TARGET_NOTIFICATION"></action>
-                <category android:name="android.intent.category.DEFAULT"></category>
+                <action android:name="com.scarlat.marius.chatapp_TARGET_NOTIFICATION"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </activity>
 
-
-        <!--Firebase Notification-->
+        <!-- Firebase Notification -->
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
-            android:resource="@drawable/ic_stat_notification" />
+            android:resource="@drawable/ic_stat_notification"/>
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_color"
-            android:resource="@color/colorAccent" />
-
+            android:resource="@color/colorAccent"/>
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"
             android:value="notify_001"/>
 
         <application>
-            <meta-data android:name="firebase_messaging_auto_init_enabled"
-                       android:value="false" />
-            <meta-data android:name="firebase_analytics_collection_enabled"
-                       android:value="false" />
+            <meta-data
+                android:name="firebase_messaging_auto_init_enabled"
+                android:value="false"/>
+            <meta-data
+                android:name="firebase_analytics_collection_enabled"
+                android:value="false"/>
         </application>
 
+        <activity android:name=".activities.ChatActivity"
+            android:parentActivityName=".activities.MainActivity">
+        </activity>
     </application>
 
 </manifest>

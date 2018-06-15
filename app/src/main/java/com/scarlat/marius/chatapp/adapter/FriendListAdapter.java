@@ -1,7 +1,10 @@
 package com.scarlat.marius.chatapp.adapter;
 
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.DateFormat;
@@ -19,6 +22,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.scarlat.marius.chatapp.R;
+import com.scarlat.marius.chatapp.activities.ChatActivity;
+import com.scarlat.marius.chatapp.activities.UserProfileActivity;
 import com.scarlat.marius.chatapp.general.Constants;
 import com.scarlat.marius.chatapp.model.Friend;
 
@@ -65,9 +70,54 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Fr
     }
 
     @Override
-    public void onBindViewHolder(@NonNull final FriendViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final FriendViewHolder holder, final int position) {
         Log.d(TAG, "onBindViewHolder: Method was invoked!");
 
+        /* Obtain information about the current friend */
+        updateFriendInfo(holder, position);
+
+        /* Display alert dialog info */
+        holder.getRootView().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final String[] availableOptions = {
+                        "View Profile",
+                        "Start chat",
+                };
+
+                new AlertDialog.Builder(getContext())
+                        .setTitle("Choose Action")
+                        .setItems(availableOptions, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                switch (which) {
+                                    case 0:     /* View user profile */
+                                        Intent profileIntent = new Intent(getContext(), UserProfileActivity.class);
+                                        profileIntent.putExtra(Constants.USER_ID, friends.get(position).getFriendId());
+                                        getContext().startActivity(profileIntent);
+
+                                        break;
+                                    case 1:     /* Start chat */
+                                        Intent chatIntent = new Intent(getContext(), ChatActivity.class);
+                                        chatIntent.putExtra(Constants.USER_ID, friends.get(position).getFriendId());
+                                        getContext().startActivity(chatIntent);
+
+                                        break;
+
+                                    default:
+                                        break;
+                                }
+                            }
+                        }).show();
+            }
+        });
+    }
+
+
+    private void updateFriendInfo(final FriendViewHolder holder, int position) {
+        Log.d(TAG, "updateFriendInfo: Method was invoked!");
+
+         /* Retrieve friend information and update his layout profile */
         final String friendId = friends.get(position).getFriendId();
 
         rootDatabaseRef.child(Constants.USERS_TABLE).child(friendId).addValueEventListener(new ValueEventListener() {
@@ -80,7 +130,7 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Fr
                     final String profileImageUrl = dataSnapshot.child(Constants.PROFILE_IMAGE).getValue().toString();
 
                     if (dataSnapshot.hasChild(Constants.ONLINE)) {
-                        boolean online = (boolean) dataSnapshot.child(Constants.ONLINE).getValue();
+                        boolean online = Boolean.valueOf(dataSnapshot.child(Constants.ONLINE).getValue().toString());
 
                         if (online) {
                             holder.getOnlineImageView().setVisibility(View.VISIBLE);
@@ -92,7 +142,6 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Fr
                             .load(profileImageUrl)
                             .into(holder.getAvatarCircleImageView());
                 }
-
             }
 
             @Override
@@ -102,9 +151,10 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Fr
         });
 
         /* Set the date since the users are friends */
-        holder.getDateTextView().setText(
-                DateFormat.format("MMM-dd-yyyy, HH:mm", friends.get(position).getFriendshipDate()));
+        holder.getDateTextView().setText( "Friends since " +
+                DateFormat.format("MMM-dd-yyyy", friends.get(position).getFriendshipDate()));
     }
+
 
     @Override
     public int getItemCount() {

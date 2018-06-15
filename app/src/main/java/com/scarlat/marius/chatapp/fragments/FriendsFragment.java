@@ -61,16 +61,9 @@ public class FriendsFragment extends Fragment {
 
         adapter = new FriendListAdapter(getContext(), friends);
         friendsRecyclerView.setAdapter(adapter);
+        populateFriendsList();
 
         return rootView;
-    }
-
-    @Override
-    public void onStart() {
-        Log.d(TAG, "onStart: Method was invoked!");
-        super.onStart();
-
-        populateFriendsList();
     }
 
     private void populateFriendsList() {

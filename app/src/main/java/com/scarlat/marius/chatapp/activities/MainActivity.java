@@ -20,8 +20,9 @@ import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
 import com.scarlat.marius.chatapp.R;
 import com.scarlat.marius.chatapp.adapter.FragmentTabsAdapter;
 import com.scarlat.marius.chatapp.general.Constants;
@@ -29,12 +30,17 @@ import com.scarlat.marius.chatapp.general.Constants;
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
-    private FirebaseAuth mAuth;
-    private Toolbar toolbar;
 
+    /* Firebase */
+    private FirebaseAuth mAuth;
+
+    /* Android views */
+    private Toolbar toolbar;
     private ViewPager viewPager;
     private FragmentTabsAdapter pagerAdapter;
     private TabLayout mainTabLayout;
+
+    private DatabaseReference rootDatabaseRef;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -76,6 +82,9 @@ public class MainActivity extends AppCompatActivity {
 
         /* Initialize Firebase authentification */
         mAuth = FirebaseAuth.getInstance();
+        if (mAuth.getCurrentUser() != null) {
+            rootDatabaseRef = FirebaseDatabase.getInstance().getReference();
+        }
 
         /*  Set Toolbar */
         toolbar = (Toolbar) findViewById(R.id.mainPageToolbar);
@@ -99,18 +108,17 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
 
         /* Perform sign in if user is not logged in */
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        if (currentUser == null) {
-            launchActivity (MainActivity.this, LoginActivity.class);
+        if (mAuth.getCurrentUser() == null) {
+            launchActivity(MainActivity.this, LoginActivity.class);
             finish();
+        } else {
+           /* Request permissions */
+            enablePermissions();
+
+            /* User appears ONLINE */
+            rootDatabaseRef.child(Constants.USERS_TABLE).child(mAuth.getUid())
+                    .child(Constants.ONLINE).setValue("true");
         }
-
-        /* Request permissions */
-        enablePermissions();
-
-        /* User appears ONLINE */
-        FirebaseDatabase.getInstance().getReference().child(Constants.USERS_TABLE).child(mAuth.getUid())
-                .child(Constants.ONLINE).setValue(true);
     }
 
     @Override
@@ -118,8 +126,16 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "onStop: Method was invoked!");
         super.onStop();
 
-        FirebaseDatabase.getInstance().getReference().child(Constants.USERS_TABLE).child(mAuth.getUid())
-                .child(Constants.ONLINE).setValue(false);
+        if (mAuth.getCurrentUser() != null) {
+//            rootDatabaseRef.child(Constants.USERS_TABLE).child(mAuth.getUid())
+//                    .child(Constants.ONLINE).setValue(false);
+//
+//            rootDatabaseRef.child(Constants.USERS_TABLE).child(mAuth.getUid())
+//                    .child(Constants.LAST_SEEN).setValue(ServerValue.TIMESTAMP);
+
+            rootDatabaseRef.child(Constants.USERS_TABLE).child(mAuth.getUid())
+                    .child(Constants.ONLINE).setValue(ServerValue.TIMESTAMP);
+        }
     }
 
 
@@ -159,6 +175,7 @@ public class MainActivity extends AppCompatActivity {
 //            }
 //        }
 
+        // TODO: create a single request code 
         requestPermissions(new String[] {
                 Manifest.permission.READ_EXTERNAL_STORAGE,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE,
