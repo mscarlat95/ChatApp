@@ -298,7 +298,7 @@ public class RegisterActivity extends AppCompatActivity {
 
         final String userID = mAuth.getUid();
 
-        refDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(userID);
+        refDatabase = FirebaseDatabase.getInstance().getReference().child(Constants.USERS_TABLE).child(userID);
         refDatabase.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -320,7 +320,7 @@ public class RegisterActivity extends AppCompatActivity {
 
                     /* Store the new token ID */
                     final String tokenID = FirebaseInstanceId.getInstance().getToken();
-                    FirebaseDatabase.getInstance().getReference().child("Users").child(userID)
+                    FirebaseDatabase.getInstance().getReference().child(Constants.USERS_TABLE).child(userID)
                             .child(Constants.TOKEN_ID).setValue(tokenID).addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {

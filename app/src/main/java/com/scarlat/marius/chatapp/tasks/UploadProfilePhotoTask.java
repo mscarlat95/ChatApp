@@ -59,7 +59,7 @@ public class UploadProfilePhotoTask extends AsyncTask<Uri, Void, Void> {
         mAuth = FirebaseAuth.getInstance();
         storageReference = FirebaseStorage.getInstance().getReference();
         dbReference = FirebaseDatabase.getInstance().getReference()
-                    .child("Users").child(mAuth.getUid());
+                    .child(Constants.USERS_TABLE).child(mAuth.getUid());
     }
 
     @Override

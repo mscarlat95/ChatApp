@@ -82,7 +82,7 @@ public class RegisterUserTask extends AsyncTask<String, Void, Void> {
         Log.d(TAG, "User ID Token = " + userID);
         Log.d(TAG, "User Information = " + userInfo.toString());
 
-        dbReference.child("Users").child(userID)
+        dbReference.child(Constants.USERS_TABLE).child(userID)
                 .setValue(userInfo)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override

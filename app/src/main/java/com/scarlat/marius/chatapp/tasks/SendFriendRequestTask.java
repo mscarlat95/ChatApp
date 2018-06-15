@@ -59,7 +59,7 @@ public class SendFriendRequestTask extends AsyncTask<Void, Void, Void> {
         /* Setup Firebase */
         FirebaseApp.initializeApp(context);
         userID = FirebaseAuth.getInstance().getUid();
-        dbReference = FirebaseDatabase.getInstance().getReference().child("FriendRequests");
+        dbReference = FirebaseDatabase.getInstance().getReference().child(Constants.FRIEND_REQUESTS_TABLE);
     }
 
     @Override

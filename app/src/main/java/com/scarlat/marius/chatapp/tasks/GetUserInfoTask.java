@@ -70,7 +70,7 @@ public class GetUserInfoTask extends AsyncTask<Void, Void, Void> {
         FirebaseApp.initializeApp(context);
         mAuth = FirebaseAuth.getInstance();
         dbReference = FirebaseDatabase.getInstance().getReference()
-                .child("Users").child(mAuth.getUid());
+                .child(Constants.USERS_TABLE).child(mAuth.getUid());
     }
 
     @Override

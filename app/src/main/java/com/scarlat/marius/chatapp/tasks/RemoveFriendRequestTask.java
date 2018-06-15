@@ -16,6 +16,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.scarlat.marius.chatapp.R;
+import com.scarlat.marius.chatapp.general.Constants;
 
 public class RemoveFriendRequestTask extends AsyncTask<Void, Void, Void> {
     private static final String TAG = "RemoveFriendRequestTask";
@@ -57,7 +58,7 @@ public class RemoveFriendRequestTask extends AsyncTask<Void, Void, Void> {
         /* Setup Firebase */
         FirebaseApp.initializeApp(context);
         userID = FirebaseAuth.getInstance().getUid();
-        dbReference = FirebaseDatabase.getInstance().getReference().child("FriendRequests");
+        dbReference = FirebaseDatabase.getInstance().getReference().child(Constants.FRIEND_REQUESTS_TABLE);
     }
 
     @Override

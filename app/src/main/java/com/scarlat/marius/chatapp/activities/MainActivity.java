@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
@@ -91,9 +90,6 @@ public class MainActivity extends AppCompatActivity {
         mainTabLayout.setupWithViewPager(viewPager);
         mainTabLayout.setTabTextColors( Color.parseColor(Constants.COLOR_INACTIVE_TAB),
                                         Color.parseColor(Constants.COLOR_ACTIVE_TAB));
-
-        /* Request permissions */
-        enablePermissions();
     }
 
     @Override
@@ -107,6 +103,9 @@ public class MainActivity extends AppCompatActivity {
             launchActivity (MainActivity.this, LoginActivity.class);
             finish();
         }
+
+        /* Request permissions */
+        enablePermissions();
     }
 
     private void logout() {
@@ -133,17 +132,23 @@ public class MainActivity extends AppCompatActivity {
     private void enablePermissions() {
         Log.d(TAG, "requestPermissions: Method was invoked!");
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M /*Marshmallow*/) {
-            if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, Constants.REQUEST_CODE_READ_EXT);
-            }
-            if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-                requestPermissions(new String[]{Manifest.permission.CAMERA}, Constants.REQUEST_CODE_CAMERA);
-            }
-            if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, Constants.REQUEST_CODE_WRITE_EXT);
-            }
-        }
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M /*Marshmallow*/) {
+//            if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+//                requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, Constants.REQUEST_CODE_READ_EXT);
+//            }
+//            if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+//                requestPermissions(new String[]{Manifest.permission.CAMERA}, Constants.REQUEST_CODE_CAMERA);
+//            }
+//            if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+//                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, Constants.REQUEST_CODE_WRITE_EXT);
+//            }
+//        }
+
+        requestPermissions(new String[] {
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.CAMERA
+        }, Constants.REQUEST_CODE_READ_EXT);
     }
 
     @Override

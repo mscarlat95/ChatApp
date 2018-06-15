@@ -20,6 +20,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.scarlat.marius.chatapp.R;
+import com.scarlat.marius.chatapp.general.Constants;
 import com.scarlat.marius.chatapp.general.UserListAdapter;
 import com.scarlat.marius.chatapp.model.User;
 
@@ -89,7 +90,7 @@ public class UserListActivity extends AppCompatActivity {
         progressDialog.setCanceledOnTouchOutside(false);
         progressDialog.show();
 
-        DatabaseReference dbReference = FirebaseDatabase.getInstance().getReference().child("Users");
+        DatabaseReference dbReference = FirebaseDatabase.getInstance().getReference().child(Constants.USERS_TABLE);
 
         dbReference.addChildEventListener(new ChildEventListener() {
             @Override

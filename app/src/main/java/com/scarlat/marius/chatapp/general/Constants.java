@@ -37,8 +37,18 @@ public class Constants {
     public static final String REQUEST_TYPE_RECEIVED = "received";
 
 
+    /* Database Tables */
+    public static final String USERS_TABLE = "Users";
+    public static final String FRIEND_REQUESTS_TABLE = "FriendRequests";
+    public static final String NOTIFICATIONS_TABLE = "Notifications";
+    public static final String FRIENDS_TABLE = "Friends";
+
     /* Notifications */
     public static final String CHANNEL_ID = "notify_001";
+    public static final String CHANNEL_NAME = "notification_channel";
+    public static final String CHANNEL_DESCRIPTION = "Notification Channel used for FirebaseMessaging";
+
+
     public static final String SOURCE = "from";
     public static final String DESTINATION = "to";
     public static final String NOTIFICATION_TYPE = "type";

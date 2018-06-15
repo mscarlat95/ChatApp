@@ -67,7 +67,7 @@ public class GetFriendInfoTask extends AsyncTask<Void, Void, Void> {
         /* Setup Firebase */
         FirebaseApp.initializeApp(context);
         dbReference = FirebaseDatabase.getInstance().getReference()
-                .child("Users").child(userID);
+                .child(Constants.USERS_TABLE).child(userID);
     }
 
     @Override

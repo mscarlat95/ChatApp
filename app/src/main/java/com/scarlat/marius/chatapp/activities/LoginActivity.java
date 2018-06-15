@@ -155,7 +155,7 @@ public class LoginActivity extends AppCompatActivity {
                     /* Store the new token ID */
                     final String tokenID = FirebaseInstanceId.getInstance().getToken();
 
-                    FirebaseDatabase.getInstance().getReference().child("Users").child(mAuth.getUid())
+                    FirebaseDatabase.getInstance().getReference().child(Constants.USERS_TABLE).child(mAuth.getUid())
                             .child(Constants.TOKEN_ID).setValue(tokenID).addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {

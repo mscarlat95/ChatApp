@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -12,8 +13,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -34,6 +33,10 @@ public class UserProfileActivity extends AppCompatActivity {
 
     private final Context context = this;
 
+    /* Firebase */
+    final DatabaseReference rootDatabaseRef = FirebaseDatabase.getInstance().getReference();
+    final CustomProgressDialog dialog = new CustomProgressDialog(context);
+
     /* Android views */
     private ImageView profileImageView;
     private TextView fullNameTextView, statusTextView, friendsNumberTextView;
@@ -53,6 +56,17 @@ public class UserProfileActivity extends AppCompatActivity {
         /* Check intent extra values */
         final Intent intent = getIntent();
         friendID = intent.getStringExtra(Constants.USER_ID);
+        if (friendID == null) {
+            Log.d(TAG, "onCreate: Friend ID is NULL. Trying to get from FirebaseMessaging Service ...");
+            
+            friendID = intent.getStringExtra("sender_id");
+            if (friendID == null) {
+                Log.d(TAG, "onCreate: Friend ID is still NULL. App is closing ...");
+                finish();
+            } 
+        }
+
+
         userID = FirebaseAuth.getInstance().getUid();
         Log.d(TAG, "onCreate: Friend Id = " + friendID);
         Log.d(TAG, "onCreate: User Id = " + userID);
@@ -106,14 +120,14 @@ public class UserProfileActivity extends AppCompatActivity {
 
         @Override
         public void onClick(View v) {
-
+            declineFriendRequest();
         }
 
     }
 
     private void checkUsersRelationship() {
         Log.d(TAG, "checkRequests: Method was invoked!");
-        final DatabaseReference dbReference = FirebaseDatabase.getInstance().getReference().child("FriendRequests");
+        final DatabaseReference dbReference = FirebaseDatabase.getInstance().getReference().child(Constants.FRIEND_REQUESTS_TABLE);
 
         sendFriendRequestButton.setVisibility(View.INVISIBLE);
         dbReference.child(userID).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -137,7 +151,7 @@ public class UserProfileActivity extends AppCompatActivity {
                                 sendFriendRequestButton.setText(R.string.cancel_friend_request);
                             }
                         } else { /* Check if users are already friends */
-                            FirebaseDatabase.getInstance().getReference().child("Friends").child(userID)
+                            FirebaseDatabase.getInstance().getReference().child(Constants.FRIENDS_TABLE).child(userID)
                                     .addListenerForSingleValueEvent(new ValueEventListener() {
                                         @Override
                                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -167,205 +181,139 @@ public class UserProfileActivity extends AppCompatActivity {
     }
 
     private void sendFriendRequest() {
-        final DatabaseReference dbReference = FirebaseDatabase.getInstance().getReference().child("FriendRequests");
-        final CustomProgressDialog dialog = new CustomProgressDialog(context);
-
         dialog.init("Sending Friend Request", "Please wait until the friend request is sent");
-        dbReference.child(userID).child(friendID).child(Constants.REQUEST_TYPE)
-                .setValue(Constants.REQUEST_TYPE_SENT).addOnCompleteListener(new OnCompleteListener<Void>() {
+
+        String notificationId = rootDatabaseRef.child(Constants.NOTIFICATIONS_TABLE)
+                                    .child(friendID).push()
+                                    .getKey();
+
+        /* Create a new notification */
+        HashMap<String, String> notificationMap = new HashMap<>();
+        notificationMap.put(Constants.SOURCE, userID);
+        notificationMap.put(Constants.NOTIFICATION_TYPE, Constants.NOTIFICATION_FRIEND_REQUEST);
+
+        /* Create friend request */
+        Map<String, Object> friendRequestMap = new HashMap<>();
+        friendRequestMap.put(Constants.FRIEND_REQUESTS_TABLE + "/" + userID + "/" + friendID + "/" + Constants.REQUEST_TYPE, Constants.REQUEST_TYPE_SENT);
+        friendRequestMap.put(Constants.FRIEND_REQUESTS_TABLE + "/" + friendID + "/" + userID + "/" + Constants.REQUEST_TYPE, Constants.REQUEST_TYPE_RECEIVED);
+        friendRequestMap.put(Constants.NOTIFICATIONS_TABLE + "/" + friendID + "/" + notificationId, notificationMap);
+
+        rootDatabaseRef.updateChildren(friendRequestMap, new DatabaseReference.CompletionListener() {
             @Override
-            public void onComplete(@NonNull Task<Void> task) {
-
-                if (task.isSuccessful()) {
-                    dbReference.child(friendID).child(userID).child(Constants.REQUEST_TYPE)
-                            .setValue(Constants.REQUEST_TYPE_RECEIVED).addOnCompleteListener(new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            if (task.isSuccessful()) {
-                                Log.d(TAG, "Set REQUEST_TYPE_RECEIVED Successful");
-                                sendNotification(userID, friendID, Constants.NOTIFICATION_FRIEND_REQUEST);
-                            } else {
-                                Log.d(TAG, "Set REQUEST_TYPE_RECEIVED Failed: " + task.getException().getMessage());
-                                Toast.makeText(context, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                            }
-                            dialog.hide();
-                        }
-                    });
-
+            public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
+                if (databaseError == null) {
+                    sendFriendRequestButton.setText(R.string.cancel_friend_request);
+                    sendFriendRequestButton.setEnabled(true);
+                    requestState = 1; // 1 - Request sent
                 } else {
-                    Log.d(TAG, "Set REQUEST_TYPE_SENT Failed: " + task.getException().getMessage());
-                    Toast.makeText(context, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                    dialog.hide();
+                    Log.d(TAG, "FriendRequest Failed: " + databaseError.getMessage());
+                    Toast.makeText(context, databaseError.getMessage(), Toast.LENGTH_SHORT).show();
                 }
-                sendFriendRequestButton.setEnabled(true);
-            }
-        });
-
-    }
-
-    private void cancelFriendRequest() {
-        final DatabaseReference dbReference = FirebaseDatabase.getInstance().getReference().child("FriendRequests");
-        final CustomProgressDialog dialog = new CustomProgressDialog(context);
-
-        dialog.init("Canceling Friend Request", "Please wait until the friend request is canceled");
-        dbReference.child(friendID).child(userID).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-            Log.d(TAG, "Removed REQUEST_TYPE_RECEIVED Successful");
-
-            if (task.isSuccessful()) {
-                dbReference.child(userID).child(friendID).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()) {
-                            Log.d(TAG, "Removed REQUEST_TYPE_SENT Successful");
-
-                            sendFriendRequestButton.setEnabled(true);
-                            sendFriendRequestButton.setText(R.string.send_friend_request);
-
-                            requestState = 0; // 0 - Unset State
-                        } else {
-                            Log.d(TAG, "Removed REQUEST_TYPE_SENT Successful Failed: " + task.getException().getMessage());
-                            Toast.makeText(context, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                        }
-                        dialog.hide();
-                    }
-                });
-            } else {
-                Log.d(TAG, "Removed REQUEST_TYPE_RECEIVED Successful Failed: " + task.getException().getMessage());
-                Toast.makeText(context, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                 dialog.hide();
             }
+        });
+    }
+
+
+    private void cancelFriendRequest() {
+        dialog.init("Canceling Friend Request", "Please wait until the friend request is canceled");
+
+         /* Cancel friend request */
+        Map<String, Object> cancelFriendRequestMap = new HashMap<>();
+        cancelFriendRequestMap.put(Constants.FRIEND_REQUESTS_TABLE + "/" + userID + "/" + friendID, null);
+        cancelFriendRequestMap.put(Constants.FRIEND_REQUESTS_TABLE + "/" + friendID + "/" + userID , null);
+
+        rootDatabaseRef.updateChildren(cancelFriendRequestMap, new DatabaseReference.CompletionListener() {
+            @Override
+            public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
+                if (databaseError == null) {
+                    sendFriendRequestButton.setText(R.string.send_friend_request);
+                    sendFriendRequestButton.setEnabled(true);
+                    requestState = 0; // 0 - Unset State
+                } else {
+                    Log.d(TAG, "Cancel Friend Request Failed: " + databaseError.getMessage());
+                    Toast.makeText(context, databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+                dialog.hide();
             }
         });
-
     }
 
     private void acceptFriendRequest() {
-        final DatabaseReference dbReference = FirebaseDatabase.getInstance().getReference().child("Friends");
-        final CustomProgressDialog dialog = new CustomProgressDialog(context);
-        final Map<String, String> timestamp = ServerValue.TIMESTAMP;
-
         dialog.init("Accept Friend Request", "Please wait until the process is done");
-        dbReference.child(userID).child(friendID).setValue(timestamp)
-            .addOnCompleteListener(new OnCompleteListener<Void>() {
-                @Override
-                public void onComplete(@NonNull Task<Void> task) {
-                if (task.isSuccessful()) {
-                    Log.d(TAG, userID + " is now friend with "  + friendID);
 
-                    dbReference.child(friendID).child(userID).setValue(timestamp)
-                        .addOnCompleteListener(new OnCompleteListener<Void>() {
-                            @Override
-                            public void onComplete(@NonNull Task<Void> task) {
-                            if (task.isSuccessful()) {
-                                Log.d(TAG, friendID + " is now friend with "  + userID);
+        Map<String, Object> acceptFriendRequestMap = new HashMap<>();
+        acceptFriendRequestMap.put(Constants.FRIEND_REQUESTS_TABLE + "/" + userID + "/" + friendID, null);
+        acceptFriendRequestMap.put(Constants.FRIEND_REQUESTS_TABLE + "/" + friendID + "/" + userID , null);
+        acceptFriendRequestMap.put(Constants.FRIENDS_TABLE + "/" + userID + "/" + friendID, ServerValue.TIMESTAMP);
+        acceptFriendRequestMap.put(Constants.FRIENDS_TABLE + "/" + friendID + "/" + userID, ServerValue.TIMESTAMP);
 
-                                /* Wait for removing friends requests */
-                                FirebaseDatabase.getInstance().getReference().child("FriendRequests")
-                                    .child(userID).child(friendID).removeValue()
-                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                        @Override
-                                        public void onComplete(@NonNull Task<Void> task) {
-                                            if(task.isSuccessful()) {
-                                                FirebaseDatabase.getInstance().getReference().child("FriendRequests")
-                                                    .child(friendID).child(userID).removeValue()
-                                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                        @Override
-                                                        public void onComplete(@NonNull Task<Void> task) {
-                                                            if (task.isSuccessful()) {
-                                                                sendFriendRequestButton.setText(R.string.unfriend_person);
-                                                                sendFriendRequestButton.setEnabled(true);
+        rootDatabaseRef.updateChildren(acceptFriendRequestMap, new DatabaseReference.CompletionListener() {
+            @Override
+            public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
+                if (databaseError == null) {
+                    sendFriendRequestButton.setText(R.string.unfriend_person);
+                    sendFriendRequestButton.setEnabled(true);
 
-                                                                declineFriendRequestButton.setVisibility(View.INVISIBLE);
-                                                                declineFriendRequestButton.setEnabled(false);
+                    declineFriendRequestButton.setVisibility(View.INVISIBLE);
+                    declineFriendRequestButton.setEnabled(false);
 
-                                                                requestState = 3; // 3 - Users are friends now
-                                                            }
-                                                        }
-                                                    });
-                                            }
-                                        }
-                                    });
-                                } else {
-                                    Log.d(TAG, friendID + " friendship with "  + userID + " Failed: " + task.getException().getMessage());
-                                    Toast.makeText(context, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                                }
-
-                                    dialog.hide();
-                                }
-                            });
+                    requestState = 3; // 3 - Users are friends now
                 } else {
-                    Log.d(TAG, userID + " friendship with "  + friendID + " Failed: " + task.getException().getMessage());
-                    Toast.makeText(context, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                    dialog.hide();
+                    Log.d(TAG, "Accept Friend Request Failed: " + databaseError.getMessage());
+                    Toast.makeText(context, databaseError.getMessage(), Toast.LENGTH_SHORT).show();
                 }
+                dialog.hide();
             }
         });
     }
 
     private void unfriendRequest() {
-        final DatabaseReference dbReference = FirebaseDatabase.getInstance().getReference().child("Friends");
-        final CustomProgressDialog dialog = new CustomProgressDialog(context);
-
         dialog.init("Unfriend", "Please wait until the process is done");
-        dbReference.child(userID).child(friendID).removeValue()
-            .addOnCompleteListener(new OnCompleteListener<Void>() {
-                @Override
-                public void onComplete(@NonNull Task<Void> task) {
-                    if (task.isSuccessful()) {
-                        Log.d(TAG, userID + " removed from friends "  + friendID);
 
-                        dbReference.child(friendID).child(userID).removeValue()
-                            .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                @Override
-                                public void onComplete(@NonNull Task<Void> task) {
-                                    if (task.isSuccessful()) {
-                                        Log.d(TAG, friendID + " removed from friends "  + userID);
-                                        Toast.makeText(context, "Unfriend Successful", Toast.LENGTH_SHORT).show();
+        Map<String, Object> unfriendRequestMap = new HashMap<>();
+        unfriendRequestMap.put(Constants.FRIENDS_TABLE + "/" + userID + "/" + friendID, null);
+        unfriendRequestMap.put(Constants.FRIENDS_TABLE + "/" + friendID + "/" + userID , null);
 
-                                        sendFriendRequestButton.setEnabled(true);
-                                        sendFriendRequestButton.setText(R.string.send_friend_request);
-
-                                        requestState = 0; // 0 - Unset State
-                                    } else {
-                                        Log.d(TAG, friendID + " friendship with "  + userID + " Failed: " + task.getException().getMessage());
-                                        Toast.makeText(context, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                                    }
-                                    dialog.hide();
-                                }
-                            });
-                    } else {
-                        Log.d(TAG, userID + " friendship with "  + friendID + " Failed: " + task.getException().getMessage());
-                        Toast.makeText(context, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                        dialog.hide();
-                    }
-                }
-            });
-    }
-
-
-    private void sendNotification(final String source, final String destination, final String notificationType) {
-        final DatabaseReference dbReference = FirebaseDatabase.getInstance().getReference().child("Notifications");
-
-        HashMap<String, String> data = new HashMap<>();
-        data.put(Constants.SOURCE, source);
-        data.put(Constants.NOTIFICATION_TYPE, notificationType);
-
-        dbReference.child(destination).push().setValue(data).addOnCompleteListener(new OnCompleteListener<Void>() {
+        rootDatabaseRef.updateChildren(unfriendRequestMap, new DatabaseReference.CompletionListener() {
             @Override
-            public void onComplete(@NonNull Task<Void> task) {
+            public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
+                if (databaseError == null) {
+                    sendFriendRequestButton.setEnabled(true);
+                    sendFriendRequestButton.setText(R.string.send_friend_request);
 
-                if (task.isSuccessful()) {
-                    sendFriendRequestButton.setText(R.string.cancel_friend_request);
-                    requestState = 1; // 1 - Request sent
+                    requestState = 0; // 0 - Unset State
                 } else {
-                    Log.d(TAG, "Sending Notification Failed: " + task.getException().getMessage());
+                    Log.d(TAG, "Unfriend Request Failed: " + databaseError.getMessage());
+                    Toast.makeText(context, databaseError.getMessage(), Toast.LENGTH_SHORT).show();
                 }
-
+                dialog.hide();
             }
         });
     }
 
+    private void declineFriendRequest() {
+        dialog.init("Decline Friend Request", "Please wait until the process is done");
 
+        Map<String, Object> unfriendRequestMap = new HashMap<>();
+        unfriendRequestMap.put(Constants.FRIEND_REQUESTS_TABLE + "/" + userID + "/" + friendID, null);
+//        unfriendRequestMap.put(Constants.FRIEND_REQUESTS_TABLE + "/" + friendID + "/" + userID , null);
+
+        rootDatabaseRef.updateChildren(unfriendRequestMap, new DatabaseReference.CompletionListener() {
+            @Override
+            public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
+                if (databaseError == null) {
+                    sendFriendRequestButton.setEnabled(true);
+                    sendFriendRequestButton.setText(R.string.send_friend_request);
+                    declineFriendRequestButton.setVisibility(View.INVISIBLE);
+
+                    requestState = 0; // 0 - Unset State
+                } else {
+                    Log.d(TAG, "Decline Friend Request Failed: " + databaseError.getMessage());
+                    Toast.makeText(context, databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+                dialog.hide();
+            }
+        });
+    }
 }

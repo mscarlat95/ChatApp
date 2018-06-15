@@ -52,7 +52,7 @@ public class ChangeStatusTask extends AsyncTask<String, Void, Void> {
         /* Setup Firebase */
         FirebaseApp.initializeApp(context);
         dbReference = FirebaseDatabase.getInstance().getReference()
-                .child("Users").child(mAuth.getUid());
+                .child(Constants.USERS_TABLE).child(mAuth.getUid());
     }
 
     @Override
