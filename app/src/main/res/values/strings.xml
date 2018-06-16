@@ -43,4 +43,6 @@
     <string name="unfriend_person">Unfriend</string>
     <string name="decline_friend_request">Decline Friend Request</string>
     <string name="last_seen">Last Seen</string>
+    <string name="message_content">Message content</string>
+    <string name="timestamp">Timestamp</string>
 </resources>

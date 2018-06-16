@@ -35,7 +35,7 @@ public class Constants {
     public static final String MESSAGE_CONTENT = "message";
     public static final String MESSAGE_TYPE = "type";
     public static final String MESSAGE_TYPE_TEXT = "text";
-
+    public static final int MAX_LOAD_MESSAGES = 10;
 
     /* Profile picture resize */
     public static final int MAX_WIDTH = 600;
@@ -55,11 +55,12 @@ public class Constants {
     public static final String CHAT_TABLE = "Chat";
     public static final String MESSAGES_TABLE = "Messages";
 
-    /* Notifications */
+    /* Notifications channel for OREO android version */
     public static final String CHANNEL_ID = "notify_001";
     public static final String CHANNEL_NAME = "ChatApp Notification Channel";
     public static final String CHANNEL_DESCRIPTION = "Notification Channel used for FirebaseMessaging";
 
+    /* Notification info */
     public static final String SOURCE = "from";
     public static final String DESTINATION = "to";
     public static final String NOTIFICATION_TYPE = "type";

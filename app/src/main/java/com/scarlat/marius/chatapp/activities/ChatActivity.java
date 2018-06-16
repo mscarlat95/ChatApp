@@ -4,8 +4,11 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -17,17 +20,23 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 import com.scarlat.marius.chatapp.R;
+import com.scarlat.marius.chatapp.adapter.MessageListAdapter;
 import com.scarlat.marius.chatapp.general.Constants;
 import com.scarlat.marius.chatapp.general.GetTimeAgo;
+import com.scarlat.marius.chatapp.model.Message;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -44,7 +53,15 @@ public class ChatActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private ImageButton sendImageButton, attachImageButton;
     private EditText messageEditText;
+    private RecyclerView messagesRecylerView;
+    private SwipeRefreshLayout messageSwipeRefreshLayout;
 
+    /* For messages layout */
+    private MessageListAdapter adapter;
+    private List<Message> messages;
+
+    /* Messages pagination */
+    private int currentPage = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +79,9 @@ public class ChatActivity extends AppCompatActivity {
             finish();
         }
 
+        /* Init message list */
+        messages = new ArrayList<>();
+
         /* Setup firebase database */
         userID = FirebaseAuth.getInstance().getUid();
         rootDatabaseRef = FirebaseDatabase.getInstance().getReference();
@@ -70,11 +90,37 @@ public class ChatActivity extends AppCompatActivity {
         attachImageButton = (ImageButton) findViewById(R.id.attachImageButton);
         sendImageButton = (ImageButton) findViewById(R.id.sendImageButton);
         messageEditText = (EditText) findViewById(R.id.messageEditText);
+        messagesRecylerView = (RecyclerView) findViewById(R.id.messagesRecylerView);
+        messageSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.messageSwipeRefreshLayout);
 
+        /* Init message layouts */
+        adapter = new MessageListAdapter(this, messages);
+        messagesRecylerView.setLayoutManager(new LinearLayoutManager(this));
+        messagesRecylerView.setHasFixedSize(true); // TODO: check if it is required or not
+        messagesRecylerView.setAdapter(adapter);
+
+        /* Setup listeners */
         sendImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 sendMessage();
+            }
+        });
+        attachImageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                attachFile();
+            }
+        });
+
+        messageSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                currentPage ++;
+
+                messages.clear();
+
+                loadMessages();
             }
         });
 
@@ -83,9 +129,21 @@ public class ChatActivity extends AppCompatActivity {
 
         /* Setup chat in case that the users didn't communicate until now */
         initChat();
+
+        /* Display messages */
+        loadMessages();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        /* User appears ONLINE */
+        rootDatabaseRef.child(Constants.USERS_TABLE).child(userID).child(Constants.ONLINE).setValue("true");
     }
 
     private void initToolbar() {
+        Log.d(TAG, "initToolbar: Method was invoked!");
         toolbar = (Toolbar) findViewById(R.id.chatToolbar);
         setSupportActionBar(toolbar);
 
@@ -98,7 +156,6 @@ public class ChatActivity extends AppCompatActivity {
         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View actionBarView = inflater.inflate(R.layout.friend_actionbar_layout, null);
         actionBar.setCustomView(actionBarView);
-
 
         /* Initialize layout views */
         final TextView fullnameTitle = (TextView) actionBarView.findViewById(R.id.fullnameTextView);
@@ -140,6 +197,8 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     private void initChat() {
+        Log.d(TAG, "initChat: Method was invoked!");
+
         rootDatabaseRef.child(Constants.CHAT_TABLE).child(userID)
                 .addValueEventListener(new ValueEventListener() {
                     @Override
@@ -173,6 +232,44 @@ public class ChatActivity extends AppCompatActivity {
                 });
     }
 
+    private void loadMessages() {
+        Log.d(TAG, "loadMessages: Method was invoked!");
+
+        Query query = rootDatabaseRef.child(Constants.MESSAGES_TABLE).child(userID).child(friendID)
+                .limitToLast(currentPage * Constants.MAX_LOAD_MESSAGES);
+
+
+
+        query.addChildEventListener(new ChildEventListener() {
+                    @Override
+                    public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                        Log.d(TAG, "Load messages onChildAdded: " + dataSnapshot.toString());
+                        Message message = dataSnapshot.getValue(Message.class);
+
+                        messages.add(message);
+                        adapter.notifyDataSetChanged();
+                        messagesRecylerView.scrollToPosition(messages.size() - 1);
+
+                        messageSwipeRefreshLayout.setRefreshing(false);
+                    }
+
+                    @Override
+                    public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) { }
+
+                    @Override
+                    public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {}
+
+                    @Override
+                    public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {}
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                        Log.d(TAG, "Loading Messages Failed: " + databaseError.getMessage());
+                    }
+                });
+
+    }
+
     private void sendMessage() {
         Log.d(TAG, "sendMessage: Method was invoked!");
 
@@ -196,8 +293,9 @@ public class ChatActivity extends AppCompatActivity {
         Map<String, Object> messageMap = new HashMap<>();
         messageMap.put(Constants.MESSAGE_CONTENT, message);
         messageMap.put(Constants.SEEN, false);
-        messageMap.put(Constants.REQUEST_TYPE, Constants.MESSAGE_TYPE_TEXT);
+        messageMap.put(Constants.MESSAGE_TYPE, Constants.MESSAGE_TYPE_TEXT);
         messageMap.put(Constants.TIMESTAMP, ServerValue.TIMESTAMP);
+        messageMap.put(Constants.SOURCE, userID);
 
         /* Add message to both of the users */
         Map<String, Object> usersMessageMap = new HashMap<>();
@@ -207,15 +305,16 @@ public class ChatActivity extends AppCompatActivity {
         rootDatabaseRef.updateChildren(usersMessageMap, new DatabaseReference.CompletionListener() {
             @Override
             public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
-
                 if (databaseError != null) {
                     Log.d(TAG, "Adding new messages into the database Failed: " + databaseError.getMessage());
-                } else {
-                    messageEditText.setText("");
                 }
-
             }
         });
+        messageEditText.setText("");
+    }
+
+    private void attachFile() {
+        Log.d(TAG, "attachFile: Method was invoked!");
     }
 
 }

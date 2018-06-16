@@ -48,6 +48,7 @@ import com.scarlat.marius.chatapp.storage.SharedPref;
 import com.scarlat.marius.chatapp.tasks.RegisterUserTask;
 
 import java.util.Arrays;
+import java.util.concurrent.ExecutionException;
 
 public class RegisterActivity extends AppCompatActivity {
 
@@ -298,35 +299,23 @@ public class RegisterActivity extends AppCompatActivity {
 
         final String userID = mAuth.getUid();
 
-        refDatabase = FirebaseDatabase.getInstance().getReference().child(Constants.USERS_TABLE).child(userID);
+        refDatabase = FirebaseDatabase.getInstance().getReference().child(Constants.USERS_TABLE);
         refDatabase.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
-                /* Check values are already set --> Avoid overwriting them */
-                if (!dataSnapshot.exists()) {
-                    Log.d(TAG, "User doesn't exists in database. Adding new records about him...");
-                    
-                    FirebaseUser user = mAuth.getCurrentUser();
-                    String photoUrl = Constants.UNSET;
-                    if (user.getPhotoUrl() != null) {
-                        photoUrl = String.valueOf(user.getPhotoUrl());
-                    }
+                if (dataSnapshot.hasChild(userID)) {
+                    Log.d(TAG, "onDataChange: User exists");
 
-                    new RegisterUserTask(RegisterActivity.this, mAuth)
-                            .execute(user.getEmail(), user.getDisplayName(), photoUrl);
-                } else {
-                    Log.d(TAG, "User already exists in database. Perform simple logging in ...");
-
-                    /* Store the new token ID */
+                   /* Store the new token ID */
                     final String tokenID = FirebaseInstanceId.getInstance().getToken();
+
                     FirebaseDatabase.getInstance().getReference().child(Constants.USERS_TABLE).child(userID)
                             .child(Constants.TOKEN_ID).setValue(tokenID).addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
                             if (task.isSuccessful()) {
                                 /* Do something */
-
                             } else {
                                 Log.d(TAG, "Cannot update the new token ID");
                                 Toast.makeText(RegisterActivity.this, "Updating tokenID failed", Toast.LENGTH_SHORT).show();
@@ -334,18 +323,33 @@ public class RegisterActivity extends AppCompatActivity {
                         }
                     });
 
+                } else {
+                    Log.d(TAG, "onDataChange: Users doesnt exists ");
+
+                    FirebaseUser user = mAuth.getCurrentUser();
+                    String photoUrl = Constants.UNSET;
+                    if (user.getPhotoUrl() != null) {
+                        photoUrl = String.valueOf(user.getPhotoUrl());
+                    }
+
+                    try {
+                        new RegisterUserTask(RegisterActivity.this, mAuth)
+                                .execute(user.getEmail(), user.getDisplayName(), photoUrl).get();
+                    } catch (InterruptedException | ExecutionException e) {
+                        e.printStackTrace();
+                    }
                 }
+
+                launchMainActivity();
             }
+
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-
+                Log.d(TAG, "Check user exists Failed: " + databaseError.getMessage());
             }
         });
-
-        launchMainActivity();
     }
-
 
 
     private void launchMainActivity() {
