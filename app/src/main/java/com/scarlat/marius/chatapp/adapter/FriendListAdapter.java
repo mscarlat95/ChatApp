@@ -1,6 +1,7 @@
 package com.scarlat.marius.chatapp.adapter;
 
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -126,21 +127,23 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Fr
                 Log.d(TAG, "onDataChange: Method was invoked!");
 
                 if (dataSnapshot.exists()) {
-                    final String fullname = dataSnapshot.child(Constants.FULLNAME).getValue().toString();
-                    final String profileImageUrl = dataSnapshot.child(Constants.PROFILE_IMAGE).getValue().toString();
+                    if (! ((Activity) context).isDestroyed()) {
+                        final String fullname = dataSnapshot.child(Constants.FULLNAME).getValue().toString();
+                        final String profileImageUrl = dataSnapshot.child(Constants.PROFILE_IMAGE).getValue().toString();
 
-                    if (dataSnapshot.hasChild(Constants.ONLINE)) {
-                        boolean online = Boolean.valueOf(dataSnapshot.child(Constants.ONLINE).getValue().toString());
+                        if (dataSnapshot.hasChild(Constants.ONLINE)) {
+                            boolean online = Boolean.valueOf(dataSnapshot.child(Constants.ONLINE).getValue().toString());
 
-                        if (online) {
-                            holder.getOnlineImageView().setVisibility(View.VISIBLE);
+                            if (online) {
+                                holder.getOnlineImageView().setVisibility(View.VISIBLE);
+                            }
                         }
-                    }
 
-                    holder.getFullNameTextView().setText(fullname);
-                    Glide.with(context)
-                            .load(profileImageUrl)
-                            .into(holder.getAvatarCircleImageView());
+                        holder.getFullNameTextView().setText(fullname);
+                        Glide.with(context)
+                                .load(profileImageUrl)
+                                .into(holder.getAvatarCircleImageView());
+                    }
                 }
             }
 

@@ -1,17 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/avatarCircleImageView"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
         android:layout_alignEnd="@+id/fullnameTextView"
         android:layout_alignParentEnd="true"
         android:layout_alignParentTop="true"
-        android:layout_marginRight="12dp"
         android:layout_alignWithParentIfMissing="false"
+        android:layout_marginRight="12dp"
+        app:civ_border_color="#fff"
+        app:civ_border_width="1dp"
         android:src="@drawable/default_avatar"/>
 
     <TextView

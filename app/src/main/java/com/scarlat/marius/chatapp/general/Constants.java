@@ -29,6 +29,14 @@ public class Constants {
     public static final String ONLINE = "online";
     public static final String LAST_SEEN = "lastSeen";
 
+    /* Message Info */
+    public static final String SEEN = "seen";
+    public static final String TIMESTAMP = "timestamp";
+    public static final String MESSAGE_CONTENT = "message";
+    public static final String MESSAGE_TYPE = "type";
+    public static final String MESSAGE_TYPE_TEXT = "text";
+
+
     /* Profile picture resize */
     public static final int MAX_WIDTH = 600;
     public static final int MAX_HEIGHT = 600;
@@ -44,6 +52,8 @@ public class Constants {
     public static final String FRIEND_REQUESTS_TABLE = "FriendRequests";
     public static final String NOTIFICATIONS_TABLE = "Notifications";
     public static final String FRIENDS_TABLE = "Friends";
+    public static final String CHAT_TABLE = "Chat";
+    public static final String MESSAGES_TABLE = "Messages";
 
     /* Notifications */
     public static final String CHANNEL_ID = "notify_001";
