@@ -120,7 +120,7 @@ public class ChatActivity extends AppCompatActivity {
 
                 messages.clear();
 
-                loadMessages();
+                displayMessages();
             }
         });
 
@@ -131,7 +131,7 @@ public class ChatActivity extends AppCompatActivity {
         initChat();
 
         /* Display messages */
-        loadMessages();
+        displayMessages();
     }
 
     @Override
@@ -232,13 +232,11 @@ public class ChatActivity extends AppCompatActivity {
                 });
     }
 
-    private void loadMessages() {
+    private void displayMessages() {
         Log.d(TAG, "loadMessages: Method was invoked!");
 
         Query query = rootDatabaseRef.child(Constants.MESSAGES_TABLE).child(userID).child(friendID)
                 .limitToLast(currentPage * Constants.MAX_LOAD_MESSAGES);
-
-
 
         query.addChildEventListener(new ChildEventListener() {
                     @Override
@@ -248,8 +246,9 @@ public class ChatActivity extends AppCompatActivity {
 
                         messages.add(message);
                         adapter.notifyDataSetChanged();
-                        messagesRecylerView.scrollToPosition(messages.size() - 1);
 
+                        int position = Math.max(0, messages.size() - currentPage * Constants.MAX_LOAD_MESSAGES - 1);
+                        messagesRecylerView.scrollToPosition(position);
                         messageSwipeRefreshLayout.setRefreshing(false);
                     }
 
@@ -317,4 +316,18 @@ public class ChatActivity extends AppCompatActivity {
         Log.d(TAG, "attachFile: Method was invoked!");
     }
 
+
+    @Override
+    protected void onPause() {
+        Log.d(TAG, "onPause: Method was invoked!");
+        super.onPause();
+    }
+
+    @Override
+    protected void onStop() {
+        rootDatabaseRef.child(Constants.USERS_TABLE).child(userID).child(Constants.ONLINE)
+                .onDisconnect().setValue(ServerValue.TIMESTAMP);
+        Log.d(TAG, "onStop: Method was invoked!");
+        super.onStop();
+    }
 }

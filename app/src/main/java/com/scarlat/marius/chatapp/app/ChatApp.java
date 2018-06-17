@@ -16,7 +16,6 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import com.scarlat.marius.chatapp.general.Constants;
 
 public class ChatApp extends Application {
-
     private static final String TAG = "ChatApp";
 
     private FirebaseAuth mAuth;

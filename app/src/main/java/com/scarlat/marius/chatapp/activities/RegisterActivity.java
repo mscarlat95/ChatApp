@@ -339,8 +339,6 @@ public class RegisterActivity extends AppCompatActivity {
                         e.printStackTrace();
                     }
                 }
-
-                launchMainActivity();
             }
 
 
@@ -349,6 +347,11 @@ public class RegisterActivity extends AppCompatActivity {
                 Log.d(TAG, "Check user exists Failed: " + databaseError.getMessage());
             }
         });
+
+
+        launchMainActivity();
+
+
     }
 
 

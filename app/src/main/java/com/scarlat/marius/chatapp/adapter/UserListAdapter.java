@@ -111,7 +111,6 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserVi
             fullNameTextView = rootView.findViewById(R.id.fullNameTextView);
             statusTextView = rootView.findViewById(R.id.statusTextView);
         }
-
     }
 
 }

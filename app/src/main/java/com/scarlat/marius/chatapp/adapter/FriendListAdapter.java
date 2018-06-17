@@ -42,7 +42,6 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Fr
 
     private final DatabaseReference rootDatabaseRef = FirebaseDatabase.getInstance().getReference();
 
-
     /* Getters and setters */
     public Context getContext() { return context; }
     public void setContext(Context context) { this.context = context; }
