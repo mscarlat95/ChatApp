@@ -158,10 +158,10 @@ public class FriendRequestsAdapter extends RecyclerView.Adapter<FriendRequestsAd
 
         public View getRootView() { return rootView; }
 
-        public CircleImageView getAvatarCircleImageView() { return avatarCircleImageView; }
-        public TextView getFullNameTextView() { return fullNameTextView; }
-        public ImageButton getAcceptRequestButton() { return acceptRequestButton; }
-        public ImageButton getDeclineRequestButton() { return declineRequestButton; }
+        CircleImageView getAvatarCircleImageView() { return avatarCircleImageView; }
+        TextView getFullNameTextView() { return fullNameTextView; }
+        ImageButton getAcceptRequestButton() { return acceptRequestButton; }
+        ImageButton getDeclineRequestButton() { return declineRequestButton; }
 
         public FriendRequestViewHolder(View itemView) {
             super(itemView);

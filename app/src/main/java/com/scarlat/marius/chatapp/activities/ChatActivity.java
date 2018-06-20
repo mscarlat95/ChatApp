@@ -19,6 +19,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -132,6 +134,16 @@ public class ChatActivity extends AppCompatActivity {
 
         /* Display messages */
         displayMessages();
+        
+        /* All messages are seen by user */
+        rootDatabaseRef.child(Constants.CHAT_TABLE).child(userID).child(friendID).child(Constants.SEEN).setValue(true).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (!task.isSuccessful()) {
+                    Log.d(TAG, "onComplete: SEEN error");
+                }
+            }
+        });
     }
 
     @Override
@@ -206,6 +218,8 @@ public class ChatActivity extends AppCompatActivity {
                         /* Users didn't communicate before */
                         if (!dataSnapshot.hasChild(friendID)) {
                             Map<String, Object> chatInfoMap = new HashMap<>();
+
+                            // TODO: check seen OK
                             chatInfoMap.put(Constants.SEEN, false);
                             chatInfoMap.put(Constants.TIMESTAMP, ServerValue.TIMESTAMP);
                             // TODO: add message content type
@@ -266,7 +280,6 @@ public class ChatActivity extends AppCompatActivity {
                         Log.d(TAG, "Loading Messages Failed: " + databaseError.getMessage());
                     }
                 });
-
     }
 
     private void sendMessage() {
@@ -301,6 +314,12 @@ public class ChatActivity extends AppCompatActivity {
         usersMessageMap.put(userReference + messageID, messageMap);
         usersMessageMap.put(friendReference + messageID, messageMap);
 
+        rootDatabaseRef.child(Constants.CHAT_TABLE).child(userID).child(friendID).child(Constants.SEEN).setValue(true);
+        rootDatabaseRef.child(Constants.CHAT_TABLE).child(userID).child(friendID).child(Constants.TIMESTAMP).setValue(ServerValue.TIMESTAMP);
+
+        rootDatabaseRef.child(Constants.CHAT_TABLE).child(friendID).child(userID).child(Constants.SEEN).setValue(false);
+        rootDatabaseRef.child(Constants.CHAT_TABLE).child(friendID).child(userID).child(Constants.TIMESTAMP).setValue(ServerValue.TIMESTAMP);
+
         rootDatabaseRef.updateChildren(usersMessageMap, new DatabaseReference.CompletionListener() {
             @Override
             public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
@@ -315,7 +334,6 @@ public class ChatActivity extends AppCompatActivity {
     private void attachFile() {
         Log.d(TAG, "attachFile: Method was invoked!");
     }
-
 
     @Override
     protected void onPause() {

@@ -39,7 +39,7 @@ public class FriendsFragment extends Fragment {
     final DatabaseReference rootDatabaseRef = FirebaseDatabase.getInstance().getReference();
 
     public FriendsFragment() {
-        Log.d(TAG, "FriendsFragment: Constructor has been invoked!");
+        // Required empty public constructor
     }
 
 

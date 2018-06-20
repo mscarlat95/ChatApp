@@ -135,6 +135,8 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Fr
 
                             if (online) {
                                 holder.getOnlineImageView().setVisibility(View.VISIBLE);
+                            } else {
+                                holder.getOnlineImageView().setVisibility(View.INVISIBLE);
                             }
                         }
 

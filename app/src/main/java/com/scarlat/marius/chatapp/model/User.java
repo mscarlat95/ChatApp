@@ -14,8 +14,6 @@ public class User {
 
     public User() {}
     public User(String fullname, String email, String status, String profileImage) {
-        super();
-
         this.fullname = fullname;
         this.email = email;
         this.status = status;
