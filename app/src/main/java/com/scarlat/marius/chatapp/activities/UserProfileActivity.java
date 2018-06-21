@@ -238,33 +238,33 @@ public class UserProfileActivity extends AppCompatActivity {
     }
 
 
-    private void updateNumberOfFriends(final String id, final boolean increase) {
-        Log.d(TAG, "updateNumberOfFriends: Method was invoked!");
-
-        rootDatabaseRef.child(Constants.USERS_TABLE).child(id).addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    int friendsNumber = Integer.parseInt(dataSnapshot.child(Constants.NUMBER_OF_FRIENDS).getValue().toString());
-
-                    if (increase) {
-                        Log.d(TAG, "updateNumberOfFriends: Increase number of friends");
-                        friendsNumber ++;
-                    } else {
-                        Log.d(TAG, "updateNumberOfFriends: Decrease number of friends");
-                        friendsNumber --;
-                    }
-
-                    rootDatabaseRef.child(Constants.USERS_TABLE).child(id).child(Constants.NUMBER_OF_FRIENDS).setValue(friendsNumber);
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                Log.d(TAG, "updateNumberOfFriends: " + databaseError.getMessage());
-            }
-        });
-    }
+//    private void updateNumberOfFriends(final String id, final boolean increase) {
+//        Log.d(TAG, "updateNumberOfFriends: Method was invoked!");
+//
+//        rootDatabaseRef.child(Constants.USERS_TABLE).child(id).addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                if (dataSnapshot.exists()) {
+//                    int friendsNumber = Integer.parseInt(dataSnapshot.child(Constants.NUMBER_OF_FRIENDS).getValue().toString());
+//
+//                    if (increase) {
+//                        Log.d(TAG, "updateNumberOfFriends: Increase number of friends");
+//                        friendsNumber ++;
+//                    } else {
+//                        Log.d(TAG, "updateNumberOfFriends: Decrease number of friends");
+//                        friendsNumber --;
+//                    }
+//
+//                    rootDatabaseRef.child(Constants.USERS_TABLE).child(id).child(Constants.NUMBER_OF_FRIENDS).setValue(friendsNumber);
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError databaseError) {
+//                Log.d(TAG, "updateNumberOfFriends: " + databaseError.getMessage());
+//            }
+//        });
+//    }
 
     private void acceptFriendRequest() {
         dialog.init("Accept Friend Request", "Please wait until the process is done");
@@ -287,8 +287,8 @@ public class UserProfileActivity extends AppCompatActivity {
 
                     requestState = 3; // 3 - Users are friends now
 
-                    updateNumberOfFriends(userID, true);
-                    updateNumberOfFriends(friendID, true);
+//                    updateNumberOfFriends(userID, true);
+//                    updateNumberOfFriends(friendID, true);
 
                 } else {
                     Log.d(TAG, "Accept Friend Request Failed: " + databaseError.getMessage());
@@ -314,9 +314,9 @@ public class UserProfileActivity extends AppCompatActivity {
                     sendFriendRequestButton.setText(R.string.send_friend_request);
 
                     requestState = 0; // 0 - Unset State
-
-                    updateNumberOfFriends(userID, false);
-                    updateNumberOfFriends(friendID, false);
+//
+//                    updateNumberOfFriends(userID, false);
+//                    updateNumberOfFriends(friendID, false);
 
                 } else {
                     Log.d(TAG, "Unfriend Request Failed: " + databaseError.getMessage());

@@ -112,7 +112,6 @@ public class ConversationListAdapter extends RecyclerView.Adapter<ConversationLi
         Query lastMessageQuery = rootDatabaseRef.child(Constants.MESSAGES_TABLE).child(userID).child(friendID).limitToLast(1);
 
         /* Display last message */
-        holder.getLastMessageTextView().setText("");
         lastMessageQuery.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
@@ -120,6 +119,7 @@ public class ConversationListAdapter extends RecyclerView.Adapter<ConversationLi
                     Log.d(TAG, "onChildAdded: Last message: " + dataSnapshot.toString());
                     String message = dataSnapshot.child(Constants.MESSAGE_CONTENT).getValue().toString();
 
+                    holder.getLastMessageTextView().setVisibility(View.VISIBLE);
                     holder.getLastMessageTextView().setText(message);
                     if (!conversations.get(position).isSeen()) {
                         Log.d(TAG, "onChildAdded: Message not seen" );
@@ -189,6 +189,8 @@ public class ConversationListAdapter extends RecyclerView.Adapter<ConversationLi
             fullNameTextView = rootView.findViewById(R.id.fullNameTextView);
             lastMessageTextView = rootView.findViewById(R.id.statusTextView);
             onlineImageView = rootView.findViewById(R.id.onlineImageView);
+
+            lastMessageTextView.setVisibility(View.INVISIBLE);
         }
     }
 }

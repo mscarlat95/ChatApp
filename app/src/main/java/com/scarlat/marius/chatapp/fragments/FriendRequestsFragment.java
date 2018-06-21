@@ -71,13 +71,19 @@ public class FriendRequestsFragment extends Fragment {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         if (dataSnapshot.exists() && dataSnapshot.getChildrenCount() > 0) {
+                            Log.d(TAG, "Retrieve friend requests : " + dataSnapshot);
+
                             requestsFriendID.clear();
 
                             for (DataSnapshot friend : dataSnapshot.getChildren()) {
-                                requestsFriendID.add(friend.getKey());
-                                Log.d(TAG, "onDataChange: " + friend.getKey());
-                            }
+                                final String requestType = friend.child(Constants.REQUEST_TYPE).getValue().toString();
+                                Log.d(TAG, "onDataChange: req type " + requestType);
 
+                                if (requestType.equals(Constants.REQUEST_TYPE_RECEIVED)) {
+                                    requestsFriendID.add(friend.getKey());
+                                    Log.d(TAG, "onDataChange: " + friend.getKey());
+                                }
+                            }
                             adapter.notifyDataSetChanged();
                         }
                     }

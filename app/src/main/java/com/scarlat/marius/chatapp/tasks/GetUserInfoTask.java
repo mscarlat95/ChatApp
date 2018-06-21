@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -38,7 +39,7 @@ public class GetUserInfoTask extends AsyncTask<Void, Void, Void> {
 
     /* Firebase */
     private FirebaseAuth mAuth;
-    private DatabaseReference dbReference;
+    private DatabaseReference rootDatabaseRef;
 
     public GetUserInfoTask(Context context, CircleImageView avatarCircleImageView,
                            EditText fullNameEditText, EditText emailEditText, EditText statusEditText,
@@ -69,15 +70,14 @@ public class GetUserInfoTask extends AsyncTask<Void, Void, Void> {
         /* Setup Firebase */
         FirebaseApp.initializeApp(context);
         mAuth = FirebaseAuth.getInstance();
-        dbReference = FirebaseDatabase.getInstance().getReference()
-                .child(Constants.USERS_TABLE).child(mAuth.getUid());
+        rootDatabaseRef = FirebaseDatabase.getInstance().getReference();
     }
 
     @Override
     protected Void doInBackground(Void... params) {
         Log.d(TAG, "doInBackground: Method was invoked!");
 
-        dbReference.addValueEventListener(new ValueEventListener() {
+        rootDatabaseRef.child(Constants.USERS_TABLE).child(mAuth.getUid()).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Log.d(TAG, "onDataChange: Method was invoked!");
@@ -94,12 +94,9 @@ public class GetUserInfoTask extends AsyncTask<Void, Void, Void> {
                     final String email = dataSnapshot.child(Constants.EMAIL).getValue().toString();
                     final String profileImage = dataSnapshot.child(Constants.PROFILE_IMAGE).getValue().toString();
                     final String status = dataSnapshot.child(Constants.STATUS).getValue().toString();
-                    final String numberOfFriends = dataSnapshot.child(Constants.NUMBER_OF_FRIENDS).getValue().toString();
-
                     statusEditText.setText(status);
                     fullNameEditText.setText(fullname);
                     emailEditText.setText(email);
-                    friendsNumberEditText.setText(numberOfFriends + " Friends");
                     Glide.with(context)
                             .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_avatar))
                             .load(profileImage)
@@ -115,6 +112,36 @@ public class GetUserInfoTask extends AsyncTask<Void, Void, Void> {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
+                if (((Activity) context).isDestroyed()) {
+                    Log.d(TAG, "onComplete: Activity is not available");
+                    return;
+                }
+
+                Log.d(TAG, "onCancelled: " + databaseError.getMessage());
+                Toast.makeText(context, databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+
+                hideProgressDialog();
+            }
+        });
+
+        rootDatabaseRef.child(Constants.FRIENDS_TABLE).child(mAuth.getUid()).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (((Activity) context).isDestroyed()) {
+                    Log.d(TAG, "onComplete: Activity is not available");
+                    return;
+                }
+
+                if (dataSnapshot.exists()) {
+                    long numberOfFriends = dataSnapshot.getChildrenCount();
+                    friendsNumberEditText.setText(numberOfFriends + " Friends");
+                }
+
+                hideProgressDialog();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
                 if (((Activity) context).isDestroyed()) {
                     Log.d(TAG, "onComplete: Activity is not available");
                     return;

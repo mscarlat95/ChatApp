@@ -63,7 +63,7 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
         if (source.equals(FirebaseAuth.getInstance().getUid())) {
             holder.getMessageTextView().setBackgroundResource(R.drawable.user_message_layout);
         } else {
-            holder.getMessageTextView().setBackgroundResource(R.drawable.friend_message_layout);
+            holder.getMessageTextView().setBackgroundResource(R.drawable.friend_message_background);
         }
 
         holder.getMessageTextView().setText(content);

@@ -104,6 +104,7 @@ public class FriendRequestsAdapter extends RecyclerView.Adapter<FriendRequestsAd
         });
     }
 
+
     private void acceptFriendRequest(final String userID, final String friendID) {
         Map<String, Object> acceptFriendRequestMap = new HashMap<>();
         acceptFriendRequestMap.put(Constants.FRIEND_REQUESTS_TABLE + "/" + userID + "/" + friendID, null);

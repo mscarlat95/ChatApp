@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -35,7 +36,7 @@ public class GetFriendInfoTask extends AsyncTask<Void, Void, Void> {
     private ProgressDialog progressDialog;
 
     /* Firebase */
-    private DatabaseReference dbReference;
+    private DatabaseReference rootDatabaseRef;
 
     public GetFriendInfoTask(Context context, String userID, ImageView profileImageView,
                              TextView fullNameEditText, TextView statusEditText,
@@ -66,15 +67,15 @@ public class GetFriendInfoTask extends AsyncTask<Void, Void, Void> {
 
         /* Setup Firebase */
         FirebaseApp.initializeApp(context);
-        dbReference = FirebaseDatabase.getInstance().getReference()
-                .child(Constants.USERS_TABLE).child(userID);
+        rootDatabaseRef = FirebaseDatabase.getInstance().getReference();
     }
 
     @Override
     protected Void doInBackground(Void... params) {
         Log.d(TAG, "doInBackground: Method was invoked!");
 
-        dbReference.addValueEventListener(new ValueEventListener() {
+        rootDatabaseRef.child(Constants.USERS_TABLE).child(userID)
+                .addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Log.d(TAG, "onDataChange: Method was invoked!");
@@ -90,22 +91,15 @@ public class GetFriendInfoTask extends AsyncTask<Void, Void, Void> {
                     final String fullname = dataSnapshot.child(Constants.FULLNAME).getValue().toString();
                     final String profileImage = dataSnapshot.child(Constants.PROFILE_IMAGE).getValue().toString();
                     final String status = dataSnapshot.child(Constants.STATUS).getValue().toString();
-                    final String numberOfFriends = dataSnapshot.child(Constants.NUMBER_OF_FRIENDS).getValue().toString();
 
                     statusTextView.setText("Status: " + status);
                     fullNameTextView.setText(fullname);
-                    friendsNumberTextView.setText("Total Friends: " + numberOfFriends);
                     Glide.with(context)
                             .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_avatar))
                             .load(profileImage)
                             .into(profileImageView);
 
-                } else {
-                    Log.d(TAG, "onDataChange: Cannot find snapshot of " + userID);
-                    Toast.makeText(context, "User ID " + userID+ " doesn't exists", Toast.LENGTH_SHORT).show();
                 }
-
-                hideProgressDialog();
             }
 
             @Override
@@ -117,10 +111,40 @@ public class GetFriendInfoTask extends AsyncTask<Void, Void, Void> {
 
                 Log.d(TAG, "onCancelled: " + databaseError.getMessage());
                 Toast.makeText(context, databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        rootDatabaseRef.child(Constants.FRIENDS_TABLE).child(userID).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (((Activity) context).isDestroyed()) {
+                    Log.d(TAG, "onComplete: Activity is not available");
+                    return;
+                }
+
+                if (dataSnapshot.exists()) {
+                    long numberOfFriends = dataSnapshot.getChildrenCount();
+                    friendsNumberTextView.setText("Total Friends: " + numberOfFriends);
+                }
+
+                hideProgressDialog();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                if (((Activity) context).isDestroyed()) {
+                    Log.d(TAG, "onComplete: Activity is not available");
+                    return;
+                }
+
+                Log.d(TAG, "onCancelled: " + databaseError.getMessage());
+                Toast.makeText(context, databaseError.getMessage(), Toast.LENGTH_SHORT).show();
 
                 hideProgressDialog();
             }
         });
+
+
 
         return null;
     }
