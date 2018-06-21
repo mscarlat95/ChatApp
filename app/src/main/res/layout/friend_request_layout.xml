@@ -27,14 +27,15 @@
         android:layout_toEndOf="@+id/avatarCircleImageView"
         android:hint="@string/full_name_hint"
         android:textColor="@android:color/black"
-        android:textSize="16sp"/>
+        android:textSize="12sp"/>
 
     <ImageButton
         android:id="@+id/acceptFriendRequestButton"
         android:layout_width="30dp"
         android:layout_height="30dp"
         android:layout_alignBottom="@id/avatarCircleImageView"
-        android:layout_marginStart="32dp"
+        android:layout_marginBottom="5dp"
+        android:layout_marginStart="10dp"
         android:layout_toEndOf="@+id/fullNameTextView"
         android:background="@android:color/transparent"
         android:scaleType="fitCenter"

@@ -123,6 +123,8 @@ public class UserProfileActivity extends AppCompatActivity {
         }
     }
 
+
+    // TODO: check database for a better assurance
     private void checkUsersRelationship() {
         Log.d(TAG, "checkRequests: Method was invoked!");
         final DatabaseReference dbReference = FirebaseDatabase.getInstance().getReference().child(Constants.FRIEND_REQUESTS_TABLE);
@@ -144,6 +146,7 @@ public class UserProfileActivity extends AppCompatActivity {
                                 sendFriendRequestButton.setText(R.string.accept_friend_request);
                                 declineFriendRequestButton.setVisibility(View.VISIBLE);
                                 declineFriendRequestButton.setEnabled(true);
+
                             } else {    // REQUEST_TYPE_SENT
                                 requestState = 1;
                                 sendFriendRequestButton.setText(R.string.cancel_friend_request);

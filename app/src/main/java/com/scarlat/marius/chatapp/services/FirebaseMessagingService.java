@@ -29,8 +29,6 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
     public void onCreate() {
         Log.d(TAG, "onCreate: Method was invoked!");
         super.onCreate();
-
-//        playNotificationSound();
     }
 
     @Override
@@ -103,8 +101,8 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
         }
 
         if (mNotificationManager.areNotificationsEnabled()) {
+//            playNotificationSound();
             mNotificationManager.notify(notificationId, mBuilder.build());
-            playNotificationSound();
         }
     }
 
