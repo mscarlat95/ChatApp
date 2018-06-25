@@ -117,10 +117,28 @@ public class ConversationListAdapter extends RecyclerView.Adapter<ConversationLi
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                 if (dataSnapshot.exists()) {
                     Log.d(TAG, "onChildAdded: Last message: " + dataSnapshot.toString());
+
+                    String type = dataSnapshot.child(Constants.MESSAGE_TYPE).getValue().toString();
                     String message = dataSnapshot.child(Constants.MESSAGE_CONTENT).getValue().toString();
 
-                    holder.getLastMessageTextView().setVisibility(View.VISIBLE);
-                    holder.getLastMessageTextView().setText(message);
+
+                    switch (type) {
+                        case Constants.MESSAGE_TYPE_TEXT:
+
+                            holder.getLastMessageTextView().setVisibility(View.VISIBLE);
+                            holder.getLastMessageTextView().setText(message);
+
+                            break;
+                        case Constants.MESSAGE_TYPE_IMAGE:
+
+                            holder.getLastMessageTextView().setVisibility(View.VISIBLE);
+                            holder.getLastMessageTextView().setText("Loading image ...");
+
+                            break;
+                        default:
+                            Log.d(TAG, "onChildAdded: Undefined message type " + type);
+                    }
+
                     if (!conversations.get(position).isSeen()) {
                         Log.d(TAG, "onChildAdded: Message not seen" );
                         holder.getLastMessageTextView().setTypeface(

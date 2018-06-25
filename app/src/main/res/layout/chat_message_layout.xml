@@ -50,4 +50,25 @@
         android:hint="@string/timestamp"
         android:textSize="12sp"/>
 
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        />
+
+    <ImageView
+        android:id="@+id/messageImageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:maxWidth="300dp"
+        android:maxHeight="300dp"
+        android:adjustViewBounds="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignStart="@+id/messageTextView"
+        android:layout_below="@+id/messageTextView"
+        android:layout_marginStart="0dp"
+        android:layout_toEndOf="@+id/profileCircleImageView"
+        android:padding="5dp"
+        android:scaleType="fitCenter" />
+
+
 </RelativeLayout>

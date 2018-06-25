@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -57,6 +58,7 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
 
         final String content = message.getMessage();
         final String source = message.getFrom();
+        final String type = message.getType();
         final long timestamp = message.getTimestamp();
 
          /* Different message content layout for user and friend */
@@ -66,9 +68,29 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
             holder.getMessageTextView().setBackgroundResource(R.drawable.friend_message_background);
         }
 
-        holder.getMessageTextView().setText(content);
+        switch (type) {
+            case Constants.MESSAGE_TYPE_TEXT:
+                holder.getMessageImageView().setVisibility(View.INVISIBLE);
+                holder.getMessageTextView().setVisibility(View.VISIBLE);
+                holder.getMessageTextView().setText(content);
+                break;
+            case Constants.MESSAGE_TYPE_IMAGE:
+                if (!((Activity) context).isDestroyed()) {
+                    holder.getMessageTextView().setVisibility(View.INVISIBLE);
+                    holder.getMessageImageView().setVisibility(View.VISIBLE);
+                    Glide.with(context)
+                            .load(content)
+                            .into(holder.getMessageImageView());
+                }
+                break;
 
-        holder.getTimestampTextView().setText(DateFormat.format("dd-MMM-yy HH:mm:ss", timestamp));
+            default:
+                Log.d(TAG, "Undefined message type = " + type);
+                break;
+        }
+
+
+        holder.getTimestampTextView().setText(DateFormat.format("dd-MMM HH:mm", timestamp));
 
         FirebaseDatabase.getInstance().getReference().child(Constants.USERS_TABLE).child(source)
                 .addValueEventListener(new ValueEventListener() {
@@ -79,7 +101,8 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
                             final String fullname = dataSnapshot.child(Constants.FULLNAME).getValue().toString();
 
                             if (!((Activity)context).isDestroyed()) {
-                                holder.getFullNameTextView().setText(fullname);
+                                holder.getFullNameTextView().setText(fullname.split(" ")[0]);
+
                                 Glide.with(context)
                                         .load(profileImage)
                                         .into(holder.getProfileCircleImageView());
@@ -107,6 +130,7 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
         private CircleImageView profileCircleImageView;
         private TextView messageTextView;
         private TextView timestampTextView;
+        private ImageView messageImageView;
 
         /* Getters and setters */
         View getRootView() { return rootView; }
@@ -114,6 +138,7 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
         TextView getMessageTextView() { return messageTextView; }
         TextView getTimestampTextView() { return timestampTextView; }
         TextView getFullNameTextView() { return fullNameTextView; }
+        ImageView getMessageImageView() { return messageImageView; }
 
         /* Constructor */
         public MessageViewHolder(View itemView) {
@@ -125,6 +150,7 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
             profileCircleImageView = rootView.findViewById(R.id.profileCircleImageView);
             messageTextView = rootView.findViewById(R.id.messageTextView);
             timestampTextView = rootView.findViewById(R.id.timestampTextView);
+            messageImageView = rootView.findViewById(R.id.messageImageView);
         }
     }
 }

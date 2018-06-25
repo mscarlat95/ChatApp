@@ -1,6 +1,8 @@
 package com.scarlat.marius.chatapp.activities;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -20,6 +22,7 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
@@ -30,6 +33,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.scarlat.marius.chatapp.R;
 import com.scarlat.marius.chatapp.adapter.MessageListAdapter;
 import com.scarlat.marius.chatapp.general.Constants;
@@ -333,7 +339,100 @@ public class ChatActivity extends AppCompatActivity {
 
     private void attachFile() {
         Log.d(TAG, "attachFile: Method was invoked!");
+
+        // TODO Select type of file
+        importFromGallery();
     }
+
+    private void importFromGallery() {
+        Log.d(TAG, "importFromGallery: Method was invoked!");
+
+        Intent galleryIntent = new Intent();
+
+        /* Open gallery */
+        galleryIntent.setType("image/*");
+        galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(Intent.createChooser(galleryIntent, "Select image"), Constants.REQUEST_CODE_READ_EXT);
+    }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        // Import from gallery
+        if (resultCode == RESULT_OK && requestCode == Constants.REQUEST_CODE_READ_EXT) {
+
+            Uri fileUri = data.getData();
+
+            /* Add message into the database */
+            final String userReference = Constants.MESSAGES_TABLE + "/" + userID + "/" + friendID + "/";
+            final String friendReference = Constants.MESSAGES_TABLE + "/" + friendID + "/" + userID + "/";
+
+            final String messageID = rootDatabaseRef.child(Constants.MESSAGES_TABLE).child(userID)
+                    .child(friendID).push().getKey();
+
+            StorageReference imagesPathRef = FirebaseStorage.getInstance().getReference().child(Constants.STORAGE_MESSAGE_IMAGES)
+                    .child(messageID + ".jpg");
+
+            imagesPathRef.putFile(fileUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+
+                    if (task.isSuccessful()) {
+                        Log.d(TAG, "Upload selected image Successful");
+
+                        FirebaseStorage.getInstance().getReference()
+                                .child(Constants.STORAGE_MESSAGE_IMAGES)
+                                .child(messageID + ".jpg").getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                    @Override
+                                    public void onSuccess(Uri uri) {
+
+                                        final String imageUrl = String.valueOf(uri);
+
+                                        Log.d(TAG, "Download url = " + imageUrl);
+
+                                        String messageID = rootDatabaseRef.child(Constants.MESSAGES_TABLE)
+                                                .child(userID).child(friendID).push()
+                                                .getKey();
+
+                                        /* Store message info */
+                                        Map<String, Object> messageMap = new HashMap<>();
+                                        messageMap.put(Constants.MESSAGE_CONTENT, imageUrl);
+                                        messageMap.put(Constants.SEEN, false);
+                                        messageMap.put(Constants.MESSAGE_TYPE, Constants.MESSAGE_TYPE_IMAGE);
+                                        messageMap.put(Constants.TIMESTAMP, ServerValue.TIMESTAMP);
+                                        messageMap.put(Constants.SOURCE, userID);
+
+                                        /* Add message to both of the users */
+                                        Map<String, Object> usersMessageMap = new HashMap<>();
+                                        usersMessageMap.put(userReference + messageID, messageMap);
+                                        usersMessageMap.put(friendReference + messageID, messageMap);
+
+                                        rootDatabaseRef.child(Constants.CHAT_TABLE).child(userID).child(friendID).child(Constants.SEEN).setValue(true);
+                                        rootDatabaseRef.child(Constants.CHAT_TABLE).child(userID).child(friendID).child(Constants.TIMESTAMP).setValue(ServerValue.TIMESTAMP);
+
+                                        rootDatabaseRef.child(Constants.CHAT_TABLE).child(friendID).child(userID).child(Constants.SEEN).setValue(false);
+                                        rootDatabaseRef.child(Constants.CHAT_TABLE).child(friendID).child(userID).child(Constants.TIMESTAMP).setValue(ServerValue.TIMESTAMP);
+
+                                        rootDatabaseRef.updateChildren(usersMessageMap, new DatabaseReference.CompletionListener() {
+                                            @Override
+                                            public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
+                                                if (databaseError != null) {
+                                                    Log.d(TAG, "Adding new messages into the database Failed: " + databaseError.getMessage());
+                                                }
+                                            }
+                                        });
+
+                                    }
+                                });
+                    }
+                }
+            });
+        }
+
+    }
+
 
     @Override
     protected void onPause() {

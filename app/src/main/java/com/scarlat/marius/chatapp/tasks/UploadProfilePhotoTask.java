@@ -68,7 +68,7 @@ public class UploadProfilePhotoTask extends AsyncTask<Uri, Void, Void> {
         Uri imageUri = params[0];
         final String fileName = mAuth.getUid() + ".jpg";
 
-        storageReference.child("profile_images").child(fileName)
+        storageReference.child(Constants.STORAGE_PROFILE_IMAGES).child(fileName)
                 .putFile(imageUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
@@ -78,7 +78,7 @@ public class UploadProfilePhotoTask extends AsyncTask<Uri, Void, Void> {
                     Log.d(TAG, "onComplete: Image upload success");
 
                     /* Update Image URL in user record from database */
-                    FirebaseStorage.getInstance().getReference().child("profile_images").child(fileName)
+                    FirebaseStorage.getInstance().getReference().child(Constants.STORAGE_PROFILE_IMAGES).child(fileName)
                             .getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
 
                         @Override

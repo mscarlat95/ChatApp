@@ -35,6 +35,8 @@ public class Constants {
     public static final String MESSAGE_CONTENT = "message";
     public static final String MESSAGE_TYPE = "type";
     public static final String MESSAGE_TYPE_TEXT = "text";
+    public static final String MESSAGE_TYPE_IMAGE= "image";
+
     public static final int MAX_LOAD_MESSAGES = 10;
 
     /* Profile picture resize */
@@ -54,6 +56,10 @@ public class Constants {
     public static final String FRIENDS_TABLE = "Friends";
     public static final String CHAT_TABLE = "Chat";
     public static final String MESSAGES_TABLE = "Messages";
+
+    /* Server Storage */
+    public static final String STORAGE_PROFILE_IMAGES = "profile_images";
+    public static final String STORAGE_MESSAGE_IMAGES = "message_images";
 
     /* Notifications channel for OREO android version */
     public static final String CHANNEL_ID = "notify_001";
