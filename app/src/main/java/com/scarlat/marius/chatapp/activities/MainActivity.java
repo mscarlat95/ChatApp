@@ -140,15 +140,17 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void logout() {
+        Log.d(TAG, "logout: Method was invoked!");
 
         /* First, save last timestamp */
         rootDatabaseRef.child(Constants.USERS_TABLE).child(FirebaseAuth.getInstance().getUid()).child(Constants.ONLINE)
-                .onDisconnect().setValue(ServerValue.TIMESTAMP).addOnCompleteListener(new OnCompleteListener<Void>() {
+                .setValue(ServerValue.TIMESTAMP).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
 
                 /* Perform logout */
                 if (task.isSuccessful()) {
+                    Log.d(TAG, "onComplete: Saved timestamp");
                     AuthUI.getInstance().signOut(MainActivity.this).addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
