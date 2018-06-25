@@ -124,13 +124,11 @@ public class ConversationListAdapter extends RecyclerView.Adapter<ConversationLi
 
                     switch (type) {
                         case Constants.MESSAGE_TYPE_TEXT:
-
                             holder.getLastMessageTextView().setVisibility(View.VISIBLE);
                             holder.getLastMessageTextView().setText(message);
 
                             break;
                         case Constants.MESSAGE_TYPE_IMAGE:
-
                             holder.getLastMessageTextView().setVisibility(View.VISIBLE);
                             holder.getLastMessageTextView().setText("Loading image ...");
 
@@ -209,6 +207,7 @@ public class ConversationListAdapter extends RecyclerView.Adapter<ConversationLi
             onlineImageView = rootView.findViewById(R.id.onlineImageView);
 
             lastMessageTextView.setVisibility(View.INVISIBLE);
+
         }
     }
 }

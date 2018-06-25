@@ -30,7 +30,7 @@ public class ChatApp extends Application {
         FirebaseMessaging.getInstance().setAutoInitEnabled(true);
 
         /* Offline database */
-//        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
 
         /* Obtain current user */
         mAuth = FirebaseAuth.getInstance();

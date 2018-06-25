@@ -140,22 +140,34 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void logout() {
-        rootDatabaseRef.child(Constants.USERS_TABLE).child(FirebaseAuth.getInstance().getUid()).child(Constants.ONLINE)
-                .onDisconnect().setValue(ServerValue.TIMESTAMP);
 
-        AuthUI.getInstance().signOut(MainActivity.this).addOnCompleteListener(new OnCompleteListener<Void>() {
+        /* First, save last timestamp */
+        rootDatabaseRef.child(Constants.USERS_TABLE).child(FirebaseAuth.getInstance().getUid()).child(Constants.ONLINE)
+                .onDisconnect().setValue(ServerValue.TIMESTAMP).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
-                if (task.isSuccessful()) {
-                    Log.d(TAG, "onComplete: Logout Successful");
 
-                    launchActivity (MainActivity.this, LoginActivity.class);
-                    finish();
-                } else {
-                    Toast.makeText(MainActivity.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                /* Perform logout */
+                if (task.isSuccessful()) {
+                    AuthUI.getInstance().signOut(MainActivity.this).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful()) {
+                                Log.d(TAG, "onComplete: Logout Successful");
+
+                                launchActivity (MainActivity.this, LoginActivity.class);
+                                finish();
+                            } else {
+                                Toast.makeText(MainActivity.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
                 }
+
             }
         });
+
+
     }
 
     private void launchActivity (Context srcContext, Class destClass) {

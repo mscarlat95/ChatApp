@@ -2,7 +2,9 @@ package com.scarlat.marius.chatapp.adapter;
 
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.DateFormat;
@@ -68,30 +70,33 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
             holder.getMessageTextView().setBackgroundResource(R.drawable.friend_message_background);
         }
 
+        /* Display message content */
         switch (type) {
             case Constants.MESSAGE_TYPE_TEXT:
-                holder.getMessageImageView().setVisibility(View.INVISIBLE);
+                Log.d(TAG, "onBindViewHolder: Text content> " + content);
+                holder.getMessageImageView().setVisibility(View.GONE);
                 holder.getMessageTextView().setVisibility(View.VISIBLE);
                 holder.getMessageTextView().setText(content);
                 break;
             case Constants.MESSAGE_TYPE_IMAGE:
+                Log.d(TAG, "onBindViewHolder: Image content> " + content);
                 if (!((Activity) context).isDestroyed()) {
-                    holder.getMessageTextView().setVisibility(View.INVISIBLE);
+                    holder.getMessageTextView().setVisibility(View.GONE);
                     holder.getMessageImageView().setVisibility(View.VISIBLE);
                     Glide.with(context)
                             .load(content)
                             .into(holder.getMessageImageView());
                 }
                 break;
-
             default:
                 Log.d(TAG, "Undefined message type = " + type);
                 break;
         }
 
-
+        /* Set timestamp */
         holder.getTimestampTextView().setText(DateFormat.format("dd-MMM HH:mm", timestamp));
 
+        /* Display user info: profile image and name */
         FirebaseDatabase.getInstance().getReference().child(Constants.USERS_TABLE).child(source)
                 .addValueEventListener(new ValueEventListener() {
                     @Override
@@ -140,6 +145,54 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
         TextView getFullNameTextView() { return fullNameTextView; }
         ImageView getMessageImageView() { return messageImageView; }
 
+        class DisplayInfoListener implements View.OnClickListener {
+            @Override
+            public void onClick(View v) {
+
+                /* Toggle timestamp */
+                if (timestampTextView.getAlpha() == 0.0f) {
+                    timestampTextView.animate().alpha(1.0f).setDuration(500);
+
+                } else {
+                    timestampTextView.animate().alpha(0.0f).setDuration(500);
+                }
+            }
+        }
+
+        class CopyInfoListener implements View.OnLongClickListener {
+            private void setClipboard(String text) {
+                android.content.ClipboardManager clipboard = (android.content.ClipboardManager)
+                                                                context.getSystemService(Context.CLIPBOARD_SERVICE);
+                android.content.ClipData clip = android.content.ClipData.newPlainText("Copied Text", text);
+                clipboard.setPrimaryClip(clip);
+            }
+
+            @Override
+            public boolean onLongClick(View v) {
+                if (v instanceof TextView) {
+                    final String text = ((TextView) v).getText().toString();
+                    final String[] availableOptions = { "Copy Text" };
+
+                    new AlertDialog.Builder(context)
+                            .setItems(availableOptions, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    switch (which) {
+                                        case 0:     /* Copy message in clipboard */
+                                            setClipboard(text);
+                                            break;
+                                        default:
+                                            Log.d(TAG, "onClick: Undefined item clicked");
+                                            break;
+                                    }
+                                }
+                            }).show();
+                    return true;
+                }
+                return false;
+            }
+        }
+
         /* Constructor */
         public MessageViewHolder(View itemView) {
             super(itemView);
@@ -151,6 +204,11 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
             messageTextView = rootView.findViewById(R.id.messageTextView);
             timestampTextView = rootView.findViewById(R.id.timestampTextView);
             messageImageView = rootView.findViewById(R.id.messageImageView);
+
+            /* Setup adapters */
+            messageTextView.setOnLongClickListener(new CopyInfoListener());
+            messageTextView.setOnClickListener(new DisplayInfoListener());
+            messageImageView.setOnClickListener(new DisplayInfoListener());
         }
     }
 }
