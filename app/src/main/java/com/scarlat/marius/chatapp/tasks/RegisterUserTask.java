@@ -1,16 +1,13 @@
 package com.scarlat.marius.chatapp.tasks;
 
 
-import android.app.ProgressDialog;
 import android.content.Context;
-import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -20,15 +17,11 @@ import com.scarlat.marius.chatapp.general.Constants;
 import java.util.HashMap;
 import java.util.Map;
 
-public class RegisterUserTask extends AsyncTask<String, Void, Void> {
-
+public class RegisterUserTask {
     private static final String TAG = "RegisterUserTask";
 
     /* Application Context */
     private Context context;
-
-    /* Progress dialog */
-    private ProgressDialog progressDialog;
 
     /* Firebase */
     private FirebaseAuth mAuth;
@@ -39,35 +32,13 @@ public class RegisterUserTask extends AsyncTask<String, Void, Void> {
         this.mAuth = mAuth;
     }
 
-    private void hideProgressDialog() {
-        if (progressDialog.isShowing()) {
-            progressDialog.dismiss();
-        }
-    }
-
-    @Override
-    protected void onPreExecute() {
-        /* Setup progress dialog */
-        progressDialog = new ProgressDialog(context);
-        progressDialog.setTitle("Registering User");
-        progressDialog.setMessage("Please wait until the account is created !");
-        progressDialog.setCanceledOnTouchOutside(false); // Don't stop it when screen is touched
-        progressDialog.show();
+    public void execute (final String email, final String fullName, final String photoUrl) {
+        Log.d(TAG, "execute: Method was invoked!");
 
         /* Setup Firebase */
-        FirebaseApp.initializeApp(context);
         dbReference = FirebaseDatabase.getInstance().getReference();
-    }
 
-
-
-    @Override
-    protected Void doInBackground(String... params) {
-        Log.d(TAG, "doInBackground: Method was invoked!");
-
-        final String email = params[0];
-        final String fullName = params[1];
-        final String photoUrl = params[2];
+        /* Save info in database */
         final String userID = mAuth.getUid();
         final String tokenID = FirebaseInstanceId.getInstance().getToken();
         Map<String, Object> userInfo = new HashMap<>();
@@ -94,11 +65,8 @@ public class RegisterUserTask extends AsyncTask<String, Void, Void> {
                             Log.d(TAG, "Add info in database failed. " + task.getException().toString());
                             Toast.makeText(context, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                         }
-
-                        hideProgressDialog();
                     }
                 });
-
-        return null;
     }
+
 }

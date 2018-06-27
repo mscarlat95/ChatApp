@@ -27,6 +27,7 @@ import com.scarlat.marius.chatapp.activities.ChatActivity;
 import com.scarlat.marius.chatapp.activities.UserProfileActivity;
 import com.scarlat.marius.chatapp.general.Constants;
 import com.scarlat.marius.chatapp.model.Friend;
+import com.scarlat.marius.chatapp.storage.SharedPref;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,6 +58,8 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Fr
     public FriendListAdapter(Context context, List<Friend> friends) {
         this.context = context;
         this.friends = friends;
+
+        SharedPref.setup(context);
     }
 
     @NonNull
@@ -114,8 +117,10 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Fr
     }
 
 
-    private void updateFriendInfo(final FriendViewHolder holder, int position) {
+    private void updateFriendInfo(final FriendViewHolder holder, final int position) {
         Log.d(TAG, "updateFriendInfo: Method was invoked!");
+
+        holder.getRootView().setVisibility(View.INVISIBLE);
 
          /* Retrieve friend information and update his layout profile */
         final String friendId = friends.get(position).getFriendId();
@@ -129,6 +134,9 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Fr
                     if (! ((Activity) context).isDestroyed()) {
                         final String fullname = dataSnapshot.child(Constants.FULLNAME).getValue().toString();
                         final String profileImageUrl = dataSnapshot.child(Constants.PROFILE_IMAGE).getValue().toString();
+
+                        /* Save in cache memory friends details */
+                        SharedPref.saveFriend(friends.get(position).getFriendId(), fullname);
 
                         if (dataSnapshot.hasChild(Constants.ONLINE)) {
                             boolean online = Boolean.valueOf(dataSnapshot.child(Constants.ONLINE).getValue().toString());
@@ -144,6 +152,8 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Fr
                         Glide.with(context)
                                 .load(profileImageUrl)
                                 .into(holder.getAvatarCircleImageView());
+
+                        holder.getRootView().setVisibility(View.VISIBLE);
                     }
                 }
             }

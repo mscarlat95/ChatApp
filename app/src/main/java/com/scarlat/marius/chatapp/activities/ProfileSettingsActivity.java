@@ -20,7 +20,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 
-import com.google.firebase.auth.FirebaseAuth;
 import com.scarlat.marius.chatapp.R;
 import com.scarlat.marius.chatapp.general.Constants;
 import com.scarlat.marius.chatapp.tasks.ChangeStatusTask;
@@ -63,6 +62,8 @@ public class ProfileSettingsActivity extends AppCompatActivity {
         statusEditText.setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
+                Log.d(TAG, "onKey: " + keyCode);
+
                 if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
                     changeUserStatus(v);
                 }
@@ -83,8 +84,7 @@ public class ProfileSettingsActivity extends AppCompatActivity {
         Log.d(TAG, "changeUserStatus: Method was invoked!");
 
         if (statusEditText.isEnabled()) {
-            new ChangeStatusTask(ProfileSettingsActivity.this, FirebaseAuth.getInstance())
-                    .execute(statusEditText.getText().toString());
+            new ChangeStatusTask(ProfileSettingsActivity.this).execute(statusEditText.getText().toString());
             statusEditText.setEnabled(false);
             statusEditText.setTextColor(emailEditText.getTextColors());
             changeStatusButton.setText(R.string.change_status_btn);

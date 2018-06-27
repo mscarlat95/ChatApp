@@ -5,6 +5,7 @@ import android.app.Application;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -27,10 +28,11 @@ public class ChatApp extends Application {
         super.onCreate();
 
         /* Firebase Messaging Service */
+        FirebaseApp.initializeApp(this);
         FirebaseMessaging.getInstance().setAutoInitEnabled(true);
 
         /* Offline database */
-        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+//        DatabaseUtil.setupDatabase();
 
         /* Obtain current user */
         mAuth = FirebaseAuth.getInstance();
@@ -41,16 +43,11 @@ public class ChatApp extends Application {
 
         /* Setup Listener for online user */
         usersDatabaseRef = FirebaseDatabase.getInstance().getReference().child(Constants.USERS_TABLE).child(mAuth.getUid());
-        usersDatabaseRef.addValueEventListener(new ValueEventListener() {
+        usersDatabaseRef.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        Log.d(TAG, "Updating user Status: Method was invoked!");
-
                         /* On disconnect, set user OFFLINE */
-                        if (dataSnapshot.exists()) {
-//                            usersDatabaseRef.child(Constants.ONLINE).onDisconnect().setValue(false);
-//                            usersDatabaseRef.child(Constants.LAST_SEEN).setValue(ServerValue.TIMESTAMP);
-
+                        if (dataSnapshot.getValue() != null) {
                             usersDatabaseRef.child(Constants.ONLINE).onDisconnect().setValue(ServerValue.TIMESTAMP);
                         }
                     }

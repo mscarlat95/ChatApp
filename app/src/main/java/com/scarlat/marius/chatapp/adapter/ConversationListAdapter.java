@@ -71,6 +71,8 @@ public class ConversationListAdapter extends RecyclerView.Adapter<ConversationLi
     public void onBindViewHolder(@NonNull final ConversationViewHolder holder, final int position) {
         Log.d(TAG, "onBindViewHolder: Method was invoked!");
 
+        holder.getRootView().setVisibility(View.INVISIBLE);
+
         final String friendID = conversations.get(position).getFriendID();
 
         /* Get friend information */
@@ -99,6 +101,8 @@ public class ConversationListAdapter extends RecyclerView.Adapter<ConversationLi
                         Glide.with(context)
                                 .load(profileImageUrl)
                                 .into(holder.getAvatarCircleImageView());
+
+                        holder.getRootView().setVisibility(View.VISIBLE);
                     }
                 }
             }
@@ -120,7 +124,6 @@ public class ConversationListAdapter extends RecyclerView.Adapter<ConversationLi
 
                     String type = dataSnapshot.child(Constants.MESSAGE_TYPE).getValue().toString();
                     String message = dataSnapshot.child(Constants.MESSAGE_CONTENT).getValue().toString();
-
 
                     switch (type) {
                         case Constants.MESSAGE_TYPE_TEXT:
@@ -207,7 +210,6 @@ public class ConversationListAdapter extends RecyclerView.Adapter<ConversationLi
             onlineImageView = rootView.findViewById(R.id.onlineImageView);
 
             lastMessageTextView.setVisibility(View.INVISIBLE);
-
         }
     }
 }

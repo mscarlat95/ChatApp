@@ -1,69 +1,52 @@
 package com.scarlat.marius.chatapp.tasks;
 
 
-import android.app.ProgressDialog;
 import android.content.Context;
-import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.scarlat.marius.chatapp.general.Constants;
+import com.scarlat.marius.chatapp.general.CustomProgressDialog;
 
-public class ChangeStatusTask extends AsyncTask<String, Void, Void> {
-
+public class ChangeStatusTask  {
     private static final String TAG = "ChangeStatusTask";
 
     private Context context;
-
-    /* Progress dialog */
-    private ProgressDialog progressDialog;
+    private CustomProgressDialog progressDialog;
 
     /* Firebase */
-    private FirebaseAuth mAuth;
+    private String userID;
     private DatabaseReference dbReference;
 
-    public ChangeStatusTask(Context context, FirebaseAuth mAuth) {
+    public ChangeStatusTask(Context context) {
         this.context = context;
-        this.mAuth = mAuth;
     }
 
-    private void hideProgressDialog() {
-        if (progressDialog.isShowing()) {
-            progressDialog.dismiss();
-        }
-    }
+    private void setup() {
+        Log.d(TAG, "setup: Method was invoked!");
 
-    @Override
-    protected void onPreExecute() {
         /* Setup progress dialog */
-        progressDialog = new ProgressDialog(context);
-        progressDialog.setTitle("Changing User Status");
-        progressDialog.setMessage("Please wait until the status is updated");
-        progressDialog.setCanceledOnTouchOutside(false); // Don't stop it when screen is touched
-        progressDialog.show();
+        progressDialog = new CustomProgressDialog(context);
+        progressDialog.init("Changing User Status", "Please wait until the status is updated");
 
         /* Setup Firebase */
-        FirebaseApp.initializeApp(context);
+        userID = FirebaseAuth.getInstance().getUid();
         dbReference = FirebaseDatabase.getInstance().getReference()
-                .child(Constants.USERS_TABLE).child(mAuth.getUid());
+                .child(Constants.USERS_TABLE).child(userID);
     }
 
-    @Override
-    protected Void doInBackground(String... params) {
-        Log.d(TAG, "doInBackground: Method was invoked!");
-        final String status = params[0];
+    public void execute(final String status) {
+        Log.d(TAG, "execute: Method was invoked!");
 
-        dbReference.child(Constants.STATUS)
-                .setValue(status)
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
+        setup();
 
+        dbReference.child(Constants.STATUS).setValue(status).addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
@@ -73,11 +56,10 @@ public class ChangeStatusTask extends AsyncTask<String, Void, Void> {
                             Log.d(TAG, "Changing Status Failed: " + task.getException().getMessage());
                             Toast.makeText(context, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                         }
-                        hideProgressDialog();
+
+                        progressDialog.hide();
                     }
                 });
-
-        return null;
     }
 
 }

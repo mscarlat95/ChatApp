@@ -69,6 +69,11 @@ public class MainActivity extends AppCompatActivity {
                 Log.d(TAG, "onOptionsItemSelected: All Users");
                 launchActivity(MainActivity.this, UserListActivity.class);
                 return true;
+
+            case R.id.offlineModeItem:
+                Log.d(TAG, "onOptionsItemSelected: Offline Features");
+                launchActivity(MainActivity.this, OfflineFeaturesActivity.class);
+                return true;
         }
 
         return false;
@@ -85,6 +90,7 @@ public class MainActivity extends AppCompatActivity {
         if (mAuth.getCurrentUser() != null) {
             rootDatabaseRef = FirebaseDatabase.getInstance().getReference();
         }
+
 
         /*  Set Toolbar */
         toolbar = (Toolbar) findViewById(R.id.mainPageToolbar);
@@ -127,12 +133,6 @@ public class MainActivity extends AppCompatActivity {
         super.onStop();
 
         if (mAuth.getCurrentUser() != null) {
-//            rootDatabaseRef.child(Constants.USERS_TABLE).child(mAuth.getUid())
-//                    .child(Constants.ONLINE).setValue(false);
-//
-//            rootDatabaseRef.child(Constants.USERS_TABLE).child(mAuth.getUid())
-//                    .child(Constants.LAST_SEEN).setValue(ServerValue.TIMESTAMP);
-
             rootDatabaseRef.child(Constants.USERS_TABLE).child(mAuth.getUid())
                     .child(Constants.ONLINE).setValue(ServerValue.TIMESTAMP);
         }
@@ -180,18 +180,6 @@ public class MainActivity extends AppCompatActivity {
 
     private void enablePermissions() {
         Log.d(TAG, "requestPermissions: Method was invoked!");
-
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M /*Marshmallow*/) {
-//            if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-//                requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, Constants.REQUEST_CODE_READ_EXT);
-//            }
-//            if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-//                requestPermissions(new String[]{Manifest.permission.CAMERA}, Constants.REQUEST_CODE_CAMERA);
-//            }
-//            if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-//                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, Constants.REQUEST_CODE_WRITE_EXT);
-//            }
-//        }
 
         // TODO: create a single request code 
         requestPermissions(new String[] {

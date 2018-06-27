@@ -8,8 +8,6 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
-import android.media.Ringtone;
-import android.media.RingtoneManager;
 import android.os.Build;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
@@ -23,7 +21,7 @@ import java.util.Map;
 
 public class FirebaseMessagingService extends com.google.firebase.messaging.FirebaseMessagingService {
 
-    private static final String TAG = "FirebaseMessagingServic";
+    private static final String TAG = "FirebaseMessagingServ";
 
     @Override
     public void onCreate() {
@@ -101,15 +99,9 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
         }
 
         if (mNotificationManager.areNotificationsEnabled()) {
-//            playNotificationSound();
             mNotificationManager.notify(notificationId, mBuilder.build());
         }
     }
 
-//     TODO: check sounds in priority
-    private void playNotificationSound() {
-        Ringtone ringtone = RingtoneManager.getRingtone(getApplicationContext(),
-                            RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION));
-        ringtone.play();
-    }
+
 }

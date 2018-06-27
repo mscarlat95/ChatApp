@@ -16,6 +16,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -70,6 +71,30 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
             holder.getMessageTextView().setBackgroundResource(R.drawable.friend_message_background);
         }
 
+        /* Display user info: profile image and name */
+        FirebaseDatabase.getInstance().getReference().child(Constants.USERS_TABLE).child(source)
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if (dataSnapshot.exists()) {
+                            final String profileImage = dataSnapshot.child(Constants.PROFILE_IMAGE).getValue().toString();
+                            final String fullname = dataSnapshot.child(Constants.FULLNAME).getValue().toString();
+
+                            if (!((Activity)context).isDestroyed()) {
+                                holder.getFullNameTextView().setText(fullname.split(" ")[0]);
+                                Glide.with(context)
+                                        .load(profileImage)
+                                        .into(holder.getProfileCircleImageView());
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                        Log.d(TAG, "onCancelled: Couldn't retrieve user fullname and profile picture");
+                    }
+                });
+
         /* Display message content */
         switch (type) {
             case Constants.MESSAGE_TYPE_TEXT:
@@ -85,6 +110,7 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
                     holder.getMessageImageView().setVisibility(View.VISIBLE);
                     Glide.with(context)
                             .load(content)
+                            .apply(RequestOptions.placeholderOf(R.drawable.loading))
                             .into(holder.getMessageImageView());
                 }
                 break;
@@ -96,30 +122,6 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
         /* Set timestamp */
         holder.getTimestampTextView().setText(DateFormat.format("dd-MMM HH:mm", timestamp));
 
-        /* Display user info: profile image and name */
-        FirebaseDatabase.getInstance().getReference().child(Constants.USERS_TABLE).child(source)
-                .addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        if (dataSnapshot.exists()) {
-                            final String profileImage = dataSnapshot.child(Constants.PROFILE_IMAGE).getValue().toString();
-                            final String fullname = dataSnapshot.child(Constants.FULLNAME).getValue().toString();
-
-                            if (!((Activity)context).isDestroyed()) {
-                                holder.getFullNameTextView().setText(fullname.split(" ")[0]);
-
-                                Glide.with(context)
-                                        .load(profileImage)
-                                        .into(holder.getProfileCircleImageView());
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-                        Log.d(TAG, "onCancelled: Couldn't retrieve user fullname and profile picture");
-                    }
-                });
     }
 
     @Override

@@ -2,12 +2,10 @@ package com.scarlat.marius.chatapp.tasks;
 
 
 import android.content.Context;
-import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -18,7 +16,7 @@ import com.scarlat.marius.chatapp.general.Constants;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SendMessageTask extends AsyncTask<String, Void, Void> {
+public class SendMessageTask {
 
     private static final String TAG = "SendMessageTask";
 
@@ -31,20 +29,11 @@ public class SendMessageTask extends AsyncTask<String, Void, Void> {
         this.friendID = friendID;
     }
 
-    @Override
-    protected void onPreExecute() {
-        /* Setup Firebase */
-        FirebaseApp.initializeApp(context);
+    public void execute(String content, String contentType) {
+
+        /* Init Firebase */
         rootDatabaseRef = FirebaseDatabase.getInstance().getReference();
         userID = FirebaseAuth.getInstance().getUid();
-    }
-
-    @Override
-    protected Void doInBackground(String... params) {
-        Log.d(TAG, "doInBackground: Method was invoked!");
-
-        String content = params[0];
-        String contentType = params[1];
 
         /* Add message into the database */
         String messageID = rootDatabaseRef.child(Constants.MESSAGES_TABLE)
@@ -82,6 +71,5 @@ public class SendMessageTask extends AsyncTask<String, Void, Void> {
             }
         });
 
-        return null;
     }
 }

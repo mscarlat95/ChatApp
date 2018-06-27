@@ -3,14 +3,12 @@ package com.scarlat.marius.chatapp.tasks;
 
 import android.content.Context;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -20,7 +18,7 @@ import com.google.firebase.storage.UploadTask;
 import com.scarlat.marius.chatapp.general.Constants;
 import com.scarlat.marius.chatapp.general.CustomProgressDialog;
 
-public class SendPhotoTask extends AsyncTask<Uri, Void, Void> {
+public class SendPhotoTask {
 
     private static final String TAG = "SendPhotoTask";
 
@@ -33,26 +31,27 @@ public class SendPhotoTask extends AsyncTask<Uri, Void, Void> {
         this.context = context;
         this.friendID = friendID;
     }
-
-    @Override
-    protected void onPreExecute() {
+    
+    public void setup() {
+        Log.d(TAG, "setup: Method was invoked!");
+        
         /* Setup Firebase */
-        FirebaseApp.initializeApp(context);
         rootDatabaseRef = FirebaseDatabase.getInstance().getReference();
         userID = FirebaseAuth.getInstance().getUid();
 
+        /* Setup progress dialog */
         progressDialog = new CustomProgressDialog(context);
         progressDialog.init("Sending photo", "Wait until the photo is uploaded");
     }
+    
+    public void execute(Uri fileUri) {
+        Log.d(TAG, "execute: Method was invoked!");
 
-    @Override
-    protected Void doInBackground(Uri... params) {
-        Log.d(TAG, "doInBackground: Method was invoked!");
-
-        Uri fileUri = params[0];
+        setup();
 
         final String messageID = rootDatabaseRef.child(Constants.MESSAGES_TABLE).child(userID)
                 .child(friendID).push().getKey();
+
         StorageReference imagesPathRef = FirebaseStorage.getInstance().getReference()
                 .child(Constants.STORAGE_MESSAGE_IMAGES).child(messageID + ".jpg");
 
@@ -79,7 +78,6 @@ public class SendPhotoTask extends AsyncTask<Uri, Void, Void> {
                 }
             }
         });
-
-        return null;
     }
+
 }

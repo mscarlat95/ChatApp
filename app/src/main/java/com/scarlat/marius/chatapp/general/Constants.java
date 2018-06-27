@@ -91,4 +91,9 @@ public class Constants {
     public static final boolean ACTIVE = true;
     public static final boolean INACTIVE = false;
 
+    /* Offline Intent filters */
+    public static final String ACTION_PEER_CONNECTED = "com.action.onPeerConnected";
+    public static final String ACTION_PEER_DISCONNECTED = "com.action.onPeerDisconnected";
+    public static final String ACTION_MESSAGE_RECEIVED = "com.action.onMessageReceived";
+
 }

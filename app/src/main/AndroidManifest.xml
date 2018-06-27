@@ -119,6 +119,13 @@
             </intent-filter>
         </activity>
 
+        <!-- Chat Activity -->
+        <activity
+            android:name=".activities.ChatActivity"
+            android:windowSoftInputMode="adjustPan"
+            android:parentActivityName=".activities.MainActivity">
+        </activity>
+
         <!-- Firebase Notification -->
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
@@ -139,8 +146,29 @@
                 android:value="false"/>
         </application>
 
-        <activity android:name=".activities.ChatActivity"
-            android:parentActivityName=".activities.MainActivity">
+        <!-- Opportunistic Communication -->
+        <service
+            android:name=".services.OpportunisticChannelDemo"
+            android:exported="true"
+            android:process=":channel">
+            <intent-filter>
+                <action android:name="ro.pub.acs.hyccups.opportunistic.IHost"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </service>
+
+        <activity android:name=".activities.OfflineFeaturesActivity">
+            <intent-filter>
+                <action android:name="com.action.onPeerConnected"/>
+                <action android:name="com.action.onPeerDisconnected"/>
+                <action android:name="com.action.onMessageReceived"/>
+            </intent-filter>
+        </activity>
+        <activity android:name=".activities.OpportunisticChatActivity">
+            <intent-filter>
+                <action android:name="com.action.onMessageReceived"/>
+            </intent-filter>
         </activity>
     </application>
 

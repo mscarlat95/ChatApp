@@ -34,7 +34,6 @@ import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -45,10 +44,10 @@ import com.google.firebase.iid.FirebaseInstanceId;
 import com.scarlat.marius.chatapp.R;
 import com.scarlat.marius.chatapp.general.Constants;
 import com.scarlat.marius.chatapp.storage.SharedPref;
-import com.scarlat.marius.chatapp.tasks.RegisterUserTask;
 
 import java.util.Arrays;
-import java.util.concurrent.ExecutionException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class RegisterActivity extends AppCompatActivity {
 
@@ -64,7 +63,7 @@ public class RegisterActivity extends AppCompatActivity {
 
     /* Firebase Auth and RealTime Database */
     private FirebaseAuth mAuth;
-    private DatabaseReference refDatabase;
+//    private DatabaseReference refDatabase;
 
     /* Facebook Login*/
     private ImageButton facebookLoginBtn;
@@ -123,6 +122,7 @@ public class RegisterActivity extends AppCompatActivity {
 
         /* Initialize SharedPreferences */
         SharedPref.setup(getApplicationContext());
+        SharedPref.saveUserLogged(null);
 
         /* Set Android field views */
         emailInputLayout = (TextInputLayout) findViewById(R.id.emailInputLayout);
@@ -147,8 +147,9 @@ public class RegisterActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             Log.d(TAG, "Adding new records about user into the database");
 
-                            new RegisterUserTask(RegisterActivity.this, mAuth)
-                                    .execute(email, fullName, Constants.UNSET);
+                            registerInDatabase(fullName, email, Constants.UNSET);
+
+                            saveUserInfo();
 
                             launchMainActivity();
 
@@ -298,62 +299,87 @@ public class RegisterActivity extends AppCompatActivity {
         Log.d(TAG, "recordDataFromAlternativesLogin: Method was invoked!");
 
         final String userID = mAuth.getUid();
+        final DatabaseReference rootDatabaseRef = FirebaseDatabase.getInstance().getReference();
 
-        refDatabase = FirebaseDatabase.getInstance().getReference().child(Constants.USERS_TABLE);
-        refDatabase.addValueEventListener(new ValueEventListener() {
+        rootDatabaseRef.child(Constants.USERS_TABLE).child(userID).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    Log.d(TAG, "onDataChange: User already exists");
 
-                if (dataSnapshot.hasChild(userID)) {
-                    Log.d(TAG, "onDataChange: User exists");
-
-                   /* Store the new token ID */
+                    /* Update current device id */
                     final String tokenID = FirebaseInstanceId.getInstance().getToken();
+                    Map<String, Object> map = new HashMap<>();
 
-                    FirebaseDatabase.getInstance().getReference().child(Constants.USERS_TABLE).child(userID)
-                            .child(Constants.TOKEN_ID).setValue(tokenID).addOnCompleteListener(new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            if (task.isSuccessful()) {
-                                /* Do something */
-                            } else {
-                                Log.d(TAG, "Cannot update the new token ID");
-                                Toast.makeText(RegisterActivity.this, "Updating tokenID failed", Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                    });
+                    map.put(Constants.TOKEN_ID, tokenID);
+                    rootDatabaseRef.child(Constants.USERS_TABLE).child(mAuth.getUid()).updateChildren(map);
 
                 } else {
-                    Log.d(TAG, "onDataChange: Users doesnt exists ");
+                    Log.d(TAG, "onDataChange: User does not exists");
 
-                    FirebaseUser user = mAuth.getCurrentUser();
-                    String photoUrl = Constants.UNSET;
-                    if (user.getPhotoUrl() != null) {
-                        photoUrl = String.valueOf(user.getPhotoUrl());
-                    }
+                    final String email = mAuth.getCurrentUser().getEmail();
+                    final String fullname = mAuth.getCurrentUser().getDisplayName();
 
-                    try {
-                        new RegisterUserTask(RegisterActivity.this, mAuth)
-                                .execute(user.getEmail(), user.getDisplayName(), photoUrl).get();
-                    } catch (InterruptedException | ExecutionException e) {
-                        e.printStackTrace();
-                    }
+                    String photoUrl = String.valueOf(mAuth.getCurrentUser().getPhotoUrl());
+                    if (photoUrl == null)
+                        photoUrl = Constants.UNSET;
+
+                    registerInDatabase(fullname, email, photoUrl);
                 }
-            }
 
+                saveUserInfo();
+
+                launchMainActivity();
+            }
 
             @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Log.d(TAG, "Check user exists Failed: " + databaseError.getMessage());
-            }
+            public void onCancelled(@NonNull DatabaseError databaseError) { }
         });
+    }
 
+    private void registerInDatabase(final String fullname, final String email, final String photoUrl) {
+        Log.d(TAG, "registerInDatabase: Method was invoked!");
 
-        launchMainActivity();
+        final DatabaseReference rootDatabaseRef = FirebaseDatabase.getInstance().getReference();
+        final String userID = mAuth.getUid();
+        final String tokenID = FirebaseInstanceId.getInstance().getToken();
+        Map<String, Object> userInfo = new HashMap<>();
 
+        userInfo.put(Constants.FULLNAME, fullname);
+        userInfo.put(Constants.EMAIL, email);
+        userInfo.put(Constants.STATUS, Constants.DEFAULT_STATUS_VAL);
+        userInfo.put(Constants.PROFILE_IMAGE, photoUrl);
+        userInfo.put(Constants.NUMBER_OF_FRIENDS, 0);
+        userInfo.put(Constants.TOKEN_ID, tokenID);
+
+        Log.d(TAG, "User ID Token = " + userID);
+        Log.d(TAG, "User Information = " + userInfo.toString());
+
+        rootDatabaseRef.child(Constants.USERS_TABLE).child(userID)
+                .setValue(userInfo)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            Log.d(TAG, "Add info in database success");
+                        } else {
+                            Log.d(TAG, "Add info in database failed");
+                        }
+                    }
+                });
 
     }
 
+
+    private void saveUserInfo() {
+        final String userID = mAuth.getUid();
+        final String tokenID = FirebaseInstanceId.getInstance().getToken();
+
+        /* Store user ID and device ID in the cache memory */
+        SharedPref.saveUserId(userID, mAuth.getCurrentUser().getDisplayName());
+        SharedPref.saveDeviceId(tokenID);
+        SharedPref.saveUserLogged(userID);
+    }
 
     private void launchMainActivity() {
         Log.d(TAG, "launchMainActivity: Method was invoked!");

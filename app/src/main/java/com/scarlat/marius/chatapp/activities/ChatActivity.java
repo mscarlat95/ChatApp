@@ -65,8 +65,22 @@ public class ChatActivity extends AppCompatActivity {
     private MessageListAdapter adapter;
     private List<Message> messages;
 
+    private HashMap<Long, String> messageSet = new HashMap<>();
+
     /* Messages pagination */
     private int currentPage = 1;
+    private boolean refreshActive = false;
+
+    private boolean isDuplicate (Message message) {
+        if (messageSet.containsKey(message.getTimestamp())) {
+            if (messageSet.get(message.getTimestamp()).equals(message.getMessage())) {
+                return true;
+            }
+        }
+
+        messageSet.put(message.getTimestamp(), message.getMessage());
+        return false;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -121,11 +135,12 @@ public class ChatActivity extends AppCompatActivity {
         messageSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                if (messages.size() > 0) {
-                    currentPage ++;
-                    messages.clear();
-                    displayMessages();
-                }
+                currentPage ++;
+                refreshActive = true;
+
+                messages.clear();
+                messageSet = new HashMap<Long, String>();
+                displayMessages();
             }
         });
 
@@ -253,20 +268,22 @@ public class ChatActivity extends AppCompatActivity {
         Query query = rootDatabaseRef.child(Constants.MESSAGES_TABLE).child(userID).child(friendID)
                 .limitToLast(currentPage * Constants.MAX_LOAD_MESSAGES);
 
+
         query.addChildEventListener(new ChildEventListener() {
                     @Override
                     public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                         Log.d(TAG, "Load messages onChildAdded: " + dataSnapshot.toString());
                         Message message = dataSnapshot.getValue(Message.class);
 
+                        if (isDuplicate(message)) {
+                            return;
+                        }
+
                         messages.add(message);
                         adapter.notifyItemInserted(messages.size() - 1);
 
                         int position = Math.max(0, messages.size() - currentPage * Constants.MAX_LOAD_MESSAGES - 1);
-
-//                        int position  = messages.size() - 1;
                         messagesRecylerView.smoothScrollToPosition(position);
-
                         messageSwipeRefreshLayout.setRefreshing(false);
                     }
 
@@ -290,13 +307,14 @@ public class ChatActivity extends AppCompatActivity {
         Log.d(TAG, "sendTextMessage: Method was invoked!");
 
         final String message = messageEditText.getText().toString();
-        if (message.isEmpty()) {
+        if (message.trim().length() == 0) {
             Toast.makeText(ChatActivity.this, "You cannot send an empty message!", Toast.LENGTH_SHORT).show();
             return;
         }
 
         new SendMessageTask(this, friendID).execute(message, Constants.MESSAGE_TYPE_TEXT);
         messageEditText.setText("");
+        currentPage = 0;
     }
 
     private void attachFromGallery() {

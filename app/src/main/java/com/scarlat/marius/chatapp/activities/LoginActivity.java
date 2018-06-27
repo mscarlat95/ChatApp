@@ -102,6 +102,7 @@ public class LoginActivity extends AppCompatActivity {
 
         /* Initialize SharedPreferences */
         SharedPref.setup(getApplicationContext());
+        SharedPref.saveUserLogged(null);
 
         /* Set Android view fields */
         emailInputLayout = (TextInputLayout) findViewById(R.id.emailInputLayout);
@@ -132,16 +133,6 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-
-    private void launchMainActivity() {
-        Intent mainIntent = new Intent(LoginActivity.this, MainActivity.class);
-
-        /* Clear all previous tasks */
-        mainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(mainIntent);
-        finish();
-    }
-
     private void emailAndPassLogin(final String email, final String password) {
         Log.d(TAG, "emailAndPassLogin: Method was invoked!");
 
@@ -152,9 +143,14 @@ public class LoginActivity extends AppCompatActivity {
                     Log.d(TAG, "Login Successful");
                     loginProgress.dismiss();
 
-                    /* Store the new token ID */
+
                     final String tokenID = FirebaseInstanceId.getInstance().getToken();
 
+                    /* Store user ID and device ID in the cache memory */
+                    SharedPref.saveUserId(mAuth.getUid(), mAuth.getCurrentUser().getDisplayName());
+                    SharedPref.saveDeviceId(tokenID);
+
+                    /* Update token id in the database */
                     FirebaseDatabase.getInstance().getReference().child(Constants.USERS_TABLE).child(mAuth.getUid())
                             .child(Constants.TOKEN_ID).setValue(tokenID).addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
@@ -167,6 +163,9 @@ public class LoginActivity extends AppCompatActivity {
                                 } else {
                                     SharedPref.clearCredentials();
                                 }
+
+                                SharedPref.saveUserLogged(mAuth.getUid());
+
                                 launchMainActivity();
 
                             } else {
@@ -184,6 +183,15 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    private void launchMainActivity() {
+        Intent mainIntent = new Intent(LoginActivity.this, MainActivity.class);
+
+        /* Clear all previous tasks */
+        mainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(mainIntent);
+        finish();
     }
 }
 
