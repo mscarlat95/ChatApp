@@ -24,7 +24,6 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -35,6 +34,7 @@ import com.scarlat.marius.chatapp.R;
 import com.scarlat.marius.chatapp.general.Constants;
 import com.scarlat.marius.chatapp.services.UserLocationService;
 import com.scarlat.marius.chatapp.storage.SharedPref;
+import com.scarlat.marius.chatapp.tasks.PopulateMapTask;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -121,7 +121,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         /*  Setup Toolbar */
         toolbar = (Toolbar) findViewById(R.id.mapToolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("Share Your Location");
+        getSupportActionBar().setTitle("Share Location With Friends");
 
         refreshButton = (Button) findViewById(R.id.refreshButton);
         refreshButton.setOnClickListener(new View.OnClickListener() {
@@ -154,8 +154,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                     /* Update user location */
                     userLocation = new LatLng(latitude, longitude);
+
                     SharedPref.saveCoordinates(latitude, longitude);
+
                     updateLocationInDatabase(latitude, longitude);
+
+                    updateMapPosition();
                 }
             };
         }
@@ -245,10 +249,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
 
         mMap.clear();
-//        MapMarkerPopulation.addMarkers(this, mMap);
-        mMap.addMarker(new MarkerOptions()
-                .position(userLocation)
-                .title("Hello world"));
+        new PopulateMapTask(this).execute(mMap);
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 14.0f));
     }
 

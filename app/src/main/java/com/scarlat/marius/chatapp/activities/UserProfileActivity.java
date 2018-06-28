@@ -89,8 +89,13 @@ public class UserProfileActivity extends AppCompatActivity {
         new GetFriendInfoTask(this, friendID, profileImageView, fullNameTextView,
                 statusTextView, friendsNumberTextView).execute();
 
-        /* Check Request States between the users */
-        checkUsersRelationship();
+        if (userID.equals(friendID)) {
+            sendFriendRequestButton.setVisibility(View.INVISIBLE);
+            declineFriendRequestButton.setVisibility(View.INVISIBLE);
+        } else {
+            /* Check Request States between the users */
+            checkUsersRelationship();
+        }
     }
 
 

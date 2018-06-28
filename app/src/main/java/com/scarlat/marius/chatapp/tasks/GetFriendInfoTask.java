@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -82,7 +83,12 @@ public class GetFriendInfoTask {
                             final String status = dataSnapshot.child(Constants.STATUS).getValue().toString();
 
                             statusTextView.setText("Status: " + status);
-                            fullNameTextView.setText(fullname);
+                            if (userID.equals(FirebaseAuth.getInstance().getUid())) {
+                                fullNameTextView.setText(fullname + " (yourself) ");
+                            } else {
+                                fullNameTextView.setText(fullname);
+                            }
+
                             Glide.with(context)
                                     .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.loading))
                                     .load(profileImage)
@@ -110,7 +116,6 @@ public class GetFriendInfoTask {
                 }  else {
                     friendsNumberTextView.setText("Total Friends: 0");
                 }
-
 
                 progressDialog.hide();
             }

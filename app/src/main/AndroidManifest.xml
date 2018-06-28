@@ -175,7 +175,8 @@
                 <action android:name="com.action.onMessageReceived"/>
             </intent-filter>
         </activity>
-        <activity android:name=".activities.OpportunisticChatActivity">
+        <activity android:name=".activities.OpportunisticChatActivity"
+                  android:windowSoftInputMode="adjustPan">
             <intent-filter>
                 <action android:name="com.action.onMessageReceived"/>
             </intent-filter>

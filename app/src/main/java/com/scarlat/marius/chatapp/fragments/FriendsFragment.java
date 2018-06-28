@@ -71,6 +71,7 @@ public class FriendsFragment extends Fragment {
 //        rootDatabaseRef.child(Constants.FRIENDS_TABLE).keepSynced(true);
 
         rootDatabaseRef.child(Constants.FRIENDS_TABLE).child(FirebaseAuth.getInstance().getUid())
+                .orderByChild(Constants.FRIENDS_SINCE)
                 .addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -83,7 +84,7 @@ public class FriendsFragment extends Fragment {
                                     /* Setup friend information */
                                     Friend friend = child.getValue(Friend.class);
                                     friend.setFriendId(child.getKey());
-                                    friends.add(friend);
+                                    friends.add(0, friend);
                                 }
                             }
 

@@ -3,6 +3,8 @@ package com.scarlat.marius.chatapp.model;
 
 import com.scarlat.marius.chatapp.general.Constants;
 
+import java.util.Map;
+
 public class User {
 
     private String userId = Constants.UNSET;
@@ -11,6 +13,7 @@ public class User {
     private String email = Constants.UNSET;
     private String status = Constants.UNSET;
     private String profileImage = Constants.UNSET;
+    private Map<String, Object> location;
 
     public User() {}
     public User(String fullname, String email, String status, String profileImage) {
@@ -35,4 +38,7 @@ public class User {
 
     public String getUserId() { return  userId; }
     public void setUserId(String userId) { this.userId = userId; }
+
+    public void setLocation(Map<String, Object> location) { this.location = location; }
+    public Map<String, Object> getLocation() { return location; }
 }

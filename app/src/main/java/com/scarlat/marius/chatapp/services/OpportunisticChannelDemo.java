@@ -4,16 +4,13 @@ package com.scarlat.marius.chatapp.services;
 import android.content.Intent;
 import android.util.Log;
 
-import com.google.firebase.auth.FirebaseAuth;
 import com.scarlat.marius.chatapp.general.Constants;
-import com.scarlat.marius.chatapp.storage.SharedPref;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import ro.pub.acs.hyccups.opportunistic.Channel;
-import ro.pub.acs.hyccups.opportunistic.SocialInfo;
 
 public class OpportunisticChannelDemo extends Channel{
 
@@ -55,7 +52,10 @@ public class OpportunisticChannelDemo extends Channel{
 
         Intent intent = new Intent(Constants.ACTION_PEER_DISCONNECTED);
         intent.putExtra(Constants.USER_ID, userId);
-        sendBroadcast(intent);
+
+//        TODO: uncomment this
+
+//        sendBroadcast(intent);
     }
 
 
@@ -71,14 +71,13 @@ public class OpportunisticChannelDemo extends Channel{
         Log.d(TAG, "onMessageReceived: sourceUserId = " + sourceUserId + "; destinationUserId = " + destinationUserId);
         Log.d(TAG, "onMessageReceived: message = " + message + "; timestamp = " + timestamp);
 
-        Intent intent = new Intent(Constants.ACTION_PEER_CONNECTED);
+        Intent intent = new Intent(Constants.ACTION_MESSAGE_RECEIVED);
         intent.putExtra(Constants.USER_ID, sourceUserId);
         intent.putExtra(Constants.MESSAGE_CONTENT, message);
         intent.putExtra(Constants.TIMESTAMP, timestamp);
-        // TODO: check destination id is the current user
+
         sendBroadcast(intent);
     }
-
 
     /**
      *
@@ -96,21 +95,21 @@ public class OpportunisticChannelDemo extends Channel{
 
 
     /* Provide customized social information about each user */
-    @Override
-    public SocialInfo getSocialInfo() {
-        Log.d(TAG, "getSocialInfo: Method was invoked !");
-
-        /* Obtain user id */
-        SharedPref.setup(getApplicationContext());
-        String userId = SharedPref.getString(Constants.USER_ID);
-
-        if (userId.equals("")) {
-            userId = FirebaseAuth.getInstance().getUid();
-        }
-        Log.d(TAG, "getSocialInfo: Current userId = " + userId);
-
-        return new SocialInfo(userId);
-    }
+//    @Override
+//    public SocialInfo getSocialInfo() {
+//        Log.d(TAG, "getSocialInfo: Method was invoked !");
+//
+//        /* Obtain user id */
+//        SharedPref.setup(getApplicationContext());
+//        String userId = SharedPref.getString(Constants.USER_ID);
+//
+//        if (userId.equals("")) {
+//            userId = FirebaseAuth.getInstance().getUid();
+//        }
+//        Log.d(TAG, "getSocialInfo: Current userId = " + userId);
+//
+//        return new SocialInfo(userId);
+//    }
 
     /* Used for troubleshooting */
     @Override

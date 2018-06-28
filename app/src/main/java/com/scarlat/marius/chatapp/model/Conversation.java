@@ -1,13 +1,11 @@
 package com.scarlat.marius.chatapp.model;
 
-
 public class Conversation {
 
     private static final String TAG = "Conversation";
 
     private boolean seen;
     private long timestamp;
-
     private String friendID;
 
     /* Constructor */

@@ -117,13 +117,15 @@ public class OpportunisticChatActivity extends AppCompatActivity {
 
         /* Send message to friend */
         connection.forward(friendId, messageContent);
+
+        messageEditText.setText("");
     }
 
     @Override
     protected void onResume() {
         Log.d(TAG, "onResume: Method was invoked!");
         super.onResume();
-        addFilters();
+        registerReceiver(broadcastReceiver, new IntentFilter(Constants.ACTION_MESSAGE_RECEIVED));
     }
 
     @Override
@@ -132,13 +134,7 @@ public class OpportunisticChatActivity extends AppCompatActivity {
         unregisterReceiver(broadcastReceiver);
         super.onPause();
     }
-
-    private void addFilters() {
-        Log.d(TAG, "addFilters: Method was invoked!");
-        IntentFilter filters = new IntentFilter();
-        filters.addAction(Constants.ACTION_MESSAGE_RECEIVED);
-        registerReceiver(broadcastReceiver, filters);
-    }
+    
 
     private void setupBroadcastReceiver() {
         Log.d(TAG, "setupBroadcastReceiver: Method was invoked!");
@@ -147,6 +143,7 @@ public class OpportunisticChatActivity extends AppCompatActivity {
             broadcastReceiver = new BroadcastReceiver() {
                 @Override
                 public void onReceive(Context context, Intent intent) {
+                    Log.d(TAG, "onReceive: Method was invoked!");
                     final String action = intent.getAction();
 
                     if (action.equals(Constants.ACTION_MESSAGE_RECEIVED)) {
@@ -163,7 +160,7 @@ public class OpportunisticChatActivity extends AppCompatActivity {
 
         final String friendId = intent.getStringExtra(Constants.USER_ID);
         final String messageContent = intent.getStringExtra(Constants.MESSAGE_CONTENT);
-        final long timestamp = Long.valueOf(intent.getStringExtra(Constants.TIMESTAMP));
+        final long timestamp = intent.getLongExtra(Constants.TIMESTAMP, 0);
 
         Message message = new Message();
         message.setFrom(friendId);

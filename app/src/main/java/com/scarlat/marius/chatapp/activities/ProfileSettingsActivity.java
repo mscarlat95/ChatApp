@@ -19,6 +19,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.scarlat.marius.chatapp.R;
 import com.scarlat.marius.chatapp.general.Constants;
@@ -84,7 +85,15 @@ public class ProfileSettingsActivity extends AppCompatActivity {
         Log.d(TAG, "changeUserStatus: Method was invoked!");
 
         if (statusEditText.isEnabled()) {
-            new ChangeStatusTask(ProfileSettingsActivity.this).execute(statusEditText.getText().toString());
+
+            final String status = statusEditText.getText().toString();
+
+            if (status.trim().length() == 0) {
+                Toast.makeText(this, "You cannot leave the status empty!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            new ChangeStatusTask(ProfileSettingsActivity.this).execute(status);
             statusEditText.setEnabled(false);
             statusEditText.setTextColor(emailEditText.getTextColors());
             changeStatusButton.setText(R.string.change_status_btn);

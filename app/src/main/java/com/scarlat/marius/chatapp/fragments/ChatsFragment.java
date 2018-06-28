@@ -72,7 +72,7 @@ public class ChatsFragment extends Fragment {
     private void loadConversations() {
         Log.d(TAG, "loadConversations: Method was invoked!");
 
-        rootDatabaseRef.child(Constants.CHAT_TABLE).child(userID).addValueEventListener(new ValueEventListener() {
+        rootDatabaseRef.child(Constants.CHAT_TABLE).child(userID).orderByChild(Constants.TIMESTAMP).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
@@ -85,7 +85,7 @@ public class ChatsFragment extends Fragment {
                             Conversation conversation = dataSnapshot.getValue(Conversation.class);
 
                             conversation.setFriendID(friendID);
-                            conversations.add(conversation);
+                            conversations.add(0, conversation);
                         }
                     }
 

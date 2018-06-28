@@ -92,7 +92,7 @@ public class UserListActivity extends AppCompatActivity {
 
         DatabaseReference dbReference = FirebaseDatabase.getInstance().getReference().child(Constants.USERS_TABLE);
 
-        dbReference.addChildEventListener(new ChildEventListener() {
+        dbReference.orderByChild(Constants.FULLNAME).addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                 if (dataSnapshot.exists()) {
