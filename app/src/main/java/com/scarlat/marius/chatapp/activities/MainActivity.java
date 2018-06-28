@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
@@ -70,6 +71,11 @@ public class MainActivity extends AppCompatActivity {
                 launchActivity(MainActivity.this, UserListActivity.class);
                 return true;
 
+            case R.id.shareLocationItem:
+                Log.d(TAG, "onOptionsItemSelected: Share Location");
+                launchActivity(MainActivity.this, MapsActivity.class);
+                return true;
+
             case R.id.offlineModeItem:
                 Log.d(TAG, "onOptionsItemSelected: Offline Features");
                 launchActivity(MainActivity.this, OfflineFeaturesActivity.class);
@@ -90,7 +96,6 @@ public class MainActivity extends AppCompatActivity {
         if (mAuth.getCurrentUser() != null) {
             rootDatabaseRef = FirebaseDatabase.getInstance().getReference();
         }
-
 
         /*  Set Toolbar */
         toolbar = (Toolbar) findViewById(R.id.mainPageToolbar);
@@ -181,12 +186,19 @@ public class MainActivity extends AppCompatActivity {
     private void enablePermissions() {
         Log.d(TAG, "requestPermissions: Method was invoked!");
 
-        // TODO: create a single request code 
-        requestPermissions(new String[] {
-                Manifest.permission.READ_EXTERNAL_STORAGE,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                Manifest.permission.CAMERA
-        }, Constants.REQUEST_CODE_READ_EXT);
+
+        if (Build.VERSION.SDK_INT >= 23) {
+
+            // TODO: create a single request code
+            requestPermissions(new String[]{
+                    Manifest.permission.READ_EXTERNAL_STORAGE,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                    Manifest.permission.CAMERA,
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+            }, Constants.REQUEST_CODE_READ_EXT);
+
+        }
     }
 
     @Override

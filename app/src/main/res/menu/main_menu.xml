@@ -9,6 +9,9 @@
         android:id="@+id/allUsersItem"
         android:title="View All Users"/>
     <item
+        android:id="@+id/shareLocationItem"
+        android:title="Share Location"/>
+    <item
         android:id="@+id/offlineModeItem"
         android:title="Offline Features"/>
     <item

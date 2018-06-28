@@ -27,25 +27,24 @@ public class ChatApp extends Application {
         Log.d(TAG, "onCreate: Method was invoked!");
         super.onCreate();
 
-        /* Firebase Messaging Service */
+        /* Init Firebase Messaging */
         FirebaseApp.initializeApp(this);
         FirebaseMessaging.getInstance().setAutoInitEnabled(true);
 
-        /* Offline database */
-//        DatabaseUtil.setupDatabase();
-
-        /* Obtain current user */
+        /* Check if user is logged in */
         mAuth = FirebaseAuth.getInstance();
         if (mAuth.getCurrentUser() == null) {
             Log.d(TAG, "onCreate: User is NULL");
             return;
         }
 
+
         /* Setup Listener for online user */
         usersDatabaseRef = FirebaseDatabase.getInstance().getReference().child(Constants.USERS_TABLE).child(mAuth.getUid());
         usersDatabaseRef.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
                         /* On disconnect, set user OFFLINE */
                         if (dataSnapshot.getValue() != null) {
                             usersDatabaseRef.child(Constants.ONLINE).onDisconnect().setValue(ServerValue.TIMESTAMP);

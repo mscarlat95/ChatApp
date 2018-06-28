@@ -82,4 +82,12 @@ public class SharedPref {
         preferencesEditor.apply();
     }
 
+    public static void saveCoordinates(double latitude, double longitude) {
+        Log.d(TAG, "saveCoordinates: Method was invoked!");
+
+        preferencesEditor = sharedPreferences.edit();
+        preferencesEditor.putString(Constants.USER_LATITUDE, String.valueOf(latitude));
+        preferencesEditor.putString(Constants.USER_LONGITUDE, String.valueOf(longitude));
+        preferencesEditor.apply();
+    }
 }

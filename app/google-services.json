@@ -23,6 +23,14 @@
           }
         },
         {
+          "client_id": "534743571431-s5malj74l20ilppkq2hd2ipn3g4q8n7s.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.scarlat.marius.chatapp",
+            "certificate_hash": "eef1002dda0f55b9e03266cce2f0c05517868e74"
+          }
+        },
+        {
           "client_id": "534743571431-n96upmdia45v605gp4lq7b74707efs73.apps.googleusercontent.com",
           "client_type": 3
         }

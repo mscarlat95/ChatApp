@@ -17,6 +17,7 @@ public class Constants {
     public static final int REQUEST_CODE_CAMERA = 9;
     public static final int REQUEST_CODE_WRITE_EXT = 10;
     public static final int REQUEST_CODE_SIGN_IN = 21;
+    public static final int REQUEST_CODE_ENABLE_GPS = 14;
 
     /* User Info */
     public static final String TOKEN_ID = "tokenId";
@@ -95,5 +96,13 @@ public class Constants {
     public static final String ACTION_PEER_CONNECTED = "com.action.onPeerConnected";
     public static final String ACTION_PEER_DISCONNECTED = "com.action.onPeerDisconnected";
     public static final String ACTION_MESSAGE_RECEIVED = "com.action.onMessageReceived";
+
+
+    /* Geolocation */
+    public static final String ACTION_LOCATION_UPDATE = "com.action.userLocation";
+    public static final String USER_LONGITUDE = "longitude";
+    public static final String USER_LATITUDE = "latitude";
+    public static final String USER_LOCATION = "location";
+
 
 }

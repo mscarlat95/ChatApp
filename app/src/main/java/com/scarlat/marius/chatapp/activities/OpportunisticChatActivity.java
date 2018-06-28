@@ -129,8 +129,8 @@ public class OpportunisticChatActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         Log.d(TAG, "onPause: Method was invoked!");
-        super.onPause();
         unregisterReceiver(broadcastReceiver);
+        super.onPause();
     }
 
     private void addFilters() {
