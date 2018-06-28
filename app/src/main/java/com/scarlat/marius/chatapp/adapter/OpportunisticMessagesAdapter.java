@@ -104,6 +104,7 @@ public class OpportunisticMessagesAdapter extends RecyclerView.Adapter<Opportuni
             messageImageView = rootView.findViewById(R.id.messageImageView);
 
             messageImageView.setVisibility(View.GONE);
+            timestampTextView.setVisibility(View.VISIBLE);
         }
     }
 }

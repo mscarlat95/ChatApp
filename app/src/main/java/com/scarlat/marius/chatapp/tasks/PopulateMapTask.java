@@ -4,6 +4,7 @@ package com.scarlat.marius.chatapp.tasks;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
@@ -170,11 +171,8 @@ public class PopulateMapTask {
         });
 
         MapMarker point = new MapMarker(context, marker);
-        try {
-            Picasso.with(context)
-                    .load(user.getProfileImage())
-                    .into(point);
-        } catch (Exception e) {}
-
+        Picasso.with(context)
+                .load(Uri.parse(user.getProfileImage()))
+                .into(point);
     }
 }

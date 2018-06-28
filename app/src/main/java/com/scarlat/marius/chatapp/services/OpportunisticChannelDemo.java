@@ -4,13 +4,17 @@ package com.scarlat.marius.chatapp.services;
 import android.content.Intent;
 import android.util.Log;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.scarlat.marius.chatapp.general.Constants;
+import com.scarlat.marius.chatapp.storage.SharedPref;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import ro.pub.acs.hyccups.opportunistic.Channel;
+import ro.pub.acs.hyccups.opportunistic.SocialInfo;
 
 public class OpportunisticChannelDemo extends Channel{
 
@@ -95,21 +99,28 @@ public class OpportunisticChannelDemo extends Channel{
 
 
     /* Provide customized social information about each user */
-//    @Override
-//    public SocialInfo getSocialInfo() {
-//        Log.d(TAG, "getSocialInfo: Method was invoked !");
-//
-//        /* Obtain user id */
-//        SharedPref.setup(getApplicationContext());
-//        String userId = SharedPref.getString(Constants.USER_ID);
-//
-//        if (userId.equals("")) {
-//            userId = FirebaseAuth.getInstance().getUid();
-//        }
-//        Log.d(TAG, "getSocialInfo: Current userId = " + userId);
-//
-//        return new SocialInfo(userId);
-//    }
+    @Override
+    public SocialInfo getSocialInfo() {
+        Log.d(TAG, "getSocialInfo: Method was invoked !");
+
+        /* Initialize shared preferences */
+        SharedPref.setup(getApplicationContext());
+
+        /* Obtain user id */
+        String userId = SharedPref.getString(Constants.USER_ID);
+        if (userId.equals("")) {
+            userId = FirebaseAuth.getInstance().getUid();
+        }
+        Log.d(TAG, "getSocialInfo: Current userId = " + userId);
+
+        /* Obtain user friends */
+        List<String> friends = new ArrayList<>();
+        Set<String> friendsSet = SharedPref.getFriendsSet();
+        friends.addAll(friendsSet);
+        Log.d(TAG, "getSocialInfo: Friends Ids = " + friends.toString());
+
+        return new SocialInfo(userId, friends);
+    }
 
     /* Used for troubleshooting */
     @Override

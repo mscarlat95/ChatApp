@@ -6,12 +6,22 @@ import android.util.Log;
 
 import com.scarlat.marius.chatapp.general.Constants;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 public class SharedPref {
     private static final String TAG = "SharedPref";
 
     // Data storage
     private static SharedPreferences sharedPreferences;
     private static SharedPreferences.Editor preferencesEditor;
+
+    private static Set<String> friendsSet = new HashSet<>();
+
+    public static Set<String> getFriendsSet() {
+        return  sharedPreferences.getStringSet(Constants.FRIENDS_TABLE, new HashSet<String>());
+    }
 
     public static void setup (Context context) {
         if (sharedPreferences == null) {
@@ -63,8 +73,9 @@ public class SharedPref {
         preferencesEditor = sharedPreferences.edit();
         preferencesEditor.putString(friendId, friendName);
         preferencesEditor.apply();
-    }
 
+        addFriendInSet(friendId);
+    }
 
     public static String getString (String key) {
         return sharedPreferences.getString(key, "");
@@ -90,4 +101,16 @@ public class SharedPref {
         preferencesEditor.putString(Constants.USER_LONGITUDE, String.valueOf(longitude));
         preferencesEditor.apply();
     }
+
+    public static void addFriendInSet(final String userId) {
+        Log.d(TAG, "addFriendInSet: " + userId);
+
+        preferencesEditor = sharedPreferences.edit();
+        friendsSet.add(userId);
+        preferencesEditor.putStringSet(Constants.FRIENDS_TABLE, friendsSet);
+        preferencesEditor.apply();
+
+        Log.d(TAG, "addFriendInSet: Set = " + Arrays.toString(friendsSet.toArray()));
+    }
+
 }

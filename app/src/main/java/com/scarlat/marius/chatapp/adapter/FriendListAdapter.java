@@ -135,6 +135,7 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Fr
                         final String fullname = dataSnapshot.child(Constants.FULLNAME).getValue().toString();
                         final String profileImageUrl = dataSnapshot.child(Constants.PROFILE_IMAGE).getValue().toString();
 
+                        // TODO: exception Index out of bounds
                         /* Save in cache memory friends details */
                         SharedPref.saveFriend(friends.get(position).getFriendId(), fullname);
 
@@ -166,7 +167,7 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Fr
 
         /* Set the date since the users are friends */
         holder.getDateTextView().setText( "Friends since " +
-                DateFormat.format("MMM-dd-yyyy", friends.get(position).getFriendshipDate()));
+                DateFormat.format("MM-dd-yyyy", friends.get(position).getFriendshipDate()));
     }
 
 

@@ -134,7 +134,6 @@ public class OpportunisticChatActivity extends AppCompatActivity {
         unregisterReceiver(broadcastReceiver);
         super.onPause();
     }
-    
 
     private void setupBroadcastReceiver() {
         Log.d(TAG, "setupBroadcastReceiver: Method was invoked!");
@@ -170,6 +169,8 @@ public class OpportunisticChatActivity extends AppCompatActivity {
 
         messages.add(message);
         adapter.notifyDataSetChanged();
+
+        messagesRecylerView.smoothScrollToPosition(messages.size() - 1);
     }
 
 }
