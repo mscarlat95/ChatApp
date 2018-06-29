@@ -56,13 +56,16 @@ public class OpportunisticMessagesAdapter extends RecyclerView.Adapter<Opportuni
         final String timestamp = DateFormat.format("dd-MMM HH:mm", message.getTimestamp()).toString();
         final String fullname = SharedPref.getString(sourceId);
 
+        Log.d(TAG,  "onBindViewHolder: " + sourceId + "; " + messageContent + "; " +
+                    timestamp + "; " + fullname);
+
         if (sourceId.equals(SharedPref.getString(Constants.USER_ID))) {
             holder.getMessageTextView().setBackgroundResource(R.drawable.user_message_layout);
         } else {
             holder.getMessageTextView().setBackgroundResource(R.drawable.friend_message_background);
         }
 
-        holder.getFullNameTextView().setText(fullname);
+        holder.getFullNameTextView().setText(fullname.split(" ")[0]);
         holder.getMessageTextView().setText(messageContent);
         holder.getTimestampTextView().setText(timestamp);
     }
@@ -75,7 +78,6 @@ public class OpportunisticMessagesAdapter extends RecyclerView.Adapter<Opportuni
 
 
     class OpportunisticMessagesViewHolder extends RecyclerView.ViewHolder {
-
         private View rootView;
 
         private TextView fullNameTextView;
@@ -104,7 +106,8 @@ public class OpportunisticMessagesAdapter extends RecyclerView.Adapter<Opportuni
             messageImageView = rootView.findViewById(R.id.messageImageView);
 
             messageImageView.setVisibility(View.GONE);
-            timestampTextView.setVisibility(View.VISIBLE);
+            timestampTextView.setAlpha(1.0f);
+
         }
     }
 }

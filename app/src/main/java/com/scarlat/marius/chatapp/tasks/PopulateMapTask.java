@@ -49,7 +49,6 @@ public class PopulateMapTask {
         available = false;
         Log.d(TAG, "Map is locked");
 
-
         /* Add current user on the map */
         rootDatabaseRef.child(Constants.USERS_TABLE).child(mAuth.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -66,7 +65,6 @@ public class PopulateMapTask {
                 Log.d(TAG, "addMarkers: onCancelled: " + databaseError.getMessage());
             }
         });
-
 
         /* Add user friends on the map */
         rootDatabaseRef.child(Constants.FRIENDS_TABLE).child(mAuth.getUid())
@@ -103,7 +101,6 @@ public class PopulateMapTask {
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
                 Log.d(TAG, "addMarkers: onCancelled: " + databaseError.getMessage());
-
                 available = true;
             }
         });
@@ -152,7 +149,12 @@ public class PopulateMapTask {
         }
         final String distance = String.format("%.2f", (resultDistance[0] / 1000)) + "km";
 
-        final String lastUpdate = GetTimeAgo.getTimeAgo(Long.parseLong(user.getLocation().get(Constants.LAST_SEEN).toString()));
+        String lastUpdate = GetTimeAgo.getTimeAgo(Long.parseLong(user.getLocation().get(Constants.LAST_SEEN).toString()));
+
+        if (lastUpdate.equals(Constants.UNSET)) {
+            /* Prevent server time differences */
+            lastUpdate = "just now";
+        }
 
         /* Build snippet */
         final String snippet =  "Email: " + user.getEmail() + "\n" +
@@ -177,7 +179,6 @@ public class PopulateMapTask {
         map.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
             @Override
             public void onInfoWindowClick(Marker marker) {
-
                 if (marker.getTag() != null) {
                     final String userID = marker.getTag().toString();
                     Intent intent = new Intent(context, UserProfileActivity.class);
@@ -189,11 +190,13 @@ public class PopulateMapTask {
         });
 
         // TODO: https://stackoverflow.com/questions/44101664/marker-seticon-throws-java-lang-illegalargumentexception-unmanaged-descriptor
-        if (marker.isVisible()) {
-            MapMarker point = new MapMarker(context, marker);
-            Picasso.with(context)
-                    .load(Uri.parse(user.getProfileImage()))
-                    .into(point);
-        }
+        try {
+            if (marker.isVisible()) {
+                MapMarker point = new MapMarker(context, marker);
+                Picasso.with(context)
+                        .load(Uri.parse(user.getProfileImage()))
+                        .into(point);
+            }
+        } catch (Exception e) {}
     }
 }

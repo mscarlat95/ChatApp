@@ -22,7 +22,9 @@ import com.scarlat.marius.chatapp.model.Message;
 import com.scarlat.marius.chatapp.storage.SharedPref;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import ro.pub.acs.hyccups.opportunistic.Connection;
 
@@ -43,6 +45,7 @@ public class OpportunisticChatActivity extends AppCompatActivity {
     private BroadcastReceiver broadcastReceiver;
 
     private List<Message> messages;
+    private Map<Long, String> receivedMessageSet;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +78,7 @@ public class OpportunisticChatActivity extends AppCompatActivity {
         }
 
         /* Init messages */
+        receivedMessageSet = new HashMap<>();
         messages = new ArrayList<>();
 
         /* Init Views */
@@ -95,6 +99,7 @@ public class OpportunisticChatActivity extends AppCompatActivity {
 
         /* Init communication channel */
         connection = new Connection(getApplicationContext(), "OpportunisticChannelDemo");
+        connection.notifyFriendsChanged();
     }
 
 
@@ -114,6 +119,7 @@ public class OpportunisticChatActivity extends AppCompatActivity {
         message.setTimestamp(System.currentTimeMillis());
         messages.add(message);
         adapter.notifyDataSetChanged();
+        messagesRecylerView.smoothScrollToPosition(messages.size() - 1);
 
         /* Send message to friend */
         connection.forward(friendId, messageContent);
@@ -161,16 +167,19 @@ public class OpportunisticChatActivity extends AppCompatActivity {
         final String messageContent = intent.getStringExtra(Constants.MESSAGE_CONTENT);
         final long timestamp = intent.getLongExtra(Constants.TIMESTAMP, 0);
 
-        Message message = new Message();
-        message.setFrom(friendId);
-        message.setMessage(messageContent);
-        message.setType(Constants.MESSAGE_TYPE_TEXT);
-        message.setTimestamp(timestamp);
+        if (!receivedMessageSet.containsKey(timestamp)) {
+            Message message = new Message();
+            message.setFrom(friendId);
+            message.setMessage(messageContent);
+            message.setType(Constants.MESSAGE_TYPE_TEXT);
+            message.setTimestamp(timestamp);
 
-        messages.add(message);
-        adapter.notifyDataSetChanged();
+            messages.add(message);
+            adapter.notifyDataSetChanged();
 
-        messagesRecylerView.smoothScrollToPosition(messages.size() - 1);
+            messagesRecylerView.smoothScrollToPosition(messages.size() - 1);
+            receivedMessageSet.put(timestamp, messageContent);
+        }
     }
 
 }

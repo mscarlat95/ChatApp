@@ -29,6 +29,8 @@ import com.scarlat.marius.chatapp.storage.SharedPref;
 import java.util.ArrayList;
 import java.util.List;
 
+import ro.pub.acs.hyccups.opportunistic.Connection;
+
 public class OfflineFeaturesActivity extends AppCompatActivity {
 
     private static final String TAG = "OfflineFeaturesActivity";
@@ -64,6 +66,10 @@ public class OfflineFeaturesActivity extends AppCompatActivity {
         inRangeUsersRecyclerView = (RecyclerView) findViewById(R.id.inRangeUsersRecyclerView);
         inRangeUsersRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         inRangeUsersRecyclerView.setAdapter(adapter);
+
+        Connection conn = new Connection(this, "OpportunisticChannelDemo");
+        conn.register();
+        conn.notifyFriendsChanged();
     }
 
     private void initToolbar() {

@@ -101,6 +101,17 @@ public class OpportunisticChannelDemo extends Channel{
     /* Provide customized social information about each user */
     @Override
     public SocialInfo getSocialInfo() {
+        SocialInfo prev = super.getSocialInfo();
+
+        if (prev == null) {
+            Log.d(TAG, "getSocialInfo: Prev is NULL");
+        } else {
+
+            Log.d(TAG, "getSocialInfo: Prev = " + prev.toString());
+            Log.d(TAG, "getSocialInfo: Prev Id = " + prev.getId());
+            Log.d(TAG, "getSocialInfo: Friends Ids = " + prev.getFriends().toString());
+        }
+
         Log.d(TAG, "getSocialInfo: Method was invoked !");
 
         /* Initialize shared preferences */
@@ -122,9 +133,14 @@ public class OpportunisticChannelDemo extends Channel{
         return new SocialInfo(userId, friends);
     }
 
-    /* Used for troubleshooting */
-    @Override
-    public void onDisconnected(String error) {
-        Log.d(TAG, "onDisconnected: Error = " + error);
-    }
+//    /* Used for troubleshooting */
+//    @Override
+//    public void onDisconnected(String error) {
+//        super.onDisconnected(error);
+//        Log.d(TAG, "onDisconnected: Error = " + error);
+//    }
+
+
+
+
 }

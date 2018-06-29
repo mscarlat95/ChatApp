@@ -86,7 +86,7 @@ public class UserLocationService extends Service {
         /* Choose criteria */
         Criteria criteria = new Criteria();
 
-        criteria.setPowerRequirement(Criteria.POWER_LOW); // Chose your desired power consumption level.
+        criteria.setPowerRequirement(Criteria.POWER_HIGH); // Chose your desired power consumption level.
         criteria.setAccuracy(Criteria.ACCURACY_FINE); // Choose your accuracy requirement.
         criteria.setSpeedRequired(true); // Chose if speed for first location fix is required.
         criteria.setAltitudeRequired(false); // Choose if you use altitude.
