@@ -3,6 +3,7 @@ package com.scarlat.marius.chatapp.adapter;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.support.annotation.NonNull;
@@ -121,7 +122,6 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
 
         /* Set timestamp */
         holder.getTimestampTextView().setText(DateFormat.format("dd-MMM HH:mm", timestamp));
-
     }
 
     @Override
@@ -161,6 +161,42 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
             }
         }
 
+        class ImageListener implements View.OnClickListener {
+            @Override
+            public void onClick(final View v) {
+                if (! (v instanceof  ImageView)) {
+                    return;
+                }
+
+                final Dialog dialog = new Dialog(context);
+                dialog.setContentView(R.layout.user_image_layout);
+
+                final int width = ViewGroup.LayoutParams.MATCH_PARENT;
+                final int height = ViewGroup.LayoutParams.WRAP_CONTENT;
+                dialog.getWindow().setLayout(width, height);
+
+                ImageView profileImage = (ImageView) dialog.findViewById(R.id.profileImageView);
+                profileImage.setImageDrawable(((ImageView) v).getDrawable());
+
+
+                try {
+                    ((Activity) context).findViewById(R.id.chatMainLayout).setVisibility(View.INVISIBLE);
+                } catch (Exception e) {}
+
+                dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                    @Override
+                    public void onCancel(DialogInterface dialog) {
+                        try {
+                            ((Activity) context).findViewById(R.id.chatMainLayout).setVisibility(View.VISIBLE);
+                        } catch (Exception e) {}
+
+                        new DisplayInfoListener().onClick(v);
+                    }
+                });
+                dialog.show();
+            }
+        }
+
         class CopyInfoListener implements View.OnLongClickListener {
             private void setClipboard(String text) {
                 android.content.ClipboardManager clipboard = (android.content.ClipboardManager)
@@ -171,27 +207,28 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
 
             @Override
             public boolean onLongClick(View v) {
-                if (v instanceof TextView) {
-                    final String text = ((TextView) v).getText().toString();
-                    final String[] availableOptions = { "Copy Text" };
-
-                    new AlertDialog.Builder(context)
-                            .setItems(availableOptions, new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    switch (which) {
-                                        case 0:     /* Copy message in clipboard */
-                                            setClipboard(text);
-                                            break;
-                                        default:
-                                            Log.d(TAG, "onClick: Undefined item clicked");
-                                            break;
-                                    }
-                                }
-                            }).show();
-                    return true;
+                if (! (v instanceof  TextView)) {
+                    return false;
                 }
-                return false;
+
+                final String text = ((TextView) v).getText().toString();
+                final String[] availableOptions = { "Copy Text" };
+
+                new AlertDialog.Builder(context)
+                        .setItems(availableOptions, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                switch (which) {
+                                    case 0:     /* Copy message in clipboard */
+                                        setClipboard(text);
+                                        break;
+                                    default:
+                                        Log.d(TAG, "onClick: Undefined item clicked");
+                                        break;
+                                }
+                            }
+                        }).show();
+                return true;
             }
         }
 
@@ -210,7 +247,7 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
             /* Setup adapters */
             messageTextView.setOnLongClickListener(new CopyInfoListener());
             messageTextView.setOnClickListener(new DisplayInfoListener());
-            messageImageView.setOnClickListener(new DisplayInfoListener());
+            messageImageView.setOnClickListener(new ImageListener());
         }
     }
 }

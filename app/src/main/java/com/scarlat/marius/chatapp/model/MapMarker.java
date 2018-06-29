@@ -41,12 +41,21 @@ public class MapMarker implements Target {
     @Override
     public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
         Log.d(TAG, "onBitmapLoaded: Method was invoked!");
-        
+
+        if (marker == null || !marker.isVisible()) {
+            Log.d(TAG, "onBitmapLoaded: Marker is not available");
+            return;
+        }
+
         final float scale = context.getResources().getDisplayMetrics().density;
         int pixels = (int) (100 /*dp*/ * scale * 0.5f);
 
-        Bitmap resized = Bitmap.createScaledBitmap(bitmap,pixels, pixels, true);
-        marker.setIcon(BitmapDescriptorFactory.fromBitmap(addWhiteBorder(resized, 3)));
+
+        // TODO: Unmanaged descriptor
+        try {
+            Bitmap resized = Bitmap.createScaledBitmap(bitmap, pixels, pixels, true);
+            marker.setIcon(BitmapDescriptorFactory.fromBitmap(addWhiteBorder(resized, 3)));
+        } catch (Exception e) {}
     }
 
     @Override

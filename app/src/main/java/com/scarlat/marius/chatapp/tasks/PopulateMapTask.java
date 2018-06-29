@@ -34,12 +34,21 @@ public class PopulateMapTask {
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private DatabaseReference rootDatabaseRef = FirebaseDatabase.getInstance().getReference();
 
+    private boolean available = false;
+
+    public boolean isAvailable() { return available; }
+
     public PopulateMapTask(Context context) {
         this.context = context;
+        available = true;
     }
 
     public void execute(final GoogleMap map) {
         Log.d(TAG, "addMarkers: Method was invoked!");
+
+        available = false;
+        Log.d(TAG, "Map is locked");
+
 
         /* Add current user on the map */
         rootDatabaseRef.child(Constants.USERS_TABLE).child(mAuth.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -85,12 +94,17 @@ public class PopulateMapTask {
                             }
                         });
                     }
+
+                    available = true;
+                    Log.d(TAG, "Map is available");
                 }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
                 Log.d(TAG, "addMarkers: onCancelled: " + databaseError.getMessage());
+
+                available = true;
             }
         });
     }
@@ -138,19 +152,23 @@ public class PopulateMapTask {
         }
         final String distance = String.format("%.2f", (resultDistance[0] / 1000)) + "km";
 
-        final String lastUpdate = GetTimeAgo.getTimeAgo(Long.valueOf(user.getLocation().get(Constants.LAST_SEEN).toString()));
+        final String lastUpdate = GetTimeAgo.getTimeAgo(Long.parseLong(user.getLocation().get(Constants.LAST_SEEN).toString()));
 
         /* Build snippet */
-        final String snippet = "Email: " + user.getEmail() + "\n" +
-                "Last Update: " + lastUpdate + "\n" +
-                "Approximate distance: " + distance;
-
+        final String snippet =  "Email: " + user.getEmail() + "\n" +
+                                "Last Update: " + lastUpdate + "\n" +
+                                "Approximate distance: " + distance;
 
         Marker marker = map.addMarker(new MarkerOptions()
                 .title(title)
                 .snippet(snippet)
                 .anchor(0.5f, 1)
                 .position(location));
+
+        if (marker == null) {
+            Log.d(TAG, "addMarker: Marker is null");
+            return;
+        }
 
         marker.setTag(user.getUserId());
 
@@ -170,9 +188,12 @@ public class PopulateMapTask {
             }
         });
 
-        MapMarker point = new MapMarker(context, marker);
-        Picasso.with(context)
-                .load(Uri.parse(user.getProfileImage()))
-                .into(point);
+        // TODO: https://stackoverflow.com/questions/44101664/marker-seticon-throws-java-lang-illegalargumentexception-unmanaged-descriptor
+        if (marker.isVisible()) {
+            MapMarker point = new MapMarker(context, marker);
+            Picasso.with(context)
+                    .load(Uri.parse(user.getProfileImage()))
+                    .into(point);
+        }
     }
 }

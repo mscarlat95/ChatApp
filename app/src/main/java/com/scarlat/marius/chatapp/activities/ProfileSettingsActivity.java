@@ -15,6 +15,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -119,6 +120,10 @@ public class ProfileSettingsActivity extends AppCompatActivity {
         if (view.getId() == R.id.avatarCircleImageView) {
             final Dialog dialog = new Dialog(this);
             dialog.setContentView(R.layout.user_image_layout);
+
+            final int width = ViewGroup.LayoutParams.MATCH_PARENT;
+            final int height = ViewGroup.LayoutParams.WRAP_CONTENT;
+            dialog.getWindow().setLayout(width, height);
 
             ImageView profileImage = (ImageView) dialog.findViewById(R.id.profileImageView);
             profileImage.setImageDrawable(avatarCircleImageView.getDrawable());

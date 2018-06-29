@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="com.scarlat.marius.chatapp">
 
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.CAMERA"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
@@ -168,7 +169,9 @@
             </intent-filter>
         </service>
 
-        <activity android:name=".activities.OfflineFeaturesActivity">
+        <activity android:name=".activities.OfflineFeaturesActivity"
+                  android:parentActivityName=".activities.MainActivity">
+
             <intent-filter>
                 <action android:name="com.action.onPeerConnected"/>
                 <action android:name="com.action.onPeerDisconnected"/>

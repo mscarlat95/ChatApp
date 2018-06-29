@@ -58,6 +58,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private FirebaseAuth mAuth;
     private DatabaseReference rootDatabaseRef;
 
+    /* Map users */
+    PopulateMapTask mapPopulationTask = new PopulateMapTask(this);
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -75,13 +78,16 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         switch (item.getItemId()) {
             case R.id.startShareLocationItem:
-                startLocationService();
                 Log.d(TAG, "onOptionsItemSelected: startShareLocationItem");
+                final String startServiceRes = startLocationService();
+
+                Toast.makeText(this, startServiceRes, Toast.LENGTH_SHORT).show();
                 break;
             case R.id.stopShareLocationItem:
-                stopLocationService();
-                Toast.makeText(this, "Location Sharing is now Stopped", Toast.LENGTH_SHORT).show();
                 Log.d(TAG, "onOptionsItemSelected: stopShareLocationItem");
+                final String stopServiceRes = stopLocationService();
+
+                Toast.makeText(this, stopServiceRes, Toast.LENGTH_SHORT).show();
                 break;
             default:
                 Log.d(TAG, "onOptionsItemSelected: Received unknown item id " + item.getItemId());
@@ -182,16 +188,16 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         });
     }
 
-    private void startLocationService() {
+    private String startLocationService() {
         Log.d(TAG, "startLocationService: Method was invoked!");
 
         if (UserLocationService.status == Constants.INACTIVE) {
             Intent intent = new Intent(getApplicationContext(), UserLocationService.class);
             startService(intent);
 
-            Toast.makeText(this, "Location Sharing is now Active", Toast.LENGTH_SHORT).show();
+            return "Location Sharing is now Active";
         } else {
-            Toast.makeText(this, "Location Sharing is already Active", Toast.LENGTH_SHORT).show();
+            return  "Location Sharing is already Active";
         }
     }
 
@@ -241,19 +247,20 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMap = googleMap;
     }
 
-
     private void updateMapPosition() {
         if (userLocation == null) {
             Log.d(TAG, "updateMapPosition: Received null position");
             return;
         }
 
-        mMap.clear();
-        new PopulateMapTask(this).execute(mMap);
+
+        if (mapPopulationTask.isAvailable()) {
+            mMap.clear();
+            mapPopulationTask.execute(mMap);
+        }
+
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 14.0f));
     }
-
-
 
     @Override
     protected void onResume() {
@@ -272,17 +279,22 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     protected void onDestroy() {
         Log.d(TAG, "onDestroy: Method was invoked!");
-        super.onDestroy();
         stopLocationService();
+
+        super.onDestroy();
     }
 
-    private void stopLocationService() {
+    private String stopLocationService() {
         Log.d(TAG, "stopLocationService: Method was invoked!");
 
         if (UserLocationService.status == Constants.ACTIVE) {
             Log.d(TAG, "onDestroy: Stopping Location Service");
             Intent intent = new Intent(getApplicationContext(), UserLocationService.class);
+
             stopService(intent);
+            return "Location Sharing is now Stopped";
+        } else {
+            return "Location Sharing is already Stopped";
         }
     }
 }

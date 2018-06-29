@@ -2,18 +2,20 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
-              android:background="#80bebebe"
+              android:background="#DE000000"
               android:elevation="1dp"
               android:gravity="center"
               android:orientation="vertical"
-              android:padding="5dp">
+              android:padding="3dp">
 
     <ImageView
         android:id="@+id/profileImageView"
-        android:layout_width="300dp"
-        android:layout_height="300dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:minWidth="350dp"
+        android:minHeight="350dp"
+        android:adjustViewBounds="true"
         android:scaleType="fitCenter"
-        android:src="@drawable/default_avatar"
-        />
+        android:src="@drawable/default_avatar"/>
 
 </LinearLayout>

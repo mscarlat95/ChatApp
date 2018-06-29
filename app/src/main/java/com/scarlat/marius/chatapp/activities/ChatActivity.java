@@ -68,8 +68,8 @@ public class ChatActivity extends AppCompatActivity {
     private HashMap<Long, String> messageSet = new HashMap<>();
 
     /* Messages pagination */
-    private int currentPage = 1;
-    private boolean refreshActive = false;
+    private int currentPage =  0;
+    private boolean firstContact = true;
 
     private boolean isDuplicate (Message message) {
         if (messageSet.containsKey(message.getTimestamp())) {
@@ -135,8 +135,8 @@ public class ChatActivity extends AppCompatActivity {
         messageSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
+                if (currentPage == 0) { currentPage = 1; }
                 currentPage ++;
-                refreshActive = true;
 
                 messages.clear();
                 messageSet = new HashMap<Long, String>();
@@ -265,8 +265,17 @@ public class ChatActivity extends AppCompatActivity {
     private void displayMessages() {
         Log.d(TAG, "loadMessages: Method was invoked!");
 
-        Query query = rootDatabaseRef.child(Constants.MESSAGES_TABLE).child(userID).child(friendID)
-                .limitToLast(currentPage * Constants.MAX_LOAD_MESSAGES);
+        Query query = null;
+
+        if (firstContact) {
+            query = rootDatabaseRef.child(Constants.MESSAGES_TABLE).child(userID).child(friendID)
+                    .limitToLast( (currentPage + 1) * Constants.MAX_LOAD_MESSAGES);
+
+            firstContact = false;
+        } else {
+            query = rootDatabaseRef.child(Constants.MESSAGES_TABLE).child(userID).child(friendID)
+                    .limitToLast(currentPage * Constants.MAX_LOAD_MESSAGES);
+        }
 
 
         query.addChildEventListener(new ChildEventListener() {
@@ -283,6 +292,7 @@ public class ChatActivity extends AppCompatActivity {
                         adapter.notifyItemInserted(messages.size() - 1);
 
                         int position = Math.max(0, messages.size() - currentPage * Constants.MAX_LOAD_MESSAGES - 1);
+
                         messagesRecylerView.smoothScrollToPosition(position);
                         messageSwipeRefreshLayout.setRefreshing(false);
                     }

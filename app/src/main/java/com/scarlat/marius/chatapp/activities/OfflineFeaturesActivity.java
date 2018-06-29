@@ -1,15 +1,23 @@
 package com.scarlat.marius.chatapp.activities;
 
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.scarlat.marius.chatapp.R;
@@ -40,9 +48,7 @@ public class OfflineFeaturesActivity extends AppCompatActivity {
         setContentView(R.layout.activity_offline_features);
 
         /*  Setup Toolbar */
-        toolbar = (Toolbar) findViewById(R.id.offlineFeaturesToolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("Friends Near You");
+        initToolbar();
 
         /* Initialize shared preferences */
         SharedPref.setup(getApplicationContext());
@@ -60,6 +66,67 @@ public class OfflineFeaturesActivity extends AppCompatActivity {
         inRangeUsersRecyclerView.setAdapter(adapter);
     }
 
+    private void initToolbar() {
+        Log.d(TAG, "initToolbar: Method was invoked!");
+
+        toolbar = (Toolbar) findViewById(R.id.offlineFeaturesToolbar);
+        toolbar.setTitle("");
+        setSupportActionBar(toolbar);
+
+        /* Obtain toolbar */
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setDisplayShowCustomEnabled(true);
+
+        /* Inflate toolbar layout */
+        LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View actionBarView = inflater.inflate(R.layout.opportunistic_actionbar_layout, null);
+        toolbar.addView(actionBarView);
+
+        /* Initialize layout views */
+        TextView titleTextView = (TextView) actionBarView.findViewById(R.id.titleTextView);
+        ImageButton infoButton = (ImageButton) actionBarView.findViewById(R.id.informationImageButton);
+
+        infoButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(OfflineFeaturesActivity.this);
+                String message = Constants.UNSET;
+
+                if (checkWifiConnection()) {
+                    message =   "\nYou are already connected to an access point (e.g. Wi-fi).\n" +
+                                "Please wait until a new user will connect to the same access point";
+                } else {
+                    message =   "\nIn order to communicate with other users in offline environment, " +
+                                "please make sure:\n\n - You have installed Hyccups application.\n " +
+                                "- You are connected to an access point (e.g. Wifi).";
+                }
+                builder.setMessage(message)
+                        .setIcon(R.drawable.info_button)
+                        .setTitle("Offline Friends Discovery")
+                        .setPositiveButton("Ok", null)
+                        .create().show();
+            }
+        });
+    }
+
+    private boolean checkWifiConnection() {
+        Log.d(TAG, "checkWifiConnection: Method was invoked!");
+
+        WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+
+        if (wifiManager.isWifiEnabled()) { // Wi-Fi adapter is ON
+            WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+
+            if( wifiInfo.getNetworkId() == -1 ){
+                return false; // Not connected to an access point
+            }
+            return true; // Connected to an access point
+        }
+        else {
+            return false; // Wi-Fi adapter is OFF
+        }
+    }
 
     @Override
     protected void onResume() {

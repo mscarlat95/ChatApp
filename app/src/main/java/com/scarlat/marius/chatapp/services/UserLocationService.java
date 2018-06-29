@@ -4,6 +4,7 @@ package com.scarlat.marius.chatapp.services;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -82,8 +83,18 @@ public class UserLocationService extends Service {
             }
         };
 
+        /* Choose criteria */
+        Criteria criteria = new Criteria();
+
+        criteria.setPowerRequirement(Criteria.POWER_LOW); // Chose your desired power consumption level.
+        criteria.setAccuracy(Criteria.ACCURACY_FINE); // Choose your accuracy requirement.
+        criteria.setSpeedRequired(true); // Chose if speed for first location fix is required.
+        criteria.setAltitudeRequired(false); // Choose if you use altitude.
+        criteria.setBearingRequired(false); // Choose if you use bearing.
+        criteria.setCostAllowed(false); // Choose if this provider can waste money
+
         /* Update the position each 3 seconds */
-        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 0, mLocationListener);
+        mLocationManager.requestLocationUpdates(mLocationManager.getBestProvider(criteria, true), 3000, 0, mLocationListener);
 
         /* At first run, get last known location */
         if (! firstLocationSetup) {
