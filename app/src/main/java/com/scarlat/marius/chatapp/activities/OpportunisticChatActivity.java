@@ -1,15 +1,21 @@
 package com.scarlat.marius.chatapp.activities;
 
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -46,6 +52,39 @@ public class OpportunisticChatActivity extends AppCompatActivity {
 
     private List<Message> messages;
     private Map<Long, String> receivedMessageSet;
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        Log.d(TAG, "onCreateOptionsMenu: Method was invoked!");
+        super.onCreateOptionsMenu(menu);
+
+        getMenuInflater().inflate(R.menu.opportunistic_chat_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        Log.d(TAG, "onOptionsItemSelected: Method was invoked!");
+
+        switch (item.getItemId()) {
+            case R.id.deleteConvItem:
+                Log.d(TAG, "onOptionsItemSelected: Delete Conversation");
+
+                /* Delete records from database */
+                SQLiteDatabase db = this.openOrCreateDatabase(Constants.USERS_TABLE, MODE_PRIVATE, null);
+                db.execSQL("DELETE FROM "  + friendId);
+
+                /* Delete messages */
+                messages.clear();
+                adapter.notifyDataSetChanged();
+
+                return true;
+
+            default:
+                Log.d(TAG, "onOptionsItemSelected: Unknown item selected " + item.getItemId());
+                return false;
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,6 +139,9 @@ public class OpportunisticChatActivity extends AppCompatActivity {
         /* Init communication channel */
         connection = new Connection(getApplicationContext(), "OpportunisticChannelDemo");
         connection.notifyFriendsChanged();
+
+        /* Retrieve all last messages */
+        retrieveLastMessages();
     }
 
 
@@ -181,5 +223,105 @@ public class OpportunisticChatActivity extends AppCompatActivity {
             receivedMessageSet.put(timestamp, messageContent);
         }
     }
+
+
+    @Override
+    public void onBackPressed() {
+        Log.d(TAG, "onBackPressed: Method was invoked!");
+
+        /* Alert user */
+        AlertDialog.Builder builder = new AlertDialog.Builder(OpportunisticChatActivity.this);
+
+        builder .setIcon(R.drawable.info_button)
+                .setTitle("Interrupt Conversation")
+                .setMessage("Are you sure you want to exit ?")
+                .setNegativeButton("No", null)
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        /* Send finish message to the destination */
+                        connection.forward(friendId, Constants.FINISH_MESSAGE);
+
+                        /* Save messages */
+                        saveMessages();
+
+                        /* Finish current activity */
+                        OpportunisticChatActivity.super.onBackPressed();
+                    }
+                })
+                .create().show();
+    }
+
+    private void saveMessages() {
+        Log.d(TAG, "saveMessages: Method was invoked!");
+
+        try {
+
+            /* Save data in database */
+            SQLiteDatabase db = this.openOrCreateDatabase(Constants.USERS_TABLE, MODE_PRIVATE, null);
+
+            /* Save table in the database */
+            db.execSQL("CREATE TABLE IF NOT EXISTS " + friendId + " (id VARCHAR, message VARCHAR, timestamp INT(30))");
+            db.execSQL("DELETE FROM "  + friendId);
+
+            /* Insert data */
+            for (Message message : messages) {
+                final String id = message.getFrom();
+                final String content = message.getMessage();
+                final long timestamp = message.getTimestamp();
+
+                final String pushedValue = "('" + id + "', " + "'" + content + "', " + timestamp + ")";
+                db.execSQL("INSERT INTO " + friendId + " (id,message,timestamp) VALUES " + pushedValue);
+
+                Log.d(TAG, "saveMessages: " + id + "; " + content + "; " + timestamp);
+            }
+        } catch (Exception e) {
+            Log.d(TAG, "saveMessages: [Exception]"  + e.getMessage());
+        }
+    }
+
+    private void retrieveLastMessages() {
+        Log.d(TAG, "retrieveLastMessages: Method was invoked!");
+
+        try {
+
+            /* Obtain database */
+            SQLiteDatabase db = this.openOrCreateDatabase(Constants.USERS_TABLE, MODE_PRIVATE, null);
+            Cursor c = db.rawQuery("SELECT * FROM " + friendId, null);
+
+            int idIndex = c.getColumnIndex("id");
+            int messageIndex = c.getColumnIndex("message");
+            int timestampIndex = c.getColumnIndex("timestamp");
+
+            /* Move cursor to the first result */
+            c.moveToFirst();
+
+            /* Add all previous messages stored in database */
+            while (!c.isAfterLast()) {
+                final String id = c.getString(idIndex);
+                final String content = c.getString(messageIndex);
+                final long timestamp = c.getLong(timestampIndex);
+
+                Log.d(TAG, "retrieveLastMessages: "  + id + "; " + content + "; " + timestamp);
+
+                Message message = new Message();
+                message.setFrom(id);
+                message.setMessage(content);
+                message.setTimestamp(timestamp);
+
+                messages.add(message);
+                adapter.notifyDataSetChanged();
+
+                c.moveToNext();
+            }
+
+            c.close();
+
+        } catch (Exception e) {
+            Log.d(TAG, "retrieveLastMessages: [Exception]" + e.getMessage());
+        }
+    }
+
 
 }

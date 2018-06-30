@@ -28,6 +28,7 @@ import com.scarlat.marius.chatapp.storage.SharedPref;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import ro.pub.acs.hyccups.opportunistic.Connection;
 
@@ -38,7 +39,6 @@ public class OfflineFeaturesActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private RecyclerView inRangeUsersRecyclerView;
     private BroadcastReceiver broadcastReceiver;
-
 
     private List<Friend> inRangeFriends;
     private InRangeFriendsAdapter adapter;
@@ -70,6 +70,25 @@ public class OfflineFeaturesActivity extends AppCompatActivity {
         Connection conn = new Connection(this, "OpportunisticChannelDemo");
         conn.register();
         conn.notifyFriendsChanged();
+
+
+        /* Check if there are recent discovered friends */
+        checkRecentFriends();
+    }
+
+    private void checkRecentFriends() {
+        Set<String> recentFriends = SharedPref.getOfflineDiscoveredFriends();
+
+        for (String current : recentFriends) {
+            Friend friend = new Friend();
+
+            friend.setFriendId(current);
+            friend.setFriendshipDate(SharedPref.getLong(Constants.CHAT_TABLE + current));
+
+            inRangeFriends.add(0, friend);
+        }
+
+        adapter.notifyDataSetChanged();
     }
 
     private void initToolbar() {
@@ -205,7 +224,7 @@ public class OfflineFeaturesActivity extends AppCompatActivity {
         friend.setFriendId(friendId);
         friend.setFriendshipDate(System.currentTimeMillis());
 
-        inRangeFriends.add(friend);
+        inRangeFriends.add(0, friend);
         adapter.notifyDataSetChanged();
     }
 

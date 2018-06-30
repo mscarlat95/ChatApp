@@ -39,6 +39,9 @@ public class OpportunisticChannelDemo extends Channel{
     public void onPeerConnected(String deviceId, String userId) {
         Log.d(TAG, "onPeerConnected: deviceId = " + deviceId + "; userId = " + userId);
 
+        SharedPref.setup(getApplicationContext());
+        SharedPref.saveDiscoveredFriends(userId, System.currentTimeMillis());
+
         Intent intent = new Intent(Constants.ACTION_PEER_CONNECTED);
         intent.putExtra(Constants.USER_ID, userId);
         sendBroadcast(intent);

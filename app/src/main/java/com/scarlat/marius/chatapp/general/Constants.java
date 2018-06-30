@@ -97,6 +97,9 @@ public class Constants {
     public static final String ACTION_PEER_DISCONNECTED = "com.action.onPeerDisconnected";
     public static final String ACTION_MESSAGE_RECEIVED = "com.action.onMessageReceived";
 
+    public static final String FINISH_MESSAGE =     "\n-- The conversation has been interrupted. --\n" +
+                                                    "-- There is no guarantee that your next messages will arrive to the destination. --\n";
+
     /* Geolocation */
     public static final String ACTION_LOCATION_UPDATE = "com.action.userLocation";
     public static final String USER_LONGITUDE = "longitude";

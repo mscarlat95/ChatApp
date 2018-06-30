@@ -19,8 +19,14 @@ public class SharedPref {
 
     private static Set<String> friendsSet = new HashSet<>();
 
+    private static Set<String> offlineDiscoveredFriends = new HashSet<>();
+
     public static Set<String> getFriendsSet() {
         return  sharedPreferences.getStringSet(Constants.FRIENDS_TABLE, new HashSet<String>());
+    }
+
+    public static Set<String> getOfflineDiscoveredFriends() {
+        return sharedPreferences.getStringSet(Constants.CHAT_TABLE, new HashSet<String>());
     }
 
     public static void setup (Context context) {
@@ -77,13 +83,11 @@ public class SharedPref {
         addFriendInSet(friendId);
     }
 
-    public static String getString (String key) {
-        return sharedPreferences.getString(key, "");
-    }
+    public static String getString (final String key) { return sharedPreferences.getString(key, ""); }
 
-    public static Boolean getBoolean (String key) {
-        return sharedPreferences.getBoolean(key, false);
-    }
+    public static Boolean getBoolean (final String key) { return sharedPreferences.getBoolean(key, false); }
+
+    public static Long getLong (final String key) { return sharedPreferences.getLong(key, 0); }
 
     public static void saveUserLogged(final String userId) {
         Log.d(TAG, "saveUserLogged: " + userId);
@@ -111,6 +115,21 @@ public class SharedPref {
         preferencesEditor.apply();
 
         Log.d(TAG, "addFriendInSet: Set = " + Arrays.toString(friendsSet.toArray()));
+    }
+
+
+    public static void saveDiscoveredFriends(final String friendId, final long timestamp) {
+        Log.d(TAG, "saveDiscoveredFriends: " + friendId + "; " + timestamp);
+
+        preferencesEditor = sharedPreferences.edit();
+
+        offlineDiscoveredFriends.add(friendId);
+        preferencesEditor.putStringSet(Constants.CHAT_TABLE, offlineDiscoveredFriends);
+        preferencesEditor.putLong(Constants.CHAT_TABLE + friendId, timestamp);
+        preferencesEditor.apply();
+
+        Log.d(TAG, "saveDiscoveredFriends: Set = " + Arrays.toString(offlineDiscoveredFriends.toArray()));
+
     }
 
 }

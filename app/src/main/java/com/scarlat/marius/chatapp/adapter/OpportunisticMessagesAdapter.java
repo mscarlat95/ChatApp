@@ -68,6 +68,7 @@ public class OpportunisticMessagesAdapter extends RecyclerView.Adapter<Opportuni
         holder.getFullNameTextView().setText(fullname.split(" ")[0]);
         holder.getMessageTextView().setText(messageContent);
         holder.getTimestampTextView().setText(timestamp);
+
     }
 
     @Override

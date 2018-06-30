@@ -134,7 +134,7 @@
         <activity
             android:name=".activities.ChatActivity"
             android:parentActivityName=".activities.MainActivity"
-            android:windowSoftInputMode="adjustPan">
+            android:windowSoftInputMode="adjustResize">
         </activity>
 
         <!-- Firebase Notification -->
@@ -179,7 +179,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".activities.OpportunisticChatActivity"
-                  android:windowSoftInputMode="adjustPan">
+                  android:windowSoftInputMode="adjustResize">
+
             <intent-filter>
                 <action android:name="com.action.onMessageReceived"/>
             </intent-filter>
