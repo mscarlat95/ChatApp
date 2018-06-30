@@ -17,6 +17,14 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
+}
+
+repositories {
+    jcenter()
 }
 
 dependencies {
@@ -66,6 +74,12 @@ dependencies {
 
     /* Unit testing */
     testCompile 'junit:junit:4.12'
+    testCompile('com.android.support.test.espresso:espresso-core:3.0.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+    testCompile "org.mockito:mockito-core:+"
+    androidTestCompile "org.mockito:mockito-android:+"
+
 
     /* Opportunistic communication via Hyccups */
     compile files('libs/opportunistic-layer-5.1.jar')
