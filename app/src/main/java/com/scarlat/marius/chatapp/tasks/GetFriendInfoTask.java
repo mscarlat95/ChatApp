@@ -18,7 +18,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.scarlat.marius.chatapp.R;
 import com.scarlat.marius.chatapp.general.Constants;
-import com.scarlat.marius.chatapp.general.CustomProgressDialog;
+import com.scarlat.marius.chatapp.model.CustomProgressDialog;
 
 public class GetFriendInfoTask {
     private static final String TAG = "GetFriendInfoTask";

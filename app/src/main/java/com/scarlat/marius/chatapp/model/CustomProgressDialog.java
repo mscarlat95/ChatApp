@@ -1,4 +1,4 @@
-package com.scarlat.marius.chatapp.general;
+package com.scarlat.marius.chatapp.model;
 
 
 import android.app.ProgressDialog;

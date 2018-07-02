@@ -106,5 +106,12 @@ public class Constants {
     public static final String USER_LATITUDE = "latitude";
     public static final String USER_LOCATION = "location";
 
+    /* Hyccups Install */
+    public static final String URL_HYCCUPS_HOME = "http://www.smartrdi.net/2017/11/08/getting-started";
+    public static final String URL_HYCCUPS_DOWNLOAD = "http://cipsm.hpc.pub.ro/hyccups-javadoc/downloads/hyccups-tracer-5.1-vc14.apk";
+    public static final String HYCCUPS_PREFERENCES = "hyccups_preferences";
+    public static final String HYCCUPS_PACKAGE_NAME = "ro.pub.acs.hyccups";
+
+    public static final String HIDE_INSTALL = "hide_install";
 
 }

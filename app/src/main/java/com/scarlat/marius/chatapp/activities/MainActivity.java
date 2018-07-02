@@ -1,10 +1,13 @@
 package com.scarlat.marius.chatapp.activities;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -26,10 +29,11 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ServerValue;
 import com.scarlat.marius.chatapp.R;
 import com.scarlat.marius.chatapp.adapter.FragmentTabsAdapter;
+import com.scarlat.marius.chatapp.general.AndroidUtil;
 import com.scarlat.marius.chatapp.general.Constants;
+import com.scarlat.marius.chatapp.storage.SharedPref;
 
 public class MainActivity extends AppCompatActivity {
-
     private static final String TAG = "MainActivity";
 
     /* Firebase */
@@ -97,6 +101,9 @@ public class MainActivity extends AppCompatActivity {
             rootDatabaseRef = FirebaseDatabase.getInstance().getReference();
         }
 
+        /* Init Shared preferences */
+        SharedPref.setup(this);
+
         /*  Set Toolbar */
         toolbar = (Toolbar) findViewById(R.id.mainPageToolbar);
         setSupportActionBar(toolbar);
@@ -129,6 +136,14 @@ public class MainActivity extends AppCompatActivity {
             /* User appears ONLINE */
             rootDatabaseRef.child(Constants.USERS_TABLE).child(mAuth.getUid())
                     .child(Constants.ONLINE).setValue("true");
+
+            /* Check if Hyccups is installed */
+            if (AndroidUtil.isAppInstalled(this, Constants.HYCCUPS_PACKAGE_NAME)) {
+                Log.d(TAG, "onStart: Hyccups is already installed");
+            } else {
+                Log.d(TAG, "onStart: Hyccups is not installed");
+                installHyccups();
+            }
         }
     }
 
@@ -170,11 +185,8 @@ public class MainActivity extends AppCompatActivity {
                         }
                     });
                 }
-
             }
         });
-
-
     }
 
     private void launchActivity (Context srcContext, Class destClass) {
@@ -186,9 +198,7 @@ public class MainActivity extends AppCompatActivity {
     private void enablePermissions() {
         Log.d(TAG, "requestPermissions: Method was invoked!");
 
-
         if (Build.VERSION.SDK_INT >= 23) {
-
             // TODO: create a single request code
             requestPermissions(new String[]{
                     Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -197,7 +207,6 @@ public class MainActivity extends AppCompatActivity {
                     Manifest.permission.ACCESS_FINE_LOCATION,
                     Manifest.permission.ACCESS_COARSE_LOCATION
             }, Constants.REQUEST_CODE_READ_EXT);
-
         }
     }
 
@@ -225,5 +234,39 @@ public class MainActivity extends AppCompatActivity {
                 }
                 break;
         }
+    }
+
+    private void installHyccups() {
+        Log.d(TAG, "installHyccups: Method was invoked!");
+
+        if (SharedPref.getString(Constants.HYCCUPS_PREFERENCES).equals(Constants.HIDE_INSTALL)) {
+            Log.d(TAG, "installHyccups: Hide dialog");
+            return;
+        }
+
+        final String[] availableOptions = { "Install Hyccups", "Cancel",  "Don't remind me" };
+        new AlertDialog.Builder(this)
+                .setTitle("Hyccups was not found")
+                .setItems(availableOptions, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (which) {
+                            case 0:
+                                Log.d(TAG, "onClick: Install Hyccups");
+                                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(Constants.URL_HYCCUPS_HOME));
+                                startActivity(browserIntent);
+                                break;
+                            case 1:
+                                Log.d(TAG, "onClick: Cancel");
+                                break;
+                            case 2:
+                                Log.d(TAG, "onClick: Don't remind me");
+                                SharedPref.saveString(Constants.HYCCUPS_PREFERENCES, Constants.HIDE_INSTALL);
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                }).show();
     }
 }

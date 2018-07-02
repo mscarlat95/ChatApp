@@ -21,7 +21,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.scarlat.marius.chatapp.activities.UserProfileActivity;
 import com.scarlat.marius.chatapp.adapter.MapMarkerInformationAdapter;
 import com.scarlat.marius.chatapp.general.Constants;
-import com.scarlat.marius.chatapp.general.GetTimeAgo;
+import com.scarlat.marius.chatapp.general.DateTimeUtil;
 import com.scarlat.marius.chatapp.model.MapMarker;
 import com.scarlat.marius.chatapp.model.User;
 import com.scarlat.marius.chatapp.storage.SharedPref;
@@ -149,7 +149,7 @@ public class PopulateMapTask {
         }
         final String distance = String.format("%.2f", (resultDistance[0] / 1000)) + "km";
 
-        String lastUpdate = GetTimeAgo.getTimeAgo(Long.parseLong(user.getLocation().get(Constants.LAST_SEEN).toString()));
+        String lastUpdate = DateTimeUtil.getTimeAgo(Long.parseLong(user.getLocation().get(Constants.LAST_SEEN).toString()));
 
         if (lastUpdate.equals(Constants.UNSET)) {
             /* Prevent server time differences */

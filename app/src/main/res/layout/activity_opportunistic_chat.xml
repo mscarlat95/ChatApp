@@ -36,7 +36,6 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="2dp"
-        android:background="#44DDDDDD"
         android:orientation="horizontal"
         android:padding="2dp"
         android:weightSum="10"
@@ -67,7 +66,7 @@
             android:layout_marginStart="2dp"
             android:layout_weight="0"
             android:adjustViewBounds="true"
-            android:background="#44DDDDDD"
+            android:background="@android:color/transparent"
             android:scaleType="fitCenter"
             app:srcCompat="@drawable/send_button"/>
 

@@ -22,7 +22,7 @@ import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 import com.scarlat.marius.chatapp.R;
 import com.scarlat.marius.chatapp.general.Constants;
-import com.scarlat.marius.chatapp.general.CustomProgressDialog;
+import com.scarlat.marius.chatapp.model.CustomProgressDialog;
 import com.scarlat.marius.chatapp.tasks.GetFriendInfoTask;
 
 import java.util.HashMap;

@@ -45,7 +45,13 @@ public class UserLocationService extends Service {
     public void onDestroy() {
         Log.d(TAG, "Service stopped");
 
+        /* Stop location listener */
+        mLocationManager.removeUpdates(mLocationListener);
+        mLocationManager = null;
+
+        /* Change service status */
         status = Constants.INACTIVE;
+
         super.onDestroy();
     }
 
@@ -86,15 +92,20 @@ public class UserLocationService extends Service {
         /* Choose criteria */
         Criteria criteria = new Criteria();
 
-        criteria.setPowerRequirement(Criteria.POWER_HIGH); // Chose your desired power consumption level.
+        criteria.setPowerRequirement(Criteria.POWER_LOW); // Chose your desired power consumption level.
         criteria.setAccuracy(Criteria.ACCURACY_FINE); // Choose your accuracy requirement.
         criteria.setSpeedRequired(true); // Chose if speed for first location fix is required.
-        criteria.setAltitudeRequired(false); // Choose if you use altitude.
-        criteria.setBearingRequired(false); // Choose if you use bearing.
+        criteria.setAltitudeRequired(true); // Choose if you use altitude.
+        criteria.setBearingRequired(true); // Choose if you use bearing.
         criteria.setCostAllowed(false); // Choose if this provider can waste money
 
+        criteria.setHorizontalAccuracy(Criteria.ACCURACY_HIGH);
+        criteria.setVerticalAccuracy(Criteria.ACCURACY_HIGH);
+        criteria.setBearingAccuracy(Criteria.ACCURACY_LOW);
+        criteria.setSpeedAccuracy(Criteria.ACCURACY_MEDIUM);
+
         /* Update the position each 3 seconds */
-        mLocationManager.requestLocationUpdates(mLocationManager.getBestProvider(criteria, true), 3000, 0, mLocationListener);
+        mLocationManager.requestLocationUpdates(mLocationManager.getBestProvider(criteria, true), 3000, 1, mLocationListener);
 
         /* At first run, get last known location */
         if (! firstLocationSetup) {
@@ -124,7 +135,6 @@ public class UserLocationService extends Service {
 
         intent.putExtra(Constants.USER_LONGITUDE, location.getLongitude());
         intent.putExtra(Constants.USER_LATITUDE, location.getLatitude());
-
         sendBroadcast(intent);
     }
 

@@ -18,7 +18,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.scarlat.marius.chatapp.R;
 import com.scarlat.marius.chatapp.adapter.InRangeFriendsAdapter;
@@ -120,7 +119,8 @@ public class OfflineFeaturesActivity extends AppCompatActivity {
 
                 if (checkWifiConnection()) {
                     message =   "\nYou are already connected to an access point (e.g. Wi-fi).\n" +
-                                "Please wait until a new user will connect to the same access point";
+                                "Please make sure you have installed Hyccups on your device.\n" +
+                                "Then you must wait until a new user will connect to the same access point as you.";
                 } else {
                     message =   "\nIn order to communicate with other users in offline environment, " +
                                 "please make sure:\n\n - You have installed Hyccups application.\n " +
@@ -207,8 +207,8 @@ public class OfflineFeaturesActivity extends AppCompatActivity {
                             break;
                     }
 
-                    String id = intent.getStringExtra(Constants.USER_ID);
-                    Toast.makeText(OfflineFeaturesActivity.this, id, Toast.LENGTH_SHORT).show();
+//                    String id = intent.getStringExtra(Constants.USER_ID);
+//                    Toast.makeText(OfflineFeaturesActivity.this, id, Toast.LENGTH_SHORT).show();
                 }
             };
         }
@@ -258,9 +258,7 @@ public class OfflineFeaturesActivity extends AppCompatActivity {
         Log.d(TAG, "messageNotify: Message = " + message);
         Log.d(TAG, "messageNotify: Timestamp = " + timestamp);
 
-        Toast.makeText(this, "You have received a new message from "
-                + friendName + " [" + friendId + "]", Toast.LENGTH_SHORT).show();
+//        Toast.makeText(this, "You have received a new message from "
+//                + friendName + " [" + friendId + "]", Toast.LENGTH_SHORT).show();
     }
-
-    
 }

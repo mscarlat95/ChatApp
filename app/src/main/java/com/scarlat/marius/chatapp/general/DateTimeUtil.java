@@ -3,7 +3,7 @@ package com.scarlat.marius.chatapp.general;
 
 import android.app.Application;
 
-public class GetTimeAgo extends Application{
+public class DateTimeUtil extends Application{
 
     /*
  * Copyright 2012 Google Inc.

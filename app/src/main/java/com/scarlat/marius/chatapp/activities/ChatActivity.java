@@ -34,7 +34,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.scarlat.marius.chatapp.R;
 import com.scarlat.marius.chatapp.adapter.MessageListAdapter;
 import com.scarlat.marius.chatapp.general.Constants;
-import com.scarlat.marius.chatapp.general.GetTimeAgo;
+import com.scarlat.marius.chatapp.general.DateTimeUtil;
 import com.scarlat.marius.chatapp.model.Message;
 import com.scarlat.marius.chatapp.tasks.SendMessageTask;
 import com.scarlat.marius.chatapp.tasks.SendPhotoTask;
@@ -135,6 +135,12 @@ public class ChatActivity extends AppCompatActivity {
         messageSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
+
+                if (messages.size() == 0) {
+                    messageSwipeRefreshLayout.setRefreshing(false);
+                    return ;
+                }
+
                 if (currentPage == 0) { currentPage = 1; }
                 currentPage ++;
 
@@ -213,7 +219,7 @@ public class ChatActivity extends AppCompatActivity {
                             if (online.equals("true")) {
                                 lastSeenDescription.setText(Constants.ONLINE);
                             } else {
-                                lastSeenDescription.setText("Last seen: " + GetTimeAgo.getTimeAgo(Long.valueOf(online)));
+                                lastSeenDescription.setText("Last seen: " + DateTimeUtil.getTimeAgo(Long.valueOf(online)));
                             }
                         }
                     }

@@ -16,7 +16,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.scarlat.marius.chatapp.general.Constants;
-import com.scarlat.marius.chatapp.general.CustomProgressDialog;
+import com.scarlat.marius.chatapp.model.CustomProgressDialog;
 
 public class UploadProfilePhotoTask {
 
