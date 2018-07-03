@@ -1,6 +1,6 @@
 <resources>
     <!--Application Name-->
-    <string name="app_name">ChatoS</string>
+    <string name="app_name">LilChat</string>
 
     <!--Facebook Login-->
     <string name="facebook_application_id">219532185493926</string>
@@ -8,7 +8,7 @@
 
     <!--Authorities-->
     <string name="authorities">com.marius.scarlat.admin.chatapp</string>
-
+cha
     <!--View resources-->
     <string name="user_register_message">Don\'t have an account, yet? Please, sign up!</string>
     <string name="email_hint">Email Address</string>

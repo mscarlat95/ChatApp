@@ -69,8 +69,9 @@ public class ForgotPasswordActivity extends AppCompatActivity {
 
         /* Setup toolbar */
         toolbar = (Toolbar) findViewById(R.id.forgotPassToolbar);
+        toolbar.setTitle(getResources().getString(R.string.app_name) + " - Password Recover");
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("ChatoS - Password Recover");
+
         getSupportActionBar().setDisplayHomeAsUpEnabled(true); // for back button
 
         /* Initialize Firebase authentication */

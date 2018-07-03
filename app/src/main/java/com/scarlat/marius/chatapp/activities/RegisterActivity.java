@@ -34,7 +34,9 @@ import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.auth.UserInfo;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -113,8 +115,9 @@ public class RegisterActivity extends AppCompatActivity {
 
         // Set Toolbar
         toolbar = (Toolbar) findViewById(R.id.registerToolbar);
+        toolbar.setTitle(getResources().getString(R.string.app_name) + " - Register");
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("ChatoS - Register");
+
         getSupportActionBar().setDisplayHomeAsUpEnabled(true); // for back button
 
         /* Initialize Firebase authentification */
@@ -317,12 +320,26 @@ public class RegisterActivity extends AppCompatActivity {
                 } else {
                     Log.d(TAG, "onDataChange: User does not exists");
 
-                    final String email = mAuth.getCurrentUser().getEmail();
-                    final String fullname = mAuth.getCurrentUser().getDisplayName();
+                    FirebaseUser currentUser = mAuth.getCurrentUser();
+                    String email = currentUser.getEmail();
+                    String fullname = currentUser.getDisplayName();
+                    String photoUrl = String.valueOf(currentUser.getPhotoUrl());
 
-                    String photoUrl = String.valueOf(mAuth.getCurrentUser().getPhotoUrl());
-                    if (photoUrl == null)
-                        photoUrl = Constants.UNSET;
+                    for (UserInfo userInfo : currentUser.getProviderData()) {
+                        if (fullname == null && userInfo.getDisplayName() != null) {
+                            fullname = userInfo.getDisplayName();
+                        }
+                        if (email == null && userInfo.getEmail() != null) {
+                            email = userInfo.getEmail();
+                        }
+                        if (photoUrl == null && userInfo.getPhotoUrl() != null) {
+                            photoUrl = String.valueOf(userInfo.getPhotoUrl());
+                        }
+                    }
+
+                    if (fullname == null)   fullname = Constants.UNSET;
+                    if (email == null)      email = Constants.UNSET;
+                    if (photoUrl == null)   photoUrl = Constants.UNSET;
 
                     registerInDatabase(fullname, email, photoUrl);
                 }

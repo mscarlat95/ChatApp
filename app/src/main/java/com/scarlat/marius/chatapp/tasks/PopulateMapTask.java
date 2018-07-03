@@ -3,6 +3,8 @@ package com.scarlat.marius.chatapp.tasks;
 
 import android.content.Context;
 import android.content.Intent;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.net.Uri;
 import android.support.annotation.NonNull;
@@ -26,6 +28,9 @@ import com.scarlat.marius.chatapp.model.MapMarker;
 import com.scarlat.marius.chatapp.model.User;
 import com.scarlat.marius.chatapp.storage.SharedPref;
 import com.squareup.picasso.Picasso;
+
+import java.io.IOException;
+import java.util.List;
 
 public class PopulateMapTask {
     private static final String TAG = "PopulateMapTask";
@@ -121,6 +126,24 @@ public class PopulateMapTask {
         return new LatLng(Double.valueOf(latitude), Double.valueOf(longitude));
     }
 
+    private String decodeAddress(double latitude, double longitude) {
+
+        Geocoder geocoder = new Geocoder(context);
+        String address = Constants.UNSET;
+
+        try {
+            List<Address> addressList = geocoder.getFromLocation(latitude, longitude, 1);
+
+            address =   getValue(addressList.get(0).getThoroughfare(), ", ") +
+                        getValue(addressList.get(0).getLocality(), ", ") +
+                        getValue(addressList.get(0).getCountryName(), "");
+        } catch (IOException e) {
+            Log.d(TAG, "decodeAddress: [Exception] "  + e.getMessage());
+        }
+
+        return address;
+    }
+
     private void addMarker(final GoogleMap map, final User user) {
         Log.d(TAG, "addMarker: Method was invoked!");
 
@@ -135,6 +158,8 @@ public class PopulateMapTask {
                 Double.valueOf(user.getLocation().get(Constants.USER_LATITUDE).toString()),
                 Double.valueOf(user.getLocation().get(Constants.USER_LONGITUDE).toString()));
 
+        /* Get address */
+        final String address = decodeAddress(location.latitude, location.longitude);
 
         /* Calculate distance between current user and its friend */
         float[] resultDistance = new float[1];
@@ -150,27 +175,27 @@ public class PopulateMapTask {
         final String distance = String.format("%.2f", (resultDistance[0] / 1000)) + "km";
 
         String lastUpdate = DateTimeUtil.getTimeAgo(Long.parseLong(user.getLocation().get(Constants.LAST_SEEN).toString()));
-
         if (lastUpdate.equals(Constants.UNSET)) {
             /* Prevent server time differences */
             lastUpdate = "just now";
         }
 
         /* Build snippet */
-        final String snippet =  "Email: " + user.getEmail() + "\n" +
-                                "Last Update: " + lastUpdate + "\n" +
-                                "Approximate distance: " + distance;
+        String snippet =    "Email: " + user.getEmail() +
+                            "\nLast Update: " + lastUpdate;
+        if (!user.getUserId().equals(FirebaseAuth.getInstance().getUid())) {
+            snippet += "\nApproximate distance: " + distance;
+        }
+        if (address != null && !address.equals(Constants.UNSET)) {
+            snippet += "\nAddress: " + address;
+        }
 
+        /* Display marker on map */
         Marker marker = map.addMarker(new MarkerOptions()
                 .title(title)
                 .snippet(snippet)
                 .anchor(0.5f, 1)
                 .position(location));
-
-        if (marker == null) {
-            Log.d(TAG, "addMarker: Marker is null");
-            return;
-        }
 
         marker.setTag(user.getUserId());
 
@@ -191,12 +216,24 @@ public class PopulateMapTask {
 
         // TODO: https://stackoverflow.com/questions/44101664/marker-seticon-throws-java-lang-illegalargumentexception-unmanaged-descriptor
         try {
-            if (marker.isVisible()) {
-                MapMarker point = new MapMarker(context, marker);
-                Picasso.with(context)
-                        .load(Uri.parse(user.getProfileImage()))
-                        .into(point);
+
+            MapMarker point = new MapMarker(context, marker);
+            Picasso.with(context)
+                    .load(Uri.parse(user.getProfileImage()))
+                    .into(point);
+
+            if (user.getUserId().equals(FirebaseAuth.getInstance().getUid())) {
+                marker.setZIndex(1.0f);
             }
+
         } catch (Exception e) {}
+    }
+
+
+    private String getValue(String str, String suffix) {
+        if (str == null) {
+            return "";
+        }
+        return str + suffix;
     }
 }

@@ -135,7 +135,6 @@ public class ChatActivity extends AppCompatActivity {
         messageSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-
                 if (messages.size() == 0) {
                     messageSwipeRefreshLayout.setRefreshing(false);
                     return ;
@@ -229,6 +228,16 @@ public class ChatActivity extends AppCompatActivity {
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
                 Log.d(TAG, "Retrieve Friend information failed: " + databaseError.getMessage());
+            }
+        });
+
+        avatarCircleImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(ChatActivity.this, UserProfileActivity.class);
+
+                intent.putExtra(Constants.USER_ID, friendID);
+                startActivity(intent);
             }
         });
     }

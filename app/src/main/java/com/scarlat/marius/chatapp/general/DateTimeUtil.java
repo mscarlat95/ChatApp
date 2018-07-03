@@ -37,7 +37,6 @@ public class DateTimeUtil extends Application{
             return Constants.UNSET;
         }
 
-        // TODO: localize
         final long diff = now - time;
         if (diff < MINUTE_MILLIS) {
             return "just now";

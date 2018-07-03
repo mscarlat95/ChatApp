@@ -94,8 +94,9 @@ public class LoginActivity extends AppCompatActivity {
 
         /* Set up toolbar */
         toolbar = (Toolbar) findViewById(R.id.loginToolbar);
+        toolbar.setTitle(getResources().getString(R.string.app_name) + " - Login");
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("ChatoS - Login");
+
 
         /* Initialize Firebase authentification */
         mAuth = FirebaseAuth.getInstance();

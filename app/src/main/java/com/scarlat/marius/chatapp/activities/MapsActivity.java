@@ -59,7 +59,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private DatabaseReference rootDatabaseRef;
 
     /* Map users */
-    PopulateMapTask mapPopulationTask = new PopulateMapTask(this);
+    private PopulateMapTask mapPopulationTask = new PopulateMapTask(this);
 
 
     @Override
@@ -253,13 +253,17 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             return;
         }
 
-
-        if (mapPopulationTask.isAvailable()) {
-            mMap.clear();
-            mapPopulationTask.execute(mMap);
+        // TODO: Unmanaged descriptor
+        try {
+            if (mapPopulationTask.isAvailable()) {
+                mMap.clear();
+                mapPopulationTask.execute(mMap);
+            }
+        } catch (Exception e) {
+            Log.d(TAG, "updateMapPosition: [Exception] " + e.getMessage());
         }
 
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 14.0f));
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 16.0f));
     }
 
     @Override

@@ -95,17 +95,18 @@ public class UserLocationService extends Service {
         criteria.setPowerRequirement(Criteria.POWER_LOW); // Chose your desired power consumption level.
         criteria.setAccuracy(Criteria.ACCURACY_FINE); // Choose your accuracy requirement.
         criteria.setSpeedRequired(true); // Chose if speed for first location fix is required.
-        criteria.setAltitudeRequired(true); // Choose if you use altitude.
-        criteria.setBearingRequired(true); // Choose if you use bearing.
+        criteria.setAltitudeRequired(false); // Choose if you use altitude.
+        criteria.setBearingRequired(false); // Choose if you use bearing.
         criteria.setCostAllowed(false); // Choose if this provider can waste money
 
         criteria.setHorizontalAccuracy(Criteria.ACCURACY_HIGH);
-        criteria.setVerticalAccuracy(Criteria.ACCURACY_HIGH);
-        criteria.setBearingAccuracy(Criteria.ACCURACY_LOW);
-        criteria.setSpeedAccuracy(Criteria.ACCURACY_MEDIUM);
+        criteria.setSpeedAccuracy(Criteria.ACCURACY_HIGH);
+
+        final String bestProvider = mLocationManager.getBestProvider(criteria, true);
+        Log.d(TAG, "setupLocationSettings: Best provider = " + bestProvider);
 
         /* Update the position each 3 seconds */
-        mLocationManager.requestLocationUpdates(mLocationManager.getBestProvider(criteria, true), 3000, 1, mLocationListener);
+        mLocationManager.requestLocationUpdates(bestProvider, 3000, 0, mLocationListener);
 
         /* At first run, get last known location */
         if (! firstLocationSetup) {
@@ -141,6 +142,5 @@ public class UserLocationService extends Service {
     public static void setStatus (boolean newStatus) {
         status = newStatus;
     }
-
 
 }

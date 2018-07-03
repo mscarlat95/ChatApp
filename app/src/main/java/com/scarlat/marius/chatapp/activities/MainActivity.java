@@ -31,6 +31,7 @@ import com.scarlat.marius.chatapp.R;
 import com.scarlat.marius.chatapp.adapter.FragmentTabsAdapter;
 import com.scarlat.marius.chatapp.general.AndroidUtil;
 import com.scarlat.marius.chatapp.general.Constants;
+import com.scarlat.marius.chatapp.general.NetworkUtil;
 import com.scarlat.marius.chatapp.storage.SharedPref;
 
 public class MainActivity extends AppCompatActivity {
@@ -106,8 +107,9 @@ public class MainActivity extends AppCompatActivity {
 
         /*  Set Toolbar */
         toolbar = (Toolbar) findViewById(R.id.mainPageToolbar);
+        toolbar.setTitle(getResources().getString(R.string.app_name));
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("ChatoS");
+
 
         /* Setup Tabs */
         viewPager = (ViewPager) findViewById(R.id.mainTabsViewPager);
@@ -133,7 +135,13 @@ public class MainActivity extends AppCompatActivity {
            /* Request permissions */
             enablePermissions();
 
-            /* User appears ONLINE */
+            /* Check internet connection */
+            if (! NetworkUtil.isNetworkConnected(this)) {
+                Log.d(TAG, "onStart: Internet is not available");
+                Toast.makeText(this, "Internet is not available. Please check your connection!", Toast.LENGTH_LONG).show();
+            }
+
+            /* User appears ONLINE in database */
             rootDatabaseRef.child(Constants.USERS_TABLE).child(mAuth.getUid())
                     .child(Constants.ONLINE).setValue("true");
 

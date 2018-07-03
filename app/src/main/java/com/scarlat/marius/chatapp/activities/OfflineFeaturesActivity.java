@@ -5,8 +5,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.net.wifi.WifiInfo;
-import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -22,6 +20,7 @@ import android.widget.TextView;
 import com.scarlat.marius.chatapp.R;
 import com.scarlat.marius.chatapp.adapter.InRangeFriendsAdapter;
 import com.scarlat.marius.chatapp.general.Constants;
+import com.scarlat.marius.chatapp.general.NetworkUtil;
 import com.scarlat.marius.chatapp.model.Friend;
 import com.scarlat.marius.chatapp.storage.SharedPref;
 
@@ -117,7 +116,7 @@ public class OfflineFeaturesActivity extends AppCompatActivity {
                 AlertDialog.Builder builder = new AlertDialog.Builder(OfflineFeaturesActivity.this);
                 String message = Constants.UNSET;
 
-                if (checkWifiConnection()) {
+                if (NetworkUtil.checkWifiConnection(OfflineFeaturesActivity.this)) {
                     message =   "\nYou are already connected to an access point (e.g. Wi-fi).\n" +
                                 "Please make sure you have installed Hyccups on your device.\n" +
                                 "Then you must wait until a new user will connect to the same access point as you.";
@@ -133,24 +132,6 @@ public class OfflineFeaturesActivity extends AppCompatActivity {
                         .create().show();
             }
         });
-    }
-
-    private boolean checkWifiConnection() {
-        Log.d(TAG, "checkWifiConnection: Method was invoked!");
-
-        WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-
-        if (wifiManager.isWifiEnabled()) { // Wi-Fi adapter is ON
-            WifiInfo wifiInfo = wifiManager.getConnectionInfo();
-
-            if( wifiInfo.getNetworkId() == -1 ){
-                return false; // Not connected to an access point
-            }
-            return true; // Connected to an access point
-        }
-        else {
-            return false; // Wi-Fi adapter is OFF
-        }
     }
 
     @Override

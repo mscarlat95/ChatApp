@@ -82,9 +82,10 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
 
         mBuilder.setContentIntent(pendingIntent);
 
+
+        /* Setup notification channel for android 8+ */
         NotificationManager mNotificationManager =
                 (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
-
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             priority = NotificationManager.IMPORTANCE_HIGH;
@@ -98,9 +99,8 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
             mNotificationManager.createNotificationChannel(channel);
         }
 
-        if (mNotificationManager.areNotificationsEnabled()) {
-            mNotificationManager.notify(notificationId, mBuilder.build());
-        }
+        /* Display notification */
+        mNotificationManager.notify(notificationId, mBuilder.build());
     }
 
 
