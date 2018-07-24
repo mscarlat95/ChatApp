@@ -216,7 +216,6 @@ public class PopulateMapTask {
 
         // TODO: https://stackoverflow.com/questions/44101664/marker-seticon-throws-java-lang-illegalargumentexception-unmanaged-descriptor
         try {
-
             MapMarker point = new MapMarker(context, marker);
             Picasso.with(context)
                     .load(Uri.parse(user.getProfileImage()))
@@ -225,7 +224,6 @@ public class PopulateMapTask {
             if (user.getUserId().equals(FirebaseAuth.getInstance().getUid())) {
                 marker.setZIndex(1.0f);
             }
-
         } catch (Exception e) {}
     }
 

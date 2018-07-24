@@ -79,7 +79,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         switch (item.getItemId()) {
             case R.id.startShareLocationItem:
                 Log.d(TAG, "onOptionsItemSelected: startShareLocationItem");
-                final String startServiceRes = startLocationService();
+                final String startServiceRes = setLocationProvider();
 
                 Toast.makeText(this, startServiceRes, Toast.LENGTH_SHORT).show();
                 break;
@@ -141,8 +141,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
 
-        /* Enable GPS */
-        enableGPS();
 
         /* Initialize broadcast receiver in order to retrieve user location */
         setupBroadcastReceiver();
@@ -188,18 +186,51 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         });
     }
 
-    private String startLocationService() {
-        Log.d(TAG, "startLocationService: Method was invoked!");
+
+    private String setLocationProvider() {
+        Log.d(TAG, "setLocationProvider: Method was invoked!");
 
         if (UserLocationService.status == Constants.INACTIVE) {
-            Intent intent = new Intent(getApplicationContext(), UserLocationService.class);
-            startService(intent);
+
+            final String[] providers = {"GPS", "Internet"};
+
+            /* Choose provider */
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+            builder.setTitle("Please, choose your location provider:")
+                    .setItems(providers, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            switch (which) {
+                                case 0: // GPS
+                                    if (checkGpsAvailable()) {
+                                        startLocationService(Constants.LOCATION_PROVIDER, LocationManager.GPS_PROVIDER);
+                                    } else {
+                                        enableGPS();
+                                    }
+                                    break;
+                                case 1: // Internet
+                                    startLocationService(Constants.LOCATION_PROVIDER, LocationManager.NETWORK_PROVIDER);
+                                    break;
+                            }
+                        }
+                    })
+                    .create().show();
 
             return "Location Sharing is now Active";
         } else {
             return  "Location Sharing is already Active";
         }
     }
+
+    private void startLocationService(final String providerKey, final String providerValue) {
+        Log.d(TAG, "startLocationService: Method was invoked!");
+
+        final Intent intent = new Intent(getApplicationContext(), UserLocationService.class);
+        intent.putExtra(providerKey, providerValue);
+        startService(intent);
+    }
+
 
     private boolean checkGpsAvailable() {
         Log.d(TAG, "checkGpsAvailable: Method was invoked!");
@@ -210,7 +241,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private void enableGPS() {
         Log.d(TAG, "enableGPS: Method was invoked!");
-        
+
         if (!checkGpsAvailable()) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
@@ -234,7 +265,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         if (requestCode == Constants.REQUEST_CODE_ENABLE_GPS) {
             if (checkGpsAvailable()) {
-                Toast.makeText(MapsActivity.this, "GPS is now enabled!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MapsActivity.this, "GPS is now enabled. Please, start ShareLocation again!", Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(MapsActivity.this, "You must enable GPS in order to track your location", Toast.LENGTH_SHORT).show();
             }
@@ -253,7 +284,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             return;
         }
 
-        // TODO: Unmanaged descriptor
         try {
             if (mapPopulationTask.isAvailable()) {
                 mMap.clear();

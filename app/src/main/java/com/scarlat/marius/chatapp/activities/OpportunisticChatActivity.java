@@ -138,6 +138,7 @@ public class OpportunisticChatActivity extends AppCompatActivity {
 
         /* Init communication channel */
         connection = new Connection(getApplicationContext(), "OpportunisticChannelDemo");
+        connection.register();
         connection.notifyFriendsChanged();
     }
 
@@ -239,6 +240,8 @@ public class OpportunisticChatActivity extends AppCompatActivity {
 
                         /* Send finish message to the destination */
                         connection.forward(friendId, Constants.FINISH_MESSAGE);
+
+                        connection.unregister();
 
                         /* Save messages */
                         SqlLiteDatabase.saveMessages(OpportunisticChatActivity.this, friendId, messages);

@@ -77,6 +77,8 @@
                 android:enabled="false"
                 android:hint="@string/status"
                 android:inputType="textCapSentences|textAutoCorrect|textMultiLine"
+                android:maxLength="256"
+                android:maxLines="2"
                 android:textAlignment="viewStart"
                 android:textColor="#888"
                 android:textSize="16sp"

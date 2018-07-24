@@ -22,11 +22,10 @@
 
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/messageSwipeRefreshLayout"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
 
         android:layout_height="0dp"
         android:layout_marginBottom="8dp"
-        android:layout_marginTop="0dp"
         app:layout_constraintBottom_toTopOf="@+id/sendMessageLinearLayout"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -60,11 +59,12 @@
 
         <ImageButton
             android:id="@+id/attachImageButton"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
             android:layout_marginEnd="2dp"
             android:layout_marginStart="2dp"
             android:layout_weight="1"
+            android:adjustViewBounds="true"
             android:background="@android:color/transparent"
             android:scaleType="fitCenter"
             app:srcCompat="@drawable/attach_button"/>
@@ -79,17 +79,19 @@
             android:background="@android:color/transparent"
             android:ems="10"
             android:hint="Type a message"
-            android:inputType="textCapSentences"
+            android:inputType="textCapSentences|textMultiLine"
+            android:maxHeight="40dp"
             android:padding="5dp"
             android:textAlignment="textStart"/>
 
         <ImageButton
             android:id="@+id/sendImageButton"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
             android:layout_marginEnd="2dp"
             android:layout_marginStart="2dp"
             android:layout_weight="1"
+            android:adjustViewBounds="true"
             android:background="@android:color/transparent"
             android:scaleType="fitCenter"
             app:srcCompat="@drawable/send_button"/>

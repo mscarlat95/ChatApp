@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,6 +14,7 @@ import android.widget.TextView;
 import com.scarlat.marius.chatapp.R;
 import com.scarlat.marius.chatapp.activities.OpportunisticChatActivity;
 import com.scarlat.marius.chatapp.general.Constants;
+import com.scarlat.marius.chatapp.general.DateTimeUtil;
 import com.scarlat.marius.chatapp.model.Friend;
 import com.scarlat.marius.chatapp.storage.SharedPref;
 
@@ -62,7 +62,7 @@ public class InRangeFriendsAdapter extends RecyclerView.Adapter<InRangeFriendsAd
         } else {
             holder.getFullNameTextView().setText(friendName);
         }
-        holder.getDateTextView().setText( "Last seen: " + DateFormat.format("HH:mm:ss", lastSeen));
+        holder.getDateTextView().setText( "Last seen: " + DateTimeUtil.getTimeAgo(lastSeen));
 
         /* Start chat */
         holder.getRootView().setOnClickListener(new View.OnClickListener() {

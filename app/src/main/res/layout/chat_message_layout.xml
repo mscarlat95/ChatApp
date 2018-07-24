@@ -36,8 +36,8 @@
         android:layout_marginTop="4dp"
         android:layout_toEndOf="@+id/profileCircleImageView"
         android:background="@drawable/user_message_layout"
-        android:hint="@string/message_content"
         android:padding="5dp"
+        android:hint="@string/message_content"
         android:textAlignment="center"
         android:textColor="#eee"
         android:textSize="14sp"/>

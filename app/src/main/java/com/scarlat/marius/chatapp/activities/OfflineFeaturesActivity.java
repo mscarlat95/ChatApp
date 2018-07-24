@@ -41,6 +41,9 @@ public class OfflineFeaturesActivity extends AppCompatActivity {
     private List<Friend> inRangeFriends;
     private InRangeFriendsAdapter adapter;
 
+
+    private Connection connection;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.d(TAG, "onCreate: Method was invoked !");
@@ -65,9 +68,11 @@ public class OfflineFeaturesActivity extends AppCompatActivity {
         inRangeUsersRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         inRangeUsersRecyclerView.setAdapter(adapter);
 
-        Connection conn = new Connection(this, "OpportunisticChannelDemo");
-        conn.register();
-        conn.notifyFriendsChanged();
+
+        /* Init opportunistic channel */
+        connection = new Connection(this, "OpportunisticChannelDemo");
+        connection.register();
+        connection.notifyFriendsChanged();
 
 
         /* Check if there are recent discovered friends */
@@ -148,6 +153,13 @@ public class OfflineFeaturesActivity extends AppCompatActivity {
         super.onPause();
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        connection.unregister();
+    }
+
     private void addFilters() {
         Log.d(TAG, "addFilters: Method was invoked!");
         IntentFilter filters = new IntentFilter();
@@ -187,9 +199,6 @@ public class OfflineFeaturesActivity extends AppCompatActivity {
                             Log.d(TAG, "onReceive: Broadcast receiver retrieve unknown action: " + action);
                             break;
                     }
-
-//                    String id = intent.getStringExtra(Constants.USER_ID);
-//                    Toast.makeText(OfflineFeaturesActivity.this, id, Toast.LENGTH_SHORT).show();
                 }
             };
         }
@@ -238,8 +247,5 @@ public class OfflineFeaturesActivity extends AppCompatActivity {
         Log.d(TAG, "messageNotify: From = "  + friendId + " > " + friendName);
         Log.d(TAG, "messageNotify: Message = " + message);
         Log.d(TAG, "messageNotify: Timestamp = " + timestamp);
-
-//        Toast.makeText(this, "You have received a new message from "
-//                + friendName + " [" + friendId + "]", Toast.LENGTH_SHORT).show();
     }
 }

@@ -105,6 +105,7 @@ public class Constants {
     public static final String USER_LONGITUDE = "longitude";
     public static final String USER_LATITUDE = "latitude";
     public static final String USER_LOCATION = "location";
+    public static final String LOCATION_PROVIDER = "location_provider";
 
     /* Hyccups Install */
     public static final String URL_HYCCUPS_HOME = "http://www.smartrdi.net/2017/11/08/getting-started";
