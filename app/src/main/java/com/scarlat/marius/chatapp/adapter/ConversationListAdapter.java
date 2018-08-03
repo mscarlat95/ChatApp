@@ -67,13 +67,20 @@ public class ConversationListAdapter extends RecyclerView.Adapter<ConversationLi
         return new ConversationViewHolder(view);
     }
 
+
     @Override
     public void onBindViewHolder(@NonNull final ConversationViewHolder holder, final int position) {
         Log.d(TAG, "onBindViewHolder: Method was invoked!");
 
-        holder.getRootView().setVisibility(View.INVISIBLE);
+        setupUserInfo(holder, position);
+    }
+
+
+    private void setupUserInfo(final ConversationViewHolder holder, final int position) {
 
         final String friendID = conversations.get(position).getFriendID();
+
+        holder.getRootView().setVisibility(View.INVISIBLE);
 
         /* Get friend information */
         rootDatabaseRef.child(Constants.USERS_TABLE).child(friendID).addValueEventListener(new ValueEventListener() {
@@ -84,8 +91,8 @@ public class ConversationListAdapter extends RecyclerView.Adapter<ConversationLi
                 if (dataSnapshot.exists()) {
                     Log.d(TAG, "onDataChange: Friend information: " + dataSnapshot.toString());
                     if (! ((Activity) context).isDestroyed()) {
-                        final String fullname = dataSnapshot.child(Constants.FULLNAME).getValue().toString();
-                        final String profileImageUrl = dataSnapshot.child(Constants.PROFILE_IMAGE).getValue().toString();
+                        final String userFullName  = dataSnapshot.child(Constants.FULLNAME).getValue().toString();
+                        final String userProfileImageUrl = dataSnapshot.child(Constants.PROFILE_IMAGE).getValue().toString();
 
                         if (dataSnapshot.hasChild(Constants.ONLINE)) {
                             boolean online = Boolean.valueOf(dataSnapshot.child(Constants.ONLINE).getValue().toString());
@@ -97,12 +104,14 @@ public class ConversationListAdapter extends RecyclerView.Adapter<ConversationLi
                             }
                         }
 
-                        holder.getFullNameTextView().setText(fullname);
+                        holder.getFullNameTextView().setText(userFullName);
                         Glide.with(context)
-                                .load(profileImageUrl)
+                                .load(userProfileImageUrl)
                                 .into(holder.getAvatarCircleImageView());
 
                         holder.getRootView().setVisibility(View.VISIBLE);
+
+                        setLastMessage(holder, position, userFullName);
                     }
                 }
             }
@@ -113,6 +122,21 @@ public class ConversationListAdapter extends RecyclerView.Adapter<ConversationLi
             }
         });
 
+        /* Add listener */
+        holder.getRootView().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(context, ChatActivity.class);
+                intent.putExtra(Constants.USER_ID, friendID);
+                context.startActivity(intent);
+            }
+        });
+
+    }
+
+    private void setLastMessage(final ConversationViewHolder holder, final int position, final String userFullName) {
+        final String friendID = conversations.get(position).getFriendID();
+
         Query lastMessageQuery = rootDatabaseRef.child(Constants.MESSAGES_TABLE).child(userID).child(friendID).limitToLast(1);
 
         /* Display last message */
@@ -122,13 +146,21 @@ public class ConversationListAdapter extends RecyclerView.Adapter<ConversationLi
                 if (dataSnapshot.exists()) {
                     Log.d(TAG, "onChildAdded: Last message: " + dataSnapshot.toString());
 
+                    String from = dataSnapshot.child(Constants.SOURCE).getValue().toString();
                     String type = dataSnapshot.child(Constants.MESSAGE_TYPE).getValue().toString();
                     String message = dataSnapshot.child(Constants.MESSAGE_CONTENT).getValue().toString();
 
                     switch (type) {
                         case Constants.MESSAGE_TYPE_TEXT:
                             holder.getLastMessageTextView().setVisibility(View.VISIBLE);
-                            holder.getLastMessageTextView().setText(message);
+
+                            if (from.equals(FirebaseAuth.getInstance().getUid())) {
+                                holder.getLastMessageTextView().setText("You: " + message);
+                            } else {
+
+                                final String userSurname = userFullName.split(" ")[0];
+                                holder.getLastMessageTextView().setText(userSurname + ": " + message);
+                            }
 
                             break;
                         case Constants.MESSAGE_TYPE_IMAGE:
@@ -166,16 +198,8 @@ public class ConversationListAdapter extends RecyclerView.Adapter<ConversationLi
             }
         });
 
-        /* Add listener */
-        holder.getRootView().setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(context, ChatActivity.class);
-                intent.putExtra(Constants.USER_ID, friendID);
-                context.startActivity(intent);
-            }
-        });
     }
+
 
     @Override
     public int getItemCount() {

@@ -4,10 +4,10 @@
                 android:id="@+id/chatMessageLayout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingBottom="8dp"
-                android:paddingEnd="5dp"
-                android:paddingStart="5dp"
-                android:paddingTop="8dp">
+                android:paddingBottom="4dp"
+                android:paddingEnd="3dp"
+                android:paddingStart="3dp"
+                android:paddingTop="4dp">
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/profileCircleImageView"

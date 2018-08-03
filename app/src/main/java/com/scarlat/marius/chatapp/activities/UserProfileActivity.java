@@ -66,7 +66,6 @@ public class UserProfileActivity extends AppCompatActivity {
             } 
         }
 
-
         userID = FirebaseAuth.getInstance().getUid();
         Log.d(TAG, "onCreate: Friend Id = " + friendID);
         Log.d(TAG, "onCreate: User Id = " + userID);
@@ -97,7 +96,6 @@ public class UserProfileActivity extends AppCompatActivity {
             checkUsersRelationship();
         }
     }
-
 
     private class FriendRequestsListener implements View.OnClickListener {
         @Override

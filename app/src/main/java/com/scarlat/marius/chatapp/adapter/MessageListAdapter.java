@@ -3,9 +3,9 @@ package com.scarlat.marius.chatapp.adapter;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.DateFormat;
@@ -24,6 +24,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.scarlat.marius.chatapp.R;
+import com.scarlat.marius.chatapp.activities.DisplayImageActivity;
 import com.scarlat.marius.chatapp.general.Constants;
 import com.scarlat.marius.chatapp.model.Message;
 
@@ -113,6 +114,19 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
                             .load(content)
                             .apply(RequestOptions.placeholderOf(R.drawable.loading))
                             .into(holder.getMessageImageView());
+
+                    /* Display image in other activity */
+                    holder.getMessageImageView().setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Intent intent = new Intent(context, DisplayImageActivity.class);
+
+                            intent.putExtra(Constants.IMAGE_URI, content);
+                            context.startActivity(intent);
+                        }
+                    });
+
+
                 }
                 break;
             default:
@@ -158,42 +172,6 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
                 } else {
                     timestampTextView.animate().alpha(0.0f).setDuration(500);
                 }
-            }
-        }
-
-        class ImageListener implements View.OnClickListener {
-            @Override
-            public void onClick(final View v) {
-                if (! (v instanceof  ImageView)) {
-                    return;
-                }
-
-                final Dialog dialog = new Dialog(context);
-                dialog.setContentView(R.layout.user_image_layout);
-
-                final int width = ViewGroup.LayoutParams.MATCH_PARENT;
-                final int height = ViewGroup.LayoutParams.WRAP_CONTENT;
-                dialog.getWindow().setLayout(width, height);
-
-                ImageView profileImage = (ImageView) dialog.findViewById(R.id.profileImageView);
-                profileImage.setImageDrawable(((ImageView) v).getDrawable());
-
-
-                try {
-                    ((Activity) context).findViewById(R.id.chatMainLayout).setVisibility(View.INVISIBLE);
-                } catch (Exception e) {}
-
-                dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
-                    @Override
-                    public void onCancel(DialogInterface dialog) {
-                        try {
-                            ((Activity) context).findViewById(R.id.chatMainLayout).setVisibility(View.VISIBLE);
-                        } catch (Exception e) {}
-
-                        new DisplayInfoListener().onClick(v);
-                    }
-                });
-                dialog.show();
             }
         }
 
@@ -247,7 +225,6 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
             /* Setup adapters */
             messageTextView.setOnLongClickListener(new CopyInfoListener());
             messageTextView.setOnClickListener(new DisplayInfoListener());
-            messageImageView.setOnClickListener(new ImageListener());
         }
     }
 }

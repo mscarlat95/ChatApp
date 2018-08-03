@@ -135,7 +135,7 @@ public class ChatActivity extends AppCompatActivity {
         messageSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                if (messages.size() == 0) {
+                if (messages.size() <= 0) {
                     messageSwipeRefreshLayout.setRefreshing(false);
                     return ;
                 }
@@ -145,6 +145,7 @@ public class ChatActivity extends AppCompatActivity {
 
                 messages.clear();
                 messageSet = new HashMap<Long, String>();
+
                 displayMessages();
             }
         });
@@ -292,7 +293,6 @@ public class ChatActivity extends AppCompatActivity {
                     .limitToLast(currentPage * Constants.MAX_LOAD_MESSAGES);
         }
 
-
         query.addChildEventListener(new ChildEventListener() {
                     @Override
                     public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
@@ -304,10 +304,9 @@ public class ChatActivity extends AppCompatActivity {
                         }
 
                         messages.add(message);
-                        adapter.notifyItemInserted(messages.size() - 1);
+                        adapter.notifyDataSetChanged();
 
                         int position = Math.max(0, messages.size() - currentPage * Constants.MAX_LOAD_MESSAGES - 1);
-
                         messagesRecylerView.smoothScrollToPosition(position);
                         messageSwipeRefreshLayout.setRefreshing(false);
                     }

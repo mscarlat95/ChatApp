@@ -29,7 +29,6 @@ public class UserLocationService extends Service {
 
     private String locationProvider = Constants.UNSET;
 
-
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {

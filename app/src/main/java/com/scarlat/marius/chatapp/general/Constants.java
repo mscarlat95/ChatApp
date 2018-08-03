@@ -115,4 +115,7 @@ public class Constants {
 
     public static final String HIDE_INSTALL = "hide_install";
 
+
+    public static final String IMAGE_URI = "image_uri";
+
 }

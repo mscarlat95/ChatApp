@@ -80,9 +80,12 @@ dependencies {
     testCompile "org.mockito:mockito-core:+"
     androidTestCompile "org.mockito:mockito-android:+"
 
-
     /* Opportunistic communication via Hyccups */
     compile files('libs/opportunistic-layer-5.1.jar')
+
+
+    /* Pinch image view */
+    compile 'com.github.chrisbanes:PhotoView:2.1.4'
 }
 
 apply plugin: 'com.google.gms.google-services'

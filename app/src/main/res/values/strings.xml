@@ -8,7 +8,7 @@
 
     <!--Authorities-->
     <string name="authorities">com.marius.scarlat.admin.chatapp</string>
-cha
+    cha
     <!--View resources-->
     <string name="user_register_message">Don\'t have an account, yet? Please, sign up!</string>
     <string name="email_hint">Email Address</string>

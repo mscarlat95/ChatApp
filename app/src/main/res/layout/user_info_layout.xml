@@ -34,8 +34,12 @@
         android:layout_height="wrap_content"
         android:layout_alignStart="@+id/fullNameTextView"
         android:layout_below="@+id/fullNameTextView"
+        android:layout_marginEnd="10dp"
         android:layout_marginTop="10dp"
-        android:hint="@string/status"/>
+        android:ellipsize="end"
+        android:hint="@string/status"
+        android:maxLength="64"
+        android:maxLines="1"/>
 
     <ImageView
         android:id="@+id/onlineImageView"

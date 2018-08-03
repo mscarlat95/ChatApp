@@ -3,8 +3,10 @@ package com.scarlat.marius.chatapp.tasks;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.util.Log;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -17,6 +19,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.scarlat.marius.chatapp.R;
+import com.scarlat.marius.chatapp.activities.DisplayImageActivity;
 import com.scarlat.marius.chatapp.general.Constants;
 import com.scarlat.marius.chatapp.model.CustomProgressDialog;
 
@@ -94,6 +97,14 @@ public class GetUserInfoTask {
                             .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.loading))
                             .load(profileImage)
                             .into(avatarCircleImageView);
+                    avatarCircleImageView.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Intent intent = new Intent(context, DisplayImageActivity.class);
+                            intent.putExtra(Constants.IMAGE_URI, profileImage);
+                            context.startActivity(intent);
+                        }
+                    });
 
                 } else {
                     Log.d(TAG, "onDataChange: Cannot find snapshot of " + mAuth.getUid());
