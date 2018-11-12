@@ -65,22 +65,11 @@ public class ChatActivity extends AppCompatActivity {
     private MessageListAdapter adapter;
     private List<Message> messages;
 
-    private HashMap<Long, String> messageSet = new HashMap<>();
-
     /* Messages pagination */
     private int currentPage =  0;
     private boolean firstContact = true;
 
-    private boolean isDuplicate (Message message) {
-        if (messageSet.containsKey(message.getTimestamp())) {
-            if (messageSet.get(message.getTimestamp()).equals(message.getMessage())) {
-                return true;
-            }
-        }
-
-        messageSet.put(message.getTimestamp(), message.getMessage());
-        return false;
-    }
+    private int currentMessagePointer = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,6 +89,7 @@ public class ChatActivity extends AppCompatActivity {
 
         /* Init message list */
         messages = new ArrayList<>();
+        currentMessagePointer = messages.size() - 1;
 
         /* Setup firebase database */
         userID = FirebaseAuth.getInstance().getUid();
@@ -132,21 +122,36 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
 
+        messagesRecylerView.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+            @Override
+
+            public void onLayoutChange(View v, int left, int top, int right,int bottom, int oldLeft,
+                                       int oldTop,int oldRight, int oldBottom) {
+                messagesRecylerView.scrollToPosition(currentMessagePointer);
+            }
+        });
+
         messageSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                if (messages.size() <= 0) {
+
+                if (messages.size() == 0) {
                     messageSwipeRefreshLayout.setRefreshing(false);
-                    return ;
+                    return;
                 }
 
                 if (currentPage == 0) { currentPage = 1; }
                 currentPage ++;
 
                 messages.clear();
-                messageSet = new HashMap<Long, String>();
-
                 displayMessages();
+            }
+        });
+
+        messageEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                currentMessagePointer = messages.size() - 1;
             }
         });
 
@@ -298,21 +303,26 @@ public class ChatActivity extends AppCompatActivity {
                     public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                         Log.d(TAG, "Load messages onChildAdded: " + dataSnapshot.toString());
                         Message message = dataSnapshot.getValue(Message.class);
+                        message.setId(dataSnapshot.getKey());
 
-                        if (isDuplicate(message)) {
-                            return;
+                        if (!messages.contains(message)) {
+                            messages.add(message);
                         }
 
-                        messages.add(message);
-                        adapter.notifyDataSetChanged();
+                        currentMessagePointer = Math.max(0, messages.size() - currentPage * Constants.MAX_LOAD_MESSAGES - 1);
 
-                        int position = Math.max(0, messages.size() - currentPage * Constants.MAX_LOAD_MESSAGES - 1);
-                        messagesRecylerView.smoothScrollToPosition(position);
-                        messageSwipeRefreshLayout.setRefreshing(false);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                messagesRecylerView.getRecycledViewPool().clear();
+                                adapter.notifyDataSetChanged();
+                                messageSwipeRefreshLayout.setRefreshing(false);
+                            }
+                        });
                     }
 
                     @Override
-                    public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) { }
+                    public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {}
 
                     @Override
                     public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {}

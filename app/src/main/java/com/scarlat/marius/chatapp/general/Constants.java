@@ -38,7 +38,7 @@ public class Constants {
     public static final String MESSAGE_TYPE_TEXT = "text";
     public static final String MESSAGE_TYPE_IMAGE= "image";
 
-    public static final int MAX_LOAD_MESSAGES = 10;
+    public static final int MAX_LOAD_MESSAGES = 8;
 
     /* Profile picture resize */
     public static final int MAX_WIDTH = 600;

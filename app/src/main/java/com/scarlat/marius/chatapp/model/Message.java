@@ -5,6 +5,7 @@ public class Message {
 
     private static final String TAG = "Message";
 
+    private String id;
     private String message;
     private String type;
     private long timestamp;
@@ -37,5 +38,22 @@ public class Message {
     public String getFrom() { return from; }
     public void setFrom(String from) { this.from = from; }
 
+    public void setId(String id) {
+        this.id = id;
+    }
 
+    public String getId() {
+        return id;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Message) {
+            if (((Message) obj).getId().equals(this.getId())) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

@@ -25,7 +25,9 @@
         android:layout_width="0dp"
 
         android:layout_height="0dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginBottom="3dp"
+        android:background="@drawable/rounded_bg"
+        android:padding="3dp"
         app:layout_constraintBottom_toTopOf="@+id/sendMessageLinearLayout"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -40,7 +42,7 @@
             android:layout_marginBottom="8dp"
             android:layout_marginLeft="0dp"
             android:layout_marginRight="0dp"
-            android:background="#aaeeeeee"/>
+            />
 
     </android.support.v4.widget.SwipeRefreshLayout>
 
@@ -63,7 +65,7 @@
             android:layout_height="32dp"
             android:layout_marginEnd="2dp"
             android:layout_marginStart="2dp"
-            android:layout_weight="1"
+            android:layout_weight="0.8"
             android:adjustViewBounds="true"
             android:background="@android:color/transparent"
             android:scaleType="fitCenter"
@@ -71,18 +73,19 @@
 
         <EditText
             android:id="@+id/messageEditText"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="2dp"
             android:layout_marginStart="2dp"
-            android:layout_weight="8"
-            android:background="@android:color/transparent"
+            android:layout_weight="8.4"
+            android:background="@drawable/rounded_bg"
             android:ems="10"
             android:hint="Type a message"
             android:inputType="textCapSentences|textMultiLine"
             android:maxHeight="40dp"
-            android:padding="5dp"
-            android:textAlignment="textStart"/>
+            android:padding="8dp"
+            android:textAlignment="textStart"
+            android:textSize="16sp"/>
 
         <ImageButton
             android:id="@+id/sendImageButton"
@@ -90,7 +93,7 @@
             android:layout_height="32dp"
             android:layout_marginEnd="2dp"
             android:layout_marginStart="2dp"
-            android:layout_weight="1"
+            android:layout_weight="0.8"
             android:adjustViewBounds="true"
             android:background="@android:color/transparent"
             android:scaleType="fitCenter"
